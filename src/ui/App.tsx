@@ -80,6 +80,12 @@ export function App() {
           </nav>
         </div>
       </header>
+      <div className="banner" role="note">
+        <div className="wrap">
+          <strong>Prototype.</strong> The rules have not yet been reviewed by a licensed clinician. Do not rely on this site for medical decisions. In an
+          emergency, call 911.
+        </div>
+      </div>
       <main>
         <div className="wrap">{body}</div>
       </main>

@@ -119,3 +119,5 @@ pre.trace { background: var(--soft); border: 1px solid var(--line); border-radiu
   header.site, footer.site, .no-print { display: none !important; }
   main { padding: 0; }
 }
+
+.banner { background: var(--soft); border-bottom: 1px solid var(--line); font-size: 0.875rem; padding: 0.5rem 0; }

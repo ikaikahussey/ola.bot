@@ -78,6 +78,11 @@ npm run test:e2e     # Playwright end-to-end tests (builds and starts the server
 npm run build && npm start   # production: serves dist/ and the API on $PORT (default 8787)
 ```
 
+## Deploying
+
+- **Any Node host:** `npm ci && npm run build && npm start`. Serves the UI and API on `$PORT`. Set `LOG_DIR` to a persistent directory to keep consented logs.
+- **Vercel:** `vercel.json` runs `npm run build:vercel`, which writes a [Build Output API](https://vercel.com/docs/build-output-api/v3) bundle: static UI plus one Node function for `/api/*`. Vercel has no persistent disk, so opt-in outcome logging is turned off there (`/api/health` reports `logging: false` and the UI hides the consent box).
+
 ## Project layout
 
 ```

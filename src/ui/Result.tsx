@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CARE_LEVEL_LABEL, ED_MAP_URL, needsProvider, specialtyForLevel } from "../engine/careLevels";
 import { evaluate, type Evaluation } from "../engine/evaluate";
 import { formatTimestamp, logPayload, type Session } from "../engine/session";
@@ -355,6 +355,13 @@ function ShareAndLog({ rule, ev, session, summary }: { rule: Rule; ev: Evaluatio
   const [consent, setConsent] = useState(false);
   const [logState, setLogState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [copied, setCopied] = useState(false);
+  const [loggingEnabled, setLoggingEnabled] = useState<boolean | null>(null);
+  useEffect(() => {
+    fetch("/api/health")
+      .then((r) => r.json())
+      .then((b: { logging?: boolean }) => setLoggingEnabled(b.logging !== false))
+      .catch(() => setLoggingEnabled(false));
+  }, []);
   const send = async () => {
     setLogState("sending");
     try {
@@ -378,6 +385,8 @@ function ShareAndLog({ rule, ev, session, summary }: { rule: Rule; ev: Evaluatio
           {copied ? "Copied" : "Copy summary"}
         </button>
       </div>
+      {loggingEnabled === false && <p className="small sub">Outcome logging is turned off on this deployment. Nothing from this session is stored.</p>}
+      {loggingEnabled && (
       <div className="box">
         <h3>Help improve these rules (optional)</h3>
         <label className="row" style={{ alignItems: "flex-start", flexWrap: "nowrap" }}>
@@ -392,6 +401,7 @@ function ShareAndLog({ rule, ev, session, summary }: { rule: Rule; ev: Evaluatio
         </button>
         {logState === "error" && <p className="small" style={{ color: "var(--alert)" }}>Could not store the record. Nothing was saved.</p>}
       </div>
+      )}
     </div>
   );
 }

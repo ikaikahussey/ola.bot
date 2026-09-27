@@ -49,13 +49,16 @@ export interface AppOptions {
   staticDir?: string;
   fetcher?: Fetcher;
   logDir?: string;
+  /** False on hosts without persistent storage; /api/log then returns 503. */
+  logging?: boolean;
 }
 
 export function createHandler(opts: AppOptions = {}) {
   return async (req: IncomingMessage, res: ServerResponse) => {
     const url = new URL(req.url ?? "/", "http://localhost");
     try {
-      if (url.pathname === "/api/health") return send(res, 200, { ok: true });
+      const logging = opts.logging ?? true;
+      if (url.pathname === "/api/health") return send(res, 200, { ok: true, logging });
 
       if (url.pathname === "/api/providers" && req.method === "GET") {
         let zip = url.searchParams.get("zip") ?? "";
@@ -74,6 +77,7 @@ export function createHandler(opts: AppOptions = {}) {
       }
 
       if (url.pathname === "/api/log" && req.method === "POST") {
+        if (!logging) throw new HttpError(503, "Outcome logging is not enabled on this deployment.");
         const entry = validateLogEntry(await readBody(req));
         await writeLog(entry, opts.logDir);
         return send(res, 201, { stored: true });
