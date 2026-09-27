@@ -1,0 +1,182 @@
+{
+  "rule_id": "stop_bang",
+  "name": "STOP-Bang Questionnaire",
+  "short_name": "STOP-Bang",
+  "assessment_title": "Sleep apnea check",
+  "condition": "Snoring or possible sleep apnea",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": 2008,
+  "citations": [
+    {
+      "text": "Chung F, Yegneswaran B, Liao P, et al. STOP questionnaire: a tool to screen patients for obstructive sleep apnea. Anesthesiology. 2008;108(5):812-821.",
+      "pmid": "18431116",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/18431116/"
+    }
+  ],
+  "validated_population": "Adult surgical patients at preoperative clinics; later validated in sleep clinic and general populations.",
+  "license_note": "STOP-Bang is copyrighted by the University Health Network (Toronto). Terms of use are published at stopbang.ca; verify permission before production deployment.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [
+    {
+      "id": "drowsy_driving",
+      "question": "Have you fallen asleep while driving, or nearly caused a crash from sleepiness, in the past month?",
+      "help": "Drowsy driving is dangerous. Do not drive until you have been evaluated.",
+      "action": "urgent_care_today",
+      "message": "Do not drive until evaluated."
+    }
+  ],
+  "items": [
+    {
+      "id": "snoring",
+      "type": "yes_no",
+      "question": "Do you snore loudly (louder than talking, or loud enough to be heard through a closed door)?",
+      "help": "Ask a bed partner or family member if you are not sure.",
+      "trace_label": "S: Loud snoring",
+      "points_if_yes": 1
+    },
+    {
+      "id": "tired",
+      "type": "yes_no",
+      "question": "Do you often feel tired, fatigued, or sleepy during the daytime?",
+      "help": "For example, falling asleep while reading or watching TV.",
+      "trace_label": "T: Daytime tiredness",
+      "points_if_yes": 1
+    },
+    {
+      "id": "observed",
+      "type": "yes_no",
+      "question": "Has anyone seen you stop breathing, or choke or gasp, during your sleep?",
+      "help": "Ask a bed partner or family member.",
+      "trace_label": "O: Observed stopped breathing",
+      "points_if_yes": 1
+    },
+    {
+      "id": "pressure",
+      "type": "yes_no",
+      "question": "Do you have, or are you being treated for, high blood pressure?",
+      "help": "Answer yes if a clinician has told you that you have high blood pressure.",
+      "trace_label": "P: High blood pressure",
+      "points_if_yes": 1
+    },
+    {
+      "id": "bmi",
+      "type": "yes_no",
+      "question": "Is your body mass index (BMI) more than 35?",
+      "help": "BMI 35 is about 205 lb at 5'4\", 225 lb at 5'7\", 245 lb at 5'10\", or 265 lb at 6'1\".",
+      "trace_label": "B: BMI over 35",
+      "points_if_yes": 1
+    },
+    {
+      "id": "age",
+      "type": "yes_no",
+      "question": "Are you older than 50?",
+      "help": "Your age in years.",
+      "trace_label": "A: Age over 50",
+      "points_if_yes": 1
+    },
+    {
+      "id": "neck",
+      "type": "yes_no",
+      "question": "Is your neck size more than 16 inches (40 cm)?",
+      "help": "Measure around the neck at the Adam's apple, or use your shirt collar size.",
+      "trace_label": "N: Neck over 16 in (40 cm)",
+      "points_if_yes": 1
+    },
+    {
+      "id": "male",
+      "type": "yes_no",
+      "question": "Is your sex assigned at birth male?",
+      "help": "The questionnaire was validated using sex assigned at birth.",
+      "trace_label": "G: Male sex",
+      "points_if_yes": 1
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "threshold_text": "0–2 low risk; 3–4 intermediate risk; 5–8 high risk of moderate-to-severe obstructive sleep apnea.",
+    "bands": [
+      {
+        "min": 0,
+        "max": 2,
+        "result": "low"
+      },
+      {
+        "min": 3,
+        "max": 4,
+        "result": "intermediate"
+      },
+      {
+        "min": 5,
+        "max": 8,
+        "result": "high"
+      }
+    ]
+  },
+  "results": {
+    "low": {
+      "label": "Low risk of sleep apnea",
+      "risk": "low",
+      "interpretation": "Your score suggests a low risk of moderate-to-severe obstructive sleep apnea.",
+      "recommendation": "No sleep testing needed based on this score.",
+      "care": {
+        "level": "self_care",
+        "within": "No visit needed for this concern",
+        "where_detail": "Home care. Book a primary care visit if daytime sleepiness continues.",
+        "ed_redirect": [
+          "Fell asleep while driving: stop driving until evaluated",
+          "Chest pain or trouble breathing: call 911"
+        ],
+        "self_care": [
+          "Keep a regular sleep schedule of 7 or more hours.",
+          "Avoid alcohol within 3 hours of bedtime."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "intermediate": {
+      "label": "Intermediate risk of sleep apnea",
+      "risk": "moderate",
+      "interpretation": "Your score suggests an intermediate risk of obstructive sleep apnea.",
+      "recommendation": "Book a primary care visit to discuss whether a sleep study is needed.",
+      "care": {
+        "level": "primary_care",
+        "within": "Within 4 weeks",
+        "where_detail": "Primary care clinic.",
+        "ed_redirect": [
+          "Fell asleep while driving: stop driving until evaluated",
+          "Chest pain or trouble breathing: call 911"
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "high": {
+      "label": "High risk of sleep apnea",
+      "risk": "high",
+      "interpretation": "Your score suggests a high risk of moderate-to-severe obstructive sleep apnea.",
+      "recommendation": "A sleep study is advised. Book a primary care or sleep medicine visit.",
+      "care": {
+        "level": "primary_care",
+        "within": "Within 2 weeks",
+        "where_detail": "Primary care or a sleep medicine clinic.",
+        "ed_redirect": [
+          "Fell asleep while driving: stop driving until evaluated",
+          "Chest pain or trouble breathing: call 911"
+        ],
+        "self_care": [
+          "Avoid driving when drowsy."
+        ],
+        "finder_specialty": "sleep_medicine"
+      }
+    }
+  }
+}

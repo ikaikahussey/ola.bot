@@ -1,0 +1,338 @@
+{
+  "rule_id": "start_back",
+  "name": "Keele STarT Back Screening Tool",
+  "short_name": "STarT Back",
+  "assessment_title": "Back pain assessment",
+  "condition": "Low back pain",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": 2008,
+  "citations": [
+    {
+      "text": "Hill JC, Dunn KM, Lewis M, et al. A primary care back pain screening tool: identifying patient subgroups for initial treatment. Arthritis Rheum. 2008;59(5):632-641.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=%22A%20primary%20care%20back%20pain%20screening%20tool%3A%20identifying%20patient%20subgroups%20for%20initial%20treatment%22%5BTitle%5D"
+    }
+  ],
+  "validated_population": "Adults with low back pain in primary care. Self-administered.",
+  "license_note": "© Keele University. Free to use for clinical care; wording must not be changed; commercial use requires a license from Keele University. Verify terms at keele.ac.uk/sbst before deployment.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [
+    {
+      "id": "cauda_equina",
+      "question": "Do you have numbness around the groin or buttocks, or new trouble controlling your bladder or bowels?",
+      "help": "These can be signs of pressure on the nerves at the base of the spine (cauda equina), which is an emergency.",
+      "action": "go_to_ed"
+    },
+    {
+      "id": "leg_weakness",
+      "question": "Do you have new weakness in a leg, or a foot that drags or slaps when you walk?",
+      "help": "New weakness can mean nerve compression.",
+      "action": "go_to_ed"
+    },
+    {
+      "id": "infection_cancer",
+      "question": "With this back pain, do you have a fever, a history of cancer, recent unexplained weight loss, or injected drug use?",
+      "help": "These increase the chance of a serious cause.",
+      "action": "urgent_care_today"
+    }
+  ],
+  "items": [
+    {
+      "id": "leg",
+      "type": "choice",
+      "question": "Do you agree or disagree: \"My back pain has spread down my leg(s) at some time in the last 2 weeks\"",
+      "help": "Pain that travels below the buttock.",
+      "trace_label": "Q1 Pain spread down leg",
+      "options": [
+        {
+          "value": "disagree",
+          "label": "Disagree",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "agree",
+          "label": "Agree",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "shoulder_neck",
+      "type": "choice",
+      "question": "Do you agree or disagree: \"I have had pain in the shoulder or neck at some time in the last 2 weeks\"",
+      "help": "Any shoulder or neck pain.",
+      "trace_label": "Q2 Shoulder or neck pain",
+      "options": [
+        {
+          "value": "disagree",
+          "label": "Disagree",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "agree",
+          "label": "Agree",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "walk",
+      "type": "choice",
+      "question": "Do you agree or disagree: \"I have only walked short distances because of my back pain\"",
+      "help": "In the last 2 weeks.",
+      "trace_label": "Q3 Walked only short distances",
+      "options": [
+        {
+          "value": "disagree",
+          "label": "Disagree",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "agree",
+          "label": "Agree",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "dressed",
+      "type": "choice",
+      "question": "Do you agree or disagree: \"In the last 2 weeks, I have dressed more slowly than usual because of back pain\"",
+      "help": "Getting dressed took longer.",
+      "trace_label": "Q4 Dressed more slowly",
+      "options": [
+        {
+          "value": "disagree",
+          "label": "Disagree",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "agree",
+          "label": "Agree",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "unsafe",
+      "type": "choice",
+      "question": "Do you agree or disagree: \"It's not really safe for a person with a condition like mine to be physically active\"",
+      "help": "Your own belief about activity.",
+      "trace_label": "Q5 Activity not safe",
+      "options": [
+        {
+          "value": "disagree",
+          "label": "Disagree",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "agree",
+          "label": "Agree",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "worry",
+      "type": "choice",
+      "question": "Do you agree or disagree: \"Worrying thoughts have been going through my mind a lot of the time\"",
+      "help": "In the last 2 weeks.",
+      "trace_label": "Q6 Worrying thoughts",
+      "options": [
+        {
+          "value": "disagree",
+          "label": "Disagree",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "agree",
+          "label": "Agree",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "terrible",
+      "type": "choice",
+      "question": "Do you agree or disagree: \"I feel that my back pain is terrible and it's never going to get any better\"",
+      "help": "Your own view of the pain.",
+      "trace_label": "Q7 Pain terrible, won't improve",
+      "options": [
+        {
+          "value": "disagree",
+          "label": "Disagree",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "agree",
+          "label": "Agree",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "enjoy",
+      "type": "choice",
+      "question": "Do you agree or disagree: \"In general I have not enjoyed all the things I used to enjoy\"",
+      "help": "In the last 2 weeks.",
+      "trace_label": "Q8 Not enjoying things",
+      "options": [
+        {
+          "value": "disagree",
+          "label": "Disagree",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "agree",
+          "label": "Agree",
+          "points": 1
+        }
+      ]
+    },
+    {
+      "id": "bothersome",
+      "type": "choice",
+      "question": "Overall, how bothersome has your back pain been in the last 2 weeks?",
+      "help": "Choose the closest answer.",
+      "trace_label": "Q9 How bothersome",
+      "options": [
+        {
+          "value": "not_at_all",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "slightly",
+          "label": "Slightly",
+          "points": 0
+        },
+        {
+          "value": "moderately",
+          "label": "Moderately",
+          "points": 0
+        },
+        {
+          "value": "very_much",
+          "label": "Very much",
+          "points": 1
+        },
+        {
+          "value": "extremely",
+          "label": "Extremely",
+          "points": 1,
+          "concerning": true
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "subscales": {
+      "psychosocial": [
+        "unsafe",
+        "worry",
+        "terrible",
+        "enjoy",
+        "bothersome"
+      ]
+    },
+    "threshold_text": "Total 0–3 = low risk. Total 4 or more: psychosocial subscale (Q5–Q9) 0–3 = medium risk; 4–5 = high risk.",
+    "bands": [
+      {
+        "min": 0,
+        "max": 3,
+        "result": "low"
+      },
+      {
+        "min": 4,
+        "max": 9,
+        "result": "high",
+        "when": {
+          "subscale": "psychosocial",
+          "gte": 4
+        }
+      },
+      {
+        "min": 4,
+        "max": 9,
+        "result": "medium"
+      }
+    ]
+  },
+  "results": {
+    "low": {
+      "label": "Low risk of long-term back problems",
+      "risk": "low",
+      "interpretation": "Your answers suggest a low risk of long-term disability from back pain. Most people in this group improve with self-care.",
+      "recommendation": "Stay active and manage pain at home.",
+      "care": {
+        "level": "self_care",
+        "within": "Self-care; primary care if not improving in 4 to 6 weeks",
+        "where_detail": "Home care. Book a primary care visit if pain is not improving after 4 to 6 weeks.",
+        "ed_redirect": [
+          "Numbness in groin/buttocks or loss of bladder or bowel control",
+          "New leg weakness",
+          "Back pain with fever"
+        ],
+        "self_care": [
+          "Keep moving; avoid bed rest.",
+          "Heat and over-the-counter pain relievers as labeled.",
+          "Return to normal activity gradually."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "medium": {
+      "label": "Medium risk of long-term back problems",
+      "risk": "moderate",
+      "interpretation": "Your answers suggest a medium risk. In the STarT Back trial, this group did better with physical therapy.",
+      "recommendation": "Book a physical therapy or primary care visit.",
+      "care": {
+        "level": "primary_care",
+        "within": "Within 2 weeks",
+        "where_detail": "Physical therapist (most U.S. states allow direct access without a referral) or primary care.",
+        "ed_redirect": [
+          "Numbness in groin/buttocks or loss of bladder or bowel control",
+          "New leg weakness",
+          "Back pain with fever"
+        ],
+        "finder_specialty": "physical_therapy"
+      }
+    },
+    "high": {
+      "label": "High risk of long-term back problems",
+      "risk": "high",
+      "interpretation": "Your answers suggest a high risk, often with worry or low mood linked to the pain. This group did better with physical therapy that also addresses thoughts and feelings about pain.",
+      "recommendation": "Book a primary care visit to arrange combined physical and psychological care.",
+      "care": {
+        "level": "primary_care",
+        "within": "Within 1 week",
+        "where_detail": "Primary care clinic, or a physical therapist trained in psychologically informed care.",
+        "ed_redirect": [
+          "Numbness in groin/buttocks or loss of bladder or bowel control",
+          "New leg weakness",
+          "Back pain with fever"
+        ],
+        "finder_specialty": "primary_care"
+      }
+    }
+  }
+}

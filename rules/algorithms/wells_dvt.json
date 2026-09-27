@@ -1,0 +1,177 @@
+{
+  "rule_id": "wells_dvt",
+  "name": "Wells Score for Deep Vein Thrombosis (modified, 2003)",
+  "short_name": "Wells DVT score",
+  "assessment_title": "Leg swelling assessment",
+  "condition": "Leg pain or swelling (possible blood clot)",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": 2003,
+  "citations": [
+    {
+      "text": "Wells PS, Anderson DR, Rodger M, et al. Evaluation of D-dimer in the diagnosis of suspected deep-vein thrombosis. N Engl J Med. 2003;349(13):1227-1235.",
+      "pmid": "14507948",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/14507948/"
+    }
+  ],
+  "validated_population": "Outpatients with suspected deep vein thrombosis of the leg.",
+  "self_report_note": "The score was validated with clinician examination. One item (whether another diagnosis is at least as likely) requires a clinician and is not asked; it is scored 0, which is the cautious choice.",
+  "license_note": "Published clinical score; not a copyrighted instrument. Question wording is original to OLA BOT.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [
+    {
+      "id": "pe",
+      "question": "Do you have sudden shortness of breath, chest pain when breathing, or are you coughing up blood?",
+      "help": "A clot may have traveled to the lungs (pulmonary embolism).",
+      "action": "call_911"
+    },
+    {
+      "id": "ischemia",
+      "question": "Is the leg cold, pale, blue, or numb?",
+      "help": "This can mean blocked blood flow in an artery.",
+      "action": "go_to_ed"
+    }
+  ],
+  "items": [
+    {
+      "id": "cancer",
+      "type": "yes_no",
+      "question": "Do you have cancer that is being treated now, was treated in the last 6 months, or is receiving palliative care?",
+      "help": "Any active cancer treatment counts.",
+      "trace_label": "Active cancer",
+      "points_if_yes": 1
+    },
+    {
+      "id": "paralysis_cast",
+      "type": "yes_no",
+      "question": "Is the painful leg paralyzed, weak from a nerve condition, or was it recently in a cast?",
+      "help": "Includes stroke-related weakness in that leg.",
+      "trace_label": "Paralysis, weakness, or recent cast on leg",
+      "points_if_yes": 1
+    },
+    {
+      "id": "bedridden_surgery",
+      "type": "yes_no",
+      "question": "In the last 12 weeks, were you in bed for 3 days or more, or did you have major surgery with anesthesia?",
+      "help": "Hospital stays and major operations count.",
+      "trace_label": "Bedridden ≥3 days or major surgery within 12 weeks",
+      "points_if_yes": 1
+    },
+    {
+      "id": "vein_tenderness",
+      "type": "yes_no",
+      "question": "Is there tenderness along the deep veins — the inner thigh or the back of the calf?",
+      "help": "Press gently along the inner thigh and the middle of the back of the calf.",
+      "trace_label": "Tenderness along deep veins",
+      "points_if_yes": 1
+    },
+    {
+      "id": "entire_leg",
+      "type": "yes_no",
+      "question": "Is the entire leg swollen, from thigh to foot?",
+      "help": "Compare with the other leg.",
+      "trace_label": "Entire leg swollen",
+      "points_if_yes": 1
+    },
+    {
+      "id": "calf_3cm",
+      "type": "yes_no",
+      "question": "Measure both calves 4 inches (10 cm) below the bony bump under the kneecap. Is the painful calf at least 1¼ inches (3 cm) bigger around?",
+      "help": "Use a soft tape measure or a string. Choose Not sure if you cannot measure.",
+      "trace_label": "Calf swelling ≥3 cm vs other leg",
+      "points_if_yes": 1
+    },
+    {
+      "id": "pitting",
+      "type": "yes_no",
+      "question": "Press a finger into the swollen area for 5 seconds. Does a dent stay, and only on the painful leg?",
+      "help": "A dent that stays is called pitting edema.",
+      "trace_label": "Pitting edema, painful leg only",
+      "points_if_yes": 1
+    },
+    {
+      "id": "collateral_veins",
+      "type": "yes_no",
+      "question": "Are there new, visible surface veins on the painful leg (not varicose veins)?",
+      "help": "New veins that stand out on the skin.",
+      "trace_label": "Collateral surface veins (non-varicose)",
+      "points_if_yes": 1
+    },
+    {
+      "id": "previous_dvt",
+      "type": "yes_no",
+      "question": "Have you ever been diagnosed with a blood clot in a leg (DVT)?",
+      "help": "Only count clots confirmed by a test.",
+      "trace_label": "Previous DVT",
+      "points_if_yes": 1
+    },
+    {
+      "id": "alternative_dx",
+      "type": "clinician_only",
+      "trace_label": "Alternative diagnosis at least as likely (−2 if yes)",
+      "fixed_points": 0,
+      "note": "requires a clinician; scored 0 (cautious)"
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "threshold_text": "Score 2 or more = DVT likely; 1 or less = DVT unlikely (Wells 2003 two-level score).",
+    "bands": [
+      {
+        "min": -2,
+        "max": 1,
+        "result": "unlikely"
+      },
+      {
+        "min": 2,
+        "max": 9,
+        "result": "likely"
+      }
+    ]
+  },
+  "results": {
+    "likely": {
+      "label": "DVT likely",
+      "risk": "high",
+      "interpretation": "Your score means a blood clot in the leg (DVT) is likely. An ultrasound is needed to confirm or rule it out.",
+      "recommendation": "Get a leg ultrasound today.",
+      "care": {
+        "level": "emergency_department",
+        "within": "Today (within 4 hours)",
+        "where_detail": "Emergency department, or an urgent care clinic that has confirmed it can do a same-day leg ultrasound.",
+        "ed_redirect": [
+          "Sudden shortness of breath or chest pain: call 911",
+          "Coughing up blood: call 911",
+          "Leg cold, pale, or numb"
+        ],
+        "finder_specialty": "emergency_department"
+      }
+    },
+    "unlikely": {
+      "label": "DVT unlikely",
+      "risk": "moderate",
+      "interpretation": "Your score means a blood clot is unlikely but not ruled out. A D-dimer blood test is the usual next step; a normal result rules out a clot when the score is low.",
+      "recommendation": "Get a D-dimer blood test within 24 hours.",
+      "care": {
+        "level": "urgent_care",
+        "within": "Within 24 hours",
+        "where_detail": "Urgent care or primary care clinic that can do a D-dimer blood test. Call ahead to confirm.",
+        "ed_redirect": [
+          "Sudden shortness of breath or chest pain: call 911",
+          "Coughing up blood: call 911",
+          "Leg cold, pale, or numb"
+        ],
+        "finder_specialty": "urgent_care"
+      }
+    }
+  }
+}

@@ -1,0 +1,330 @@
+{
+  "rule_id": "canadian_ct_head",
+  "name": "Canadian CT Head Rule",
+  "short_name": "Canadian CT Head Rule",
+  "assessment_title": "Head injury assessment",
+  "condition": "Minor head injury",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": 2001,
+  "citations": [
+    {
+      "text": "Stiell IG, Wells GA, Vandemheen K, et al. The Canadian CT Head Rule for patients with minor head injury. Lancet. 2001;357(9266):1391-1396.",
+      "pmid": "11356436",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/11356436/"
+    }
+  ],
+  "validated_population": "Adults 16 and older with a minor head injury (passed out, memory loss, or confusion afterward) who were alert on arrival (GCS 13 to 15). People taking blood thinners were excluded.",
+  "self_report_note": "The rule was validated with a clinician assessing alertness (Glasgow Coma Scale). Someone who was not injured should answer for the injured person when possible.",
+  "license_note": "Published clinical decision rule; criteria are not a copyrighted instrument. Question wording is original to OLA BOT.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [
+    {
+      "id": "seizure",
+      "question": "Has the person had a seizure, or are they getting more drowsy or harder to wake?",
+      "help": "Answer yes for any shaking episode, or if the person is becoming sleepier.",
+      "action": "call_911"
+    },
+    {
+      "id": "pupils_weakness",
+      "question": "Is there weakness or numbness on one side of the body, or are the pupils different sizes?",
+      "help": "Look at both pupils (black centers of the eyes) in normal light.",
+      "action": "call_911"
+    }
+  ],
+  "items": [
+    {
+      "id": "age_group",
+      "type": "choice",
+      "question": "How old is the injured person?",
+      "help": "The rule was validated for people 16 and older.",
+      "trace_label": "Age group",
+      "options": [
+        {
+          "value": "under_16",
+          "label": "Under 16"
+        },
+        {
+          "value": "16_64",
+          "label": "16 to 64",
+          "benign": true
+        },
+        {
+          "value": "65_plus",
+          "label": "65 or older",
+          "concerning": true
+        }
+      ],
+      "critical": true
+    },
+    {
+      "id": "anticoagulant",
+      "type": "yes_no",
+      "question": "Does the person take a blood thinner? (For example warfarin, apixaban, rivaroxaban, dabigatran, edoxaban, or clopidogrel.)",
+      "help": "Blood thinners raise the risk of bleeding in the brain. Daily low-dose aspirin alone is a no.",
+      "trace_label": "Takes a blood thinner",
+      "critical": true
+    },
+    {
+      "id": "loc_amnesia_confusion",
+      "type": "yes_no",
+      "question": "After the injury, did the person pass out, lose memory of the event, or seem confused or disoriented?",
+      "help": "Answer yes for any passing out, any gap in memory about the injury, or any confusion seen by others.",
+      "trace_label": "Passed out, memory loss, or confusion (rule applies)",
+      "critical": true
+    },
+    {
+      "id": "not_alert_2h",
+      "type": "yes_no",
+      "question": "Two hours or more after the injury, is the person still not fully alert or not answering questions normally?",
+      "help": "Ask the person their name, where they are, and today's date.",
+      "trace_label": "High risk: not fully alert 2 hours after injury (GCS <15)",
+      "critical": true,
+      "show_if": {
+        "var": "loc_amnesia_confusion",
+        "equals": "yes"
+      }
+    },
+    {
+      "id": "skull_fracture",
+      "type": "yes_no",
+      "question": "Is there a dent in the skull, or an open wound where the skull might be broken?",
+      "help": "Feel gently around the injury. Do not press into an open wound.",
+      "trace_label": "High risk: possible open or depressed skull fracture",
+      "critical": true,
+      "show_if": {
+        "var": "loc_amnesia_confusion",
+        "equals": "yes"
+      }
+    },
+    {
+      "id": "basal_skull_signs",
+      "type": "yes_no",
+      "question": "Is there bruising around both eyes or behind an ear, or clear fluid or blood coming from the nose or ears?",
+      "help": "These are signs of a break at the base of the skull.",
+      "trace_label": "High risk: signs of basal skull fracture",
+      "critical": true,
+      "show_if": {
+        "var": "loc_amnesia_confusion",
+        "equals": "yes"
+      }
+    },
+    {
+      "id": "vomiting_2",
+      "type": "yes_no",
+      "question": "Has the person vomited 2 or more times since the injury?",
+      "help": "Count separate episodes of throwing up.",
+      "trace_label": "High risk: vomiting 2 or more times",
+      "critical": true,
+      "show_if": {
+        "var": "loc_amnesia_confusion",
+        "equals": "yes"
+      }
+    },
+    {
+      "id": "amnesia_before_30",
+      "type": "yes_no",
+      "question": "Is there memory loss for 30 minutes or more of the time BEFORE the injury?",
+      "help": "Ask the person what they were doing in the half hour before the injury.",
+      "trace_label": "Medium risk: memory loss ≥30 minutes before injury",
+      "critical": true,
+      "show_if": {
+        "var": "loc_amnesia_confusion",
+        "equals": "yes"
+      }
+    },
+    {
+      "id": "dangerous_mechanism",
+      "type": "yes_no",
+      "question": "Was it a dangerous injury? (Hit by a vehicle as a pedestrian, thrown from a vehicle, or a fall from more than 3 feet or 5 stairs.)",
+      "help": "Answer yes if any of these happened.",
+      "trace_label": "Medium risk: dangerous mechanism",
+      "critical": true,
+      "show_if": {
+        "var": "loc_amnesia_confusion",
+        "equals": "yes"
+      }
+    }
+  ],
+  "scoring": {
+    "method": "decision",
+    "threshold_text": "Applies only after passing out, memory loss, or confusion. High risk (any): not alert at 2 hours, skull fracture signs, vomiting ≥2, age 65+. Medium risk (any): memory loss ≥30 min before injury, dangerous mechanism. Otherwise low risk (CT not required).",
+    "steps": [
+      {
+        "label": "No passing out, memory loss, or confusion (rule does not apply)",
+        "when": {
+          "var": "loc_amnesia_confusion",
+          "equals": "no"
+        },
+        "result": "no_criteria"
+      },
+      {
+        "label": "Any high-risk factor",
+        "when": {
+          "any": [
+            {
+              "any_yes": [
+                "not_alert_2h",
+                "skull_fracture",
+                "basal_skull_signs",
+                "vomiting_2"
+              ]
+            },
+            {
+              "var": "age_group",
+              "equals": "65_plus"
+            }
+          ]
+        },
+        "result": "high"
+      },
+      {
+        "label": "Any medium-risk factor",
+        "when": {
+          "any_yes": [
+            "amnesia_before_30",
+            "dangerous_mechanism"
+          ]
+        },
+        "result": "medium"
+      }
+    ],
+    "default_result": "low"
+  },
+  "overrides": [
+    {
+      "label": "Under 16 (outside the validated age range)",
+      "when": {
+        "var": "age_group",
+        "equals": "under_16"
+      },
+      "result": "child"
+    },
+    {
+      "label": "Takes a blood thinner (excluded from the rule)",
+      "when": {
+        "var": "anticoagulant",
+        "equals": "yes"
+      },
+      "result": "anticoagulated"
+    }
+  ],
+  "results": {
+    "high": {
+      "label": "High risk: head CT recommended",
+      "risk": "high",
+      "interpretation": "A high-risk factor is present. The rule recommends a CT scan of the head to check for an injury that may need surgery.",
+      "recommendation": "Go to an emergency department now for evaluation and a head CT.",
+      "care": {
+        "level": "emergency_department",
+        "within": "Now (go immediately)",
+        "where_detail": "Hospital emergency department with CT scanning. Do not drive yourself.",
+        "ed_redirect": [
+          "Seizure, worsening drowsiness, or repeated vomiting: call 911",
+          "Weakness on one side or unequal pupils: call 911"
+        ],
+        "finder_specialty": "emergency_department"
+      }
+    },
+    "medium": {
+      "label": "Medium risk: head CT advised",
+      "risk": "moderate",
+      "interpretation": "A medium-risk factor is present. The rule advises a CT scan to look for brain injury.",
+      "recommendation": "Go to an emergency department today for evaluation and a possible head CT.",
+      "care": {
+        "level": "emergency_department",
+        "within": "Today (within 4 hours)",
+        "where_detail": "Hospital emergency department with CT scanning. Do not drive yourself.",
+        "ed_redirect": [
+          "Seizure, worsening drowsiness, or repeated vomiting: call 911",
+          "Worst headache, weakness, or trouble speaking: call 911"
+        ],
+        "finder_specialty": "emergency_department"
+      }
+    },
+    "low": {
+      "label": "Low risk: head CT not required",
+      "risk": "low",
+      "interpretation": "No high- or medium-risk factors are present. By the Canadian CT Head Rule, a CT scan is not required. A concussion is still possible.",
+      "recommendation": "Rest at home with another adult present for the next 24 hours. Get checked if symptoms persist.",
+      "care": {
+        "level": "self_care",
+        "within": "Home observation for 24 hours; primary care within 2 to 3 days if symptoms persist",
+        "where_detail": "Home care with another adult present. Book a primary care visit if headache, dizziness, or trouble concentrating continue.",
+        "ed_redirect": [
+          "Vomiting more than once",
+          "Worsening headache, drowsiness, or confusion",
+          "Seizure, weakness, or trouble speaking"
+        ],
+        "self_care": [
+          "Have another adult stay with you for 24 hours.",
+          "Rest your brain and body; avoid alcohol and driving.",
+          "Acetaminophen as labeled for headache."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "no_criteria": {
+      "label": "Minor head bump (rule does not apply)",
+      "risk": "low",
+      "interpretation": "There was no passing out, memory loss, or confusion. The CT Head Rule applies only when one of these happened. A head bump without them is usually minor.",
+      "recommendation": "Watch for warning signs at home for the next 24 hours.",
+      "care": {
+        "level": "self_care",
+        "within": "Home observation for 24 hours",
+        "where_detail": "Home care. Book a primary care visit if headache or other symptoms last more than a few days.",
+        "ed_redirect": [
+          "Vomiting more than once",
+          "Worsening headache, drowsiness, or confusion",
+          "Seizure, weakness, or trouble speaking"
+        ],
+        "self_care": [
+          "Rest; avoid alcohol for 24 hours.",
+          "Acetaminophen as labeled for headache."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "anticoagulated": {
+      "label": "Blood thinner: needs evaluation",
+      "risk": "high",
+      "interpretation": "People taking blood thinners were excluded from the Canadian CT Head Rule. Head injuries on blood thinners carry a higher risk of bleeding in the brain, and a CT scan is usually advised.",
+      "recommendation": "Go to an emergency department for evaluation. Bring your medication list.",
+      "care": {
+        "level": "emergency_department",
+        "within": "Today (within 2 hours)",
+        "where_detail": "Hospital emergency department with CT scanning.",
+        "ed_redirect": [
+          "Drowsiness, vomiting, or confusion: call 911",
+          "Weakness or trouble speaking: call 911"
+        ],
+        "finder_specialty": "emergency_department"
+      }
+    },
+    "child": {
+      "label": "Rule does not apply (under 16)",
+      "risk": "not_applicable",
+      "interpretation": "The Canadian CT Head Rule was not validated in children. Children with head injuries are assessed with different rules (such as PECARN) by a clinician.",
+      "recommendation": "Have a clinician examine the child today.",
+      "care": {
+        "level": "urgent_care",
+        "within": "Today (within 4 hours)",
+        "where_detail": "Pediatric urgent care or a hospital emergency department that treats children.",
+        "ed_redirect": [
+          "Passed out, vomiting, or not acting normally: go to the emergency department",
+          "Seizure or very hard to wake: call 911"
+        ],
+        "finder_specialty": "pediatrics"
+      }
+    }
+  }
+}

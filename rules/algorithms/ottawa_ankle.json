@@ -1,0 +1,208 @@
+{
+  "rule_id": "ottawa_ankle",
+  "name": "Ottawa Ankle Rules",
+  "short_name": "Ottawa Ankle Rules",
+  "assessment_title": "Ankle and foot injury assessment",
+  "condition": "Ankle or midfoot injury",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": 1992,
+  "citations": [
+    {
+      "text": "Stiell IG, Greenberg GH, McKnight RD, Nair RC, McDowell I, Worthington JR. A study to develop clinical decision rules for the use of radiography in acute ankle injuries. Ann Emerg Med. 1992;21(4):384-390.",
+      "pmid": "1554175",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/1554175/"
+    }
+  ],
+  "validated_population": "Adults with an ankle or midfoot injury in the emergency department.",
+  "self_report_note": "The rule was validated with a clinician pressing on the bones. Pressing on your own ankle is less reliable. The rule does not apply to people who cannot feel their foot or who were injured more than 10 days ago.",
+  "license_note": "Published clinical decision rule; criteria are not a copyrighted instrument. Question wording is original to OLA BOT.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [
+    {
+      "id": "deformity",
+      "question": "Is the ankle or foot bent at an odd angle, or is bone showing through the skin?",
+      "help": "Answer yes for an obvious deformity or an open wound over the injury.",
+      "action": "go_to_ed"
+    },
+    {
+      "id": "cold_numb",
+      "question": "Is the foot cold, pale, blue, or numb?",
+      "help": "Compare with the other foot. These signs can mean poor blood flow or nerve injury.",
+      "action": "go_to_ed"
+    }
+  ],
+  "items": [
+    {
+      "id": "ankle_zone_pain",
+      "type": "yes_no",
+      "question": "Is your pain around the ankle bones (the bony bumps on either side of the ankle)?",
+      "help": "The ankle bones are the round bumps on the inside and outside of the ankle.",
+      "trace_label": "Pain in ankle (malleolar) zone",
+      "critical": true
+    },
+    {
+      "id": "lateral_malleolus_tender",
+      "type": "yes_no",
+      "question": "Press firmly on the back edge and tip of the OUTER ankle bone (the lowest 2½ inches). Is it painful to press?",
+      "help": "Start at the tip of the outside ankle bump and press along the back edge of the bone, moving up about 2½ inches (6 cm).",
+      "trace_label": "Bone tenderness, outer ankle bone (posterior edge/tip)",
+      "critical": true,
+      "show_if": {
+        "var": "ankle_zone_pain",
+        "equals": "yes"
+      }
+    },
+    {
+      "id": "medial_malleolus_tender",
+      "type": "yes_no",
+      "question": "Press firmly on the back edge and tip of the INNER ankle bone (the lowest 2½ inches). Is it painful to press?",
+      "help": "Start at the tip of the inside ankle bump and press along the back edge of the bone, moving up about 2½ inches (6 cm).",
+      "trace_label": "Bone tenderness, inner ankle bone (posterior edge/tip)",
+      "critical": true,
+      "show_if": {
+        "var": "ankle_zone_pain",
+        "equals": "yes"
+      }
+    },
+    {
+      "id": "midfoot_pain",
+      "type": "yes_no",
+      "question": "Is there pain in the middle part of your foot?",
+      "help": "The midfoot is the area between the ankle and the toes.",
+      "trace_label": "Pain in midfoot zone",
+      "critical": true
+    },
+    {
+      "id": "fifth_metatarsal_tender",
+      "type": "yes_no",
+      "question": "Press on the bony bump halfway along the OUTER edge of your foot. Is it painful to press?",
+      "help": "Run your finger along the outside edge of the foot from the little toe toward the heel. About halfway there is a bony bump.",
+      "trace_label": "Bone tenderness, base of 5th metatarsal",
+      "critical": true,
+      "show_if": {
+        "var": "midfoot_pain",
+        "equals": "yes"
+      }
+    },
+    {
+      "id": "navicular_tender",
+      "type": "yes_no",
+      "question": "Press on the bony bump on the INNER side of your foot, in front of the ankle. Is it painful to press?",
+      "help": "It is about 1 inch in front of and below the inside ankle bone.",
+      "trace_label": "Bone tenderness, navicular bone",
+      "critical": true,
+      "show_if": {
+        "var": "midfoot_pain",
+        "equals": "yes"
+      }
+    },
+    {
+      "id": "unable_bear_weight",
+      "type": "yes_no",
+      "question": "Were you unable to take 4 steps on the injured foot right after the injury, AND are you still unable now? (Limping counts as able.)",
+      "help": "Answer yes only if you could not take 4 steps on your own, even limping, both right after the injury and now.",
+      "trace_label": "Unable to bear weight (4 steps) immediately and now",
+      "critical": true
+    }
+  ],
+  "scoring": {
+    "method": "decision",
+    "threshold_text": "Ankle X-ray if ankle-zone pain plus any of: outer ankle bone tenderness, inner ankle bone tenderness, or unable to walk 4 steps. Foot X-ray if midfoot pain plus any of: 5th metatarsal tenderness, navicular tenderness, or unable to walk 4 steps. Otherwise no X-ray.",
+    "steps": [
+      {
+        "label": "Ankle X-ray criteria met",
+        "when": {
+          "all": [
+            {
+              "var": "ankle_zone_pain",
+              "equals": "yes"
+            },
+            {
+              "any_yes": [
+                "lateral_malleolus_tender",
+                "medial_malleolus_tender",
+                "unable_bear_weight"
+              ]
+            }
+          ]
+        },
+        "result": "xray"
+      },
+      {
+        "label": "Foot X-ray criteria met",
+        "when": {
+          "all": [
+            {
+              "var": "midfoot_pain",
+              "equals": "yes"
+            },
+            {
+              "any_yes": [
+                "fifth_metatarsal_tender",
+                "navicular_tender",
+                "unable_bear_weight"
+              ]
+            }
+          ]
+        },
+        "result": "xray"
+      }
+    ],
+    "default_result": "no_xray"
+  },
+  "results": {
+    "xray": {
+      "label": "X-ray recommended",
+      "risk": "high",
+      "interpretation": "Your answers meet the Ottawa criteria for an X-ray. A broken bone is possible and needs to be ruled out.",
+      "recommendation": "Get an X-ray of the ankle and/or foot today.",
+      "care": {
+        "level": "urgent_care",
+        "within": "Today (within 12 hours)",
+        "where_detail": "Urgent care clinic with on-site X-ray. Call ahead to confirm X-ray is available.",
+        "ed_redirect": [
+          "Bone out of place or showing through skin",
+          "Foot cold, pale, blue, or numb",
+          "Pain that is rapidly getting worse"
+        ],
+        "self_care": [
+          "Keep weight off the foot until examined.",
+          "Ice for 15 minutes at a time and elevate the foot."
+        ],
+        "finder_specialty": "urgent_care"
+      }
+    },
+    "no_xray": {
+      "label": "X-ray not needed",
+      "risk": "low",
+      "interpretation": "Your answers do not meet the Ottawa criteria for an X-ray. In the original studies, the rule missed very few fractures when no criteria were met. This is most likely a sprain.",
+      "recommendation": "Treat as a sprain at home. Get an exam if you cannot walk on it or it is not improving.",
+      "care": {
+        "level": "self_care",
+        "within": "Manage at home; see primary care if not improving in 5 to 7 days",
+        "where_detail": "Home care. Book a primary care or orthopedics visit if pain or swelling is not improving after 5 to 7 days.",
+        "ed_redirect": [
+          "Foot becomes cold, pale, or numb",
+          "Cannot bear any weight after 24 hours",
+          "Severe swelling that keeps increasing"
+        ],
+        "self_care": [
+          "Rest, ice 15 minutes at a time, compression wrap, and elevate the foot.",
+          "Acetaminophen or ibuprofen as labeled for pain.",
+          "Walk as pain allows."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    }
+  }
+}

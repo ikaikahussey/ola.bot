@@ -1,0 +1,278 @@
+{
+  "rule_id": "audit_c",
+  "name": "Alcohol Use Disorders Identification Test–Consumption (AUDIT-C)",
+  "short_name": "AUDIT-C",
+  "assessment_title": "Alcohol use check",
+  "condition": "Alcohol use",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": 1998,
+  "citations": [
+    {
+      "text": "Bush K, Kivlahan DR, McDonell MB, Fihn SD, Bradley KA. The AUDIT alcohol consumption questions (AUDIT-C): an effective brief screening test for problem drinking. Arch Intern Med. 1998;158(16):1789-1795.",
+      "pmid": "9738608",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/9738608/"
+    },
+    {
+      "text": "Bradley KA, DeBenedetti AF, Volk RJ, Williams EC, Frank D, Kivlahan DR. AUDIT-C as a brief screen for alcohol misuse in primary care. Alcohol Clin Exp Res. 2007;31(7):1208-1217.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=%22AUDIT-C%20as%20a%20brief%20screen%20for%20alcohol%20misuse%20in%20primary%20care%22%5BTitle%5D"
+    }
+  ],
+  "validated_population": "Adults in primary care (VA general medical clinics). Self-administered.",
+  "license_note": "AUDIT-C questions are the first three items of the WHO AUDIT, which is freely available. Item wording is used verbatim.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [
+    {
+      "id": "withdrawal",
+      "question": "After cutting down or stopping drinking, do you have shaking, heavy sweating, seeing or hearing things that are not there, or have you had a seizure?",
+      "help": "These are signs of alcohol withdrawal, which can be dangerous.",
+      "action": "go_to_ed"
+    }
+  ],
+  "items": [
+    {
+      "id": "sex",
+      "type": "choice",
+      "question": "What was your sex assigned at birth?",
+      "help": "The positive-screen cut-point differs by sex in the validation studies. If you choose \"Another answer\", the lower (more sensitive) cut-point is used.",
+      "trace_label": "Sex (sets cut-point)",
+      "options": [
+        {
+          "value": "male",
+          "label": "Male",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "female",
+          "label": "Female",
+          "points": 0,
+          "concerning": true
+        },
+        {
+          "value": "other",
+          "label": "Another answer / prefer not to say",
+          "points": 0
+        }
+      ]
+    },
+    {
+      "id": "frequency",
+      "type": "choice",
+      "question": "How often do you have a drink containing alcohol?",
+      "help": "One drink = 12 oz beer, 5 oz wine, or 1.5 oz liquor.",
+      "trace_label": "Q1 How often you drink",
+      "options": [
+        {
+          "value": "never",
+          "label": "Never",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "monthly",
+          "label": "Monthly or less",
+          "points": 1
+        },
+        {
+          "value": "2_4_month",
+          "label": "2 to 4 times a month",
+          "points": 2
+        },
+        {
+          "value": "2_3_week",
+          "label": "2 to 3 times a week",
+          "points": 3
+        },
+        {
+          "value": "4_week",
+          "label": "4 or more times a week",
+          "points": 4
+        }
+      ]
+    },
+    {
+      "id": "typical",
+      "type": "choice",
+      "question": "How many standard drinks containing alcohol do you have on a typical day?",
+      "help": "One drink = 12 oz beer, 5 oz wine, or 1.5 oz liquor.",
+      "trace_label": "Q2 Drinks on a typical day",
+      "options": [
+        {
+          "value": "1_2",
+          "label": "1 or 2",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "3_4",
+          "label": "3 or 4",
+          "points": 1
+        },
+        {
+          "value": "5_6",
+          "label": "5 or 6",
+          "points": 2
+        },
+        {
+          "value": "7_9",
+          "label": "7 to 9",
+          "points": 3
+        },
+        {
+          "value": "10",
+          "label": "10 or more",
+          "points": 4
+        }
+      ],
+      "show_if": {
+        "not": {
+          "var": "frequency",
+          "equals": "never"
+        }
+      }
+    },
+    {
+      "id": "six_plus",
+      "type": "choice",
+      "question": "How often do you have six or more drinks on one occasion?",
+      "help": "One occasion means one sitting, party, or evening.",
+      "trace_label": "Q3 Six or more drinks at once",
+      "options": [
+        {
+          "value": "never",
+          "label": "Never",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "less_monthly",
+          "label": "Less than monthly",
+          "points": 1
+        },
+        {
+          "value": "monthly",
+          "label": "Monthly",
+          "points": 2
+        },
+        {
+          "value": "weekly",
+          "label": "Weekly",
+          "points": 3
+        },
+        {
+          "value": "daily",
+          "label": "Daily or almost daily",
+          "points": 4
+        }
+      ],
+      "show_if": {
+        "not": {
+          "var": "frequency",
+          "equals": "never"
+        }
+      }
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "threshold_text": "Positive screen: 4 or more for men; 3 or more for women (and for \"another answer\"). 8 to 12 suggests severe alcohol misuse.",
+    "bands": [
+      {
+        "min": 8,
+        "max": 12,
+        "result": "high"
+      },
+      {
+        "min": 0,
+        "max": 3,
+        "result": "negative",
+        "when": {
+          "var": "sex",
+          "equals": "male"
+        }
+      },
+      {
+        "min": 4,
+        "max": 7,
+        "result": "positive",
+        "when": {
+          "var": "sex",
+          "equals": "male"
+        }
+      },
+      {
+        "min": 0,
+        "max": 2,
+        "result": "negative"
+      },
+      {
+        "min": 3,
+        "max": 7,
+        "result": "positive"
+      }
+    ]
+  },
+  "results": {
+    "negative": {
+      "label": "Negative alcohol screen",
+      "risk": "low",
+      "interpretation": "Your score is below the cut-point for alcohol misuse.",
+      "recommendation": "No action needed. U.S. guidelines advise no more than 2 drinks a day for men and 1 for women, or not drinking.",
+      "care": {
+        "level": "self_care",
+        "within": "No visit needed for alcohol use",
+        "where_detail": "Home care.",
+        "ed_redirect": [
+          "Signs of withdrawal (shaking, seeing things, seizure): go to the emergency department"
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "positive": {
+      "label": "Positive alcohol screen",
+      "risk": "moderate",
+      "interpretation": "Your score is at or above the cut-point for possible unhealthy alcohol use.",
+      "recommendation": "Book a primary care visit to talk about drinking and ways to cut down.",
+      "care": {
+        "level": "primary_care",
+        "within": "Within 2 to 4 weeks",
+        "where_detail": "Primary care clinic. Free, confidential help: SAMHSA National Helpline 1-800-662-4357 (24 hours).",
+        "ed_redirect": [
+          "Signs of withdrawal (shaking, seeing things, seizure): go to the emergency department"
+        ],
+        "self_care": [
+          "If you drink heavily every day, do not stop suddenly without medical advice; withdrawal can be dangerous."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "high": {
+      "label": "High alcohol screen (8 to 12)",
+      "risk": "high",
+      "interpretation": "Scores of 8 to 12 suggest severe alcohol misuse and a higher chance of alcohol use disorder.",
+      "recommendation": "Book a primary care visit within 1 week. Do not stop drinking suddenly without medical advice if you drink every day.",
+      "care": {
+        "level": "primary_care",
+        "within": "Within 1 week",
+        "where_detail": "Primary care clinic or addiction medicine. Free, confidential help: SAMHSA National Helpline 1-800-662-4357 (24 hours).",
+        "ed_redirect": [
+          "Signs of withdrawal (shaking, seeing things, seizure): go to the emergency department"
+        ],
+        "self_care": [
+          "If you drink heavily every day, do not stop suddenly without medical advice; withdrawal can be dangerous."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    }
+  }
+}

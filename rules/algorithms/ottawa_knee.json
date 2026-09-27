@@ -1,0 +1,149 @@
+{
+  "rule_id": "ottawa_knee",
+  "name": "Ottawa Knee Rule",
+  "short_name": "Ottawa Knee Rule",
+  "assessment_title": "Knee injury assessment",
+  "condition": "Knee injury",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": 1996,
+  "citations": [
+    {
+      "text": "Stiell IG, Greenberg GH, Wells GA, et al. Prospective validation of a decision rule for the use of radiography in acute knee injuries. JAMA. 1996;275(8):611-615.",
+      "pmid": "8594242",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/8594242/"
+    }
+  ],
+  "validated_population": "Adults 18 and older with an acute knee injury in the emergency department.",
+  "self_report_note": "The rule was validated with a clinician examining the knee. Self-examination is less reliable. The rule does not apply to injuries more than 7 days old.",
+  "license_note": "Published clinical decision rule; criteria are not a copyrighted instrument. Question wording is original to OLA BOT.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [
+    {
+      "id": "deformity",
+      "question": "Is the knee bent at an odd angle, is the kneecap visibly out of place, or is bone showing through the skin?",
+      "help": "Answer yes for an obvious deformity or an open wound over the knee.",
+      "action": "go_to_ed"
+    },
+    {
+      "id": "cold_numb",
+      "question": "Is the lower leg or foot cold, pale, blue, or numb?",
+      "help": "Compare with the other leg. These signs can mean poor blood flow or nerve injury.",
+      "action": "go_to_ed"
+    }
+  ],
+  "items": [
+    {
+      "id": "age_55",
+      "type": "yes_no",
+      "question": "Are you 55 years or older?",
+      "help": "Older adults have a higher chance of a fracture after a knee injury.",
+      "trace_label": "Age 55 or older"
+    },
+    {
+      "id": "patella_only_tender",
+      "type": "yes_no",
+      "question": "When you press around the knee, is the kneecap the ONLY bony spot that hurts?",
+      "help": "Press on the kneecap and on the bones around it. Answer yes if only the kneecap is tender.",
+      "trace_label": "Isolated kneecap (patella) tenderness",
+      "critical": true
+    },
+    {
+      "id": "fibula_head_tender",
+      "type": "yes_no",
+      "question": "Press on the bony bump on the OUTER side of the leg, just below the knee. Is it painful to press?",
+      "help": "This bump (head of the fibula) is on the outside of the leg, about 1 inch below the knee joint.",
+      "trace_label": "Tenderness at head of fibula",
+      "critical": true
+    },
+    {
+      "id": "cannot_flex_90",
+      "type": "yes_no",
+      "question": "Are you unable to bend the knee to a right angle (90°, like sitting in a chair)?",
+      "help": "Sit and try to bend the knee so your lower leg is straight down. Answer yes if you cannot bend that far.",
+      "trace_label": "Unable to bend knee to 90°",
+      "critical": true
+    },
+    {
+      "id": "unable_bear_weight",
+      "type": "yes_no",
+      "question": "Were you unable to take 4 steps right after the injury, AND are you still unable now? (Limping counts as able.)",
+      "help": "Answer yes only if you could not take 4 steps on your own, even limping, both right after the injury and now.",
+      "trace_label": "Unable to bear weight (4 steps) immediately and now",
+      "critical": true
+    }
+  ],
+  "scoring": {
+    "method": "decision",
+    "threshold_text": "Knee X-ray if any one of: age 55+, isolated kneecap tenderness, fibula head tenderness, unable to bend to 90°, or unable to walk 4 steps. Otherwise no X-ray.",
+    "steps": [
+      {
+        "label": "Any Ottawa knee criterion present",
+        "when": {
+          "any_yes": [
+            "age_55",
+            "patella_only_tender",
+            "fibula_head_tender",
+            "cannot_flex_90",
+            "unable_bear_weight"
+          ]
+        },
+        "result": "xray"
+      }
+    ],
+    "default_result": "no_xray"
+  },
+  "results": {
+    "xray": {
+      "label": "X-ray recommended",
+      "risk": "high",
+      "interpretation": "Your answers meet at least one Ottawa criterion. A fracture is possible and needs to be ruled out.",
+      "recommendation": "Get a knee X-ray today.",
+      "care": {
+        "level": "urgent_care",
+        "within": "Today (within 12 hours)",
+        "where_detail": "Urgent care clinic with on-site X-ray. Call ahead to confirm X-ray is available.",
+        "ed_redirect": [
+          "Kneecap or bone out of place",
+          "Leg cold, pale, or numb",
+          "Knee locked and cannot straighten"
+        ],
+        "self_care": [
+          "Keep weight off the leg until examined.",
+          "Ice for 15 minutes at a time and elevate the leg."
+        ],
+        "finder_specialty": "urgent_care"
+      }
+    },
+    "no_xray": {
+      "label": "X-ray not needed",
+      "risk": "low",
+      "interpretation": "No Ottawa criteria are present. A fracture is unlikely. Ligament or cartilage injuries are still possible and do not show on X-ray.",
+      "recommendation": "Treat at home. Get an exam if the knee gives way, locks, or is not improving.",
+      "care": {
+        "level": "self_care",
+        "within": "Manage at home; see primary care or orthopedics within 1 week if not improving",
+        "where_detail": "Home care. Book a primary care or orthopedics visit within 1 week if the knee gives way, locks, or stays swollen.",
+        "ed_redirect": [
+          "Leg becomes cold, pale, or numb",
+          "Knee locks and cannot straighten",
+          "Rapid, severe swelling"
+        ],
+        "self_care": [
+          "Rest, ice 15 minutes at a time, compression wrap, and elevate the leg.",
+          "Acetaminophen or ibuprofen as labeled for pain."
+        ],
+        "finder_specialty": "orthopedics"
+      }
+    }
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "rule_id": "pc_ptsd5",
+  "name": "Primary Care PTSD Screen for DSM-5 (PC-PTSD-5)",
+  "short_name": "PC-PTSD-5",
+  "assessment_title": "Trauma stress check",
+  "condition": "Stress after a traumatic event",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": 2016,
+  "citations": [
+    {
+      "text": "Prins A, Bovin MJ, Smolenski DJ, et al. The Primary Care PTSD Screen for DSM-5 (PC-PTSD-5): development and evaluation within a veteran primary care sample. J Gen Intern Med. 2016;31(10):1206-1211.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=%22The%20Primary%20Care%20PTSD%20Screen%20for%20DSM-5%20%28PC-PTSD-5%29%3A%20Development%20and%20Evaluation%20Within%20a%20Veteran%20Primary%20Care%20Sample%22%5BTitle%5D"
+    }
+  ],
+  "validated_population": "Adult veterans in primary care. Self-administered.",
+  "license_note": "Developed by the U.S. Department of Veterans Affairs National Center for PTSD; U.S. government work. Item wording is used verbatim. Verify current terms at ptsd.va.gov before deployment.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [],
+  "items": [
+    {
+      "id": "trauma_exposure",
+      "type": "yes_no",
+      "question": "Sometimes things happen to people that are unusually or especially frightening, horrible, or traumatic. For example: a serious accident or fire; a physical or sexual assault or abuse; an earthquake or flood; a war; seeing someone be killed or seriously injured; having a loved one die through homicide or suicide. Have you ever experienced this kind of event?",
+      "help": "Answer yes if any event like these happened to you or you saw it happen.",
+      "trace_label": "Experienced a traumatic event",
+      "points_if_yes": 0,
+      "critical": true
+    },
+    {
+      "id": "nightmares",
+      "type": "yes_no",
+      "question": "In the past month, have you had nightmares about the event(s) or thought about the event(s) when you did not want to?",
+      "help": "Unwanted memories or bad dreams.",
+      "trace_label": "Nightmares or unwanted thoughts",
+      "points_if_yes": 1,
+      "show_if": {
+        "var": "trauma_exposure",
+        "equals": "yes"
+      }
+    },
+    {
+      "id": "avoid",
+      "type": "yes_no",
+      "question": "In the past month, have you tried hard not to think about the event(s) or went out of your way to avoid situations that reminded you of the event(s)?",
+      "help": "Avoiding places, people, or thoughts.",
+      "trace_label": "Avoidance",
+      "points_if_yes": 1,
+      "show_if": {
+        "var": "trauma_exposure",
+        "equals": "yes"
+      }
+    },
+    {
+      "id": "on_guard",
+      "type": "yes_no",
+      "question": "In the past month, have you been constantly on guard, watchful, or easily startled?",
+      "help": "Jumpy or always watching for danger.",
+      "trace_label": "On guard or easily startled",
+      "points_if_yes": 1,
+      "show_if": {
+        "var": "trauma_exposure",
+        "equals": "yes"
+      }
+    },
+    {
+      "id": "numb",
+      "type": "yes_no",
+      "question": "In the past month, have you felt numb or detached from people, activities, or your surroundings?",
+      "help": "Feeling cut off or empty.",
+      "trace_label": "Numb or detached",
+      "points_if_yes": 1,
+      "show_if": {
+        "var": "trauma_exposure",
+        "equals": "yes"
+      }
+    },
+    {
+      "id": "guilt",
+      "type": "yes_no",
+      "question": "In the past month, have you felt guilty or unable to stop blaming yourself or others for the event(s) or any problems the event(s) may have caused?",
+      "help": "Blame or guilt that will not go away.",
+      "trace_label": "Guilt or blame",
+      "points_if_yes": 1,
+      "show_if": {
+        "var": "trauma_exposure",
+        "equals": "yes"
+      }
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "threshold_text": "Count of \"yes\" answers to the 5 symptom questions: 0–2 negative screen; 3–5 positive screen (cut-point 3, Prins 2016).",
+    "bands": [
+      {
+        "min": 0,
+        "max": 2,
+        "result": "negative"
+      },
+      {
+        "min": 3,
+        "max": 5,
+        "result": "positive"
+      }
+    ]
+  },
+  "results": {
+    "negative": {
+      "label": "Negative PTSD screen",
+      "risk": "low",
+      "interpretation": "Your answers do not meet the screening cut-point for probable PTSD.",
+      "recommendation": "No further PTSD evaluation needed now. Seek help if symptoms develop or worsen.",
+      "care": {
+        "level": "self_care",
+        "within": "Self-care; primary care if symptoms develop",
+        "where_detail": "Home care. Book a primary care visit if distress continues.",
+        "ed_redirect": [
+          "Thoughts of harming yourself or ending your life: call or text 988 now",
+          "Immediate danger: call 911"
+        ],
+        "self_care": [
+          "Veterans can call the Veterans Crisis Line: dial 988, then press 1."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "positive": {
+      "label": "Positive PTSD screen",
+      "risk": "moderate",
+      "interpretation": "Your answers meet the screening cut-point for probable PTSD. A screen is not a diagnosis; a full evaluation is the next step.",
+      "recommendation": "Book an evaluation with a mental health clinician or primary care.",
+      "care": {
+        "level": "mental_health",
+        "within": "Within 1 to 2 weeks",
+        "where_detail": "Licensed mental health clinician, or primary care. Veterans: VA medical center or Vet Center.",
+        "ed_redirect": [
+          "Thoughts of harming yourself or ending your life: call or text 988 now",
+          "Immediate danger: call 911"
+        ],
+        "finder_specialty": "mental_health"
+      }
+    }
+  }
+}

@@ -1,0 +1,314 @@
+{
+  "rule_id": "uti_bent",
+  "name": "Clinical Diagnosis of Urinary Tract Infection in Women (Bent)",
+  "short_name": "UTI symptom rule (Bent)",
+  "assessment_title": "Painful urination assessment",
+  "condition": "Painful or frequent urination (possible bladder infection)",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": 2002,
+  "citations": [
+    {
+      "text": "Bent S, Nallamothu BK, Simel DL, Fihn SD, Saint S. Does this woman have an acute uncomplicated urinary tract infection? JAMA. 2002;287(20):2701-2710.",
+      "pmid": "12020306",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/12020306/"
+    }
+  ],
+  "validated_population": "Adult women with symptoms of acute uncomplicated urinary tract infection (systematic review).",
+  "license_note": "Published diagnostic criteria from a systematic review; not a copyrighted instrument. Question wording is original to OLA BOT.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [
+    {
+      "id": "vomiting",
+      "question": "Are you vomiting and unable to keep fluids down?",
+      "help": "Being unable to keep fluids down needs same-day care.",
+      "action": "urgent_care_today"
+    }
+  ],
+  "items": [
+    {
+      "id": "sex",
+      "type": "choice",
+      "question": "What was your sex assigned at birth?",
+      "help": "This rule was studied in women. Urinary infections in men are handled differently.",
+      "trace_label": "Sex assigned at birth",
+      "options": [
+        {
+          "value": "female",
+          "label": "Female",
+          "benign": true
+        },
+        {
+          "value": "male",
+          "label": "Male",
+          "concerning": true
+        }
+      ],
+      "critical": true
+    },
+    {
+      "id": "pregnant",
+      "type": "yes_no",
+      "question": "Are you pregnant or could you be pregnant?",
+      "help": "Urinary infections in pregnancy need prompt treatment.",
+      "trace_label": "Pregnant or possibly pregnant",
+      "critical": true,
+      "show_if": {
+        "var": "sex",
+        "equals": "female"
+      }
+    },
+    {
+      "id": "fever_flank",
+      "type": "yes_no",
+      "question": "Do you have a fever (100.4°F / 38°C or higher), chills, or pain in your side or back?",
+      "help": "These can mean the infection has reached the kidney.",
+      "trace_label": "Fever, chills, or side/back pain",
+      "critical": true
+    },
+    {
+      "id": "dysuria",
+      "type": "yes_no",
+      "question": "Does it burn or hurt when you urinate?",
+      "help": "Pain or burning while passing urine.",
+      "trace_label": "Painful urination (dysuria)"
+    },
+    {
+      "id": "frequency",
+      "type": "yes_no",
+      "question": "Do you need to urinate much more often than usual?",
+      "help": "Going to the bathroom much more often, often passing small amounts.",
+      "trace_label": "Urinating more often (frequency)"
+    },
+    {
+      "id": "hematuria",
+      "type": "yes_no",
+      "question": "Have you seen blood in your urine?",
+      "help": "Pink, red, or brown urine.",
+      "trace_label": "Visible blood in urine"
+    },
+    {
+      "id": "discharge",
+      "type": "yes_no",
+      "question": "Do you have new or unusual vaginal discharge?",
+      "help": "A change in amount, color, or smell.",
+      "trace_label": "Vaginal discharge",
+      "concerning_answer": "yes",
+      "show_if": {
+        "var": "sex",
+        "equals": "female"
+      }
+    },
+    {
+      "id": "irritation",
+      "type": "yes_no",
+      "question": "Do you have vaginal itching or irritation?",
+      "help": "Itching, soreness, or irritation of the vagina or vulva.",
+      "trace_label": "Vaginal itching or irritation",
+      "show_if": {
+        "var": "sex",
+        "equals": "female"
+      }
+    }
+  ],
+  "scoring": {
+    "method": "decision",
+    "threshold_text": "Painful urination plus frequency, without vaginal discharge or irritation: UTI probability above 90% (Bent 2002). Discharge or irritation lowers the probability and suggests other causes. One urinary symptom alone: probability about 50%.",
+    "steps": [
+      {
+        "label": "Vaginal discharge or irritation present",
+        "when": {
+          "any_yes": [
+            "discharge",
+            "irritation"
+          ]
+        },
+        "result": "other_cause"
+      },
+      {
+        "label": "Painful urination AND frequency, without discharge or irritation",
+        "when": {
+          "all_yes": [
+            "dysuria",
+            "frequency"
+          ]
+        },
+        "result": "high"
+      },
+      {
+        "label": "At least one urinary symptom (pain, frequency, or blood)",
+        "when": {
+          "any_yes": [
+            "dysuria",
+            "frequency",
+            "hematuria"
+          ]
+        },
+        "result": "intermediate"
+      }
+    ],
+    "default_result": "unlikely"
+  },
+  "overrides": [
+    {
+      "label": "Male (rule not validated; infection is considered complicated)",
+      "when": {
+        "var": "sex",
+        "equals": "male"
+      },
+      "result": "male"
+    },
+    {
+      "label": "Fever, chills, or side/back pain (possible kidney infection)",
+      "when": {
+        "var": "fever_flank",
+        "equals": "yes"
+      },
+      "result": "kidney"
+    },
+    {
+      "label": "Pregnant or possibly pregnant",
+      "when": {
+        "var": "pregnant",
+        "equals": "yes"
+      },
+      "result": "pregnant"
+    }
+  ],
+  "results": {
+    "high": {
+      "label": "UTI very likely",
+      "risk": "high",
+      "interpretation": "Painful urination plus frequency, without vaginal symptoms, means a bladder infection is very likely (above 90% in the studies reviewed).",
+      "recommendation": "Treatment is usually started based on symptoms. A telehealth or in-person visit can prescribe it.",
+      "care": {
+        "level": "telehealth",
+        "within": "Within 24 hours",
+        "where_detail": "Telehealth visit (many insurers cover this; see the number on your insurance card) or an urgent care clinic.",
+        "ed_redirect": [
+          "Vomiting and cannot keep fluids down",
+          "Fever with shaking chills or confusion",
+          "Severe side or back pain"
+        ],
+        "self_care": [
+          "Drink plenty of water.",
+          "Phenazopyridine (over the counter) can ease burning for up to 2 days; it turns urine orange."
+        ],
+        "finder_specialty": "urgent_care"
+      }
+    },
+    "intermediate": {
+      "label": "UTI possible",
+      "risk": "moderate",
+      "interpretation": "With one urinary symptom, the chance of a bladder infection is about 50%. A urine test helps decide.",
+      "recommendation": "Get a urine test.",
+      "care": {
+        "level": "urgent_care",
+        "within": "Within 24 hours",
+        "where_detail": "Urgent care clinic or primary care clinic that can test urine on site.",
+        "ed_redirect": [
+          "Vomiting and cannot keep fluids down",
+          "Fever with shaking chills or confusion",
+          "Severe side or back pain"
+        ],
+        "finder_specialty": "urgent_care"
+      }
+    },
+    "other_cause": {
+      "label": "Other cause possible",
+      "risk": "moderate",
+      "interpretation": "Vaginal discharge or irritation makes a bladder infection less likely and suggests a vaginal infection or sexually transmitted infection.",
+      "recommendation": "Get an exam and testing.",
+      "care": {
+        "level": "primary_care",
+        "within": "Within 24 to 48 hours",
+        "where_detail": "Primary care, gynecology, or urgent care clinic that performs pelvic exams.",
+        "ed_redirect": [
+          "Vomiting and cannot keep fluids down",
+          "Fever with shaking chills or confusion",
+          "Severe side or back pain"
+        ],
+        "finder_specialty": "ob_gyn"
+      }
+    },
+    "unlikely": {
+      "label": "UTI unlikely",
+      "risk": "low",
+      "interpretation": "You did not report the main urinary infection symptoms.",
+      "recommendation": "No UTI treatment needed based on these answers.",
+      "care": {
+        "level": "self_care",
+        "within": "Self-care; primary care if symptoms develop",
+        "where_detail": "Home care. Book a primary care visit if new urinary symptoms appear.",
+        "ed_redirect": [
+          "Vomiting and cannot keep fluids down",
+          "Fever with shaking chills or confusion",
+          "Severe side or back pain"
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "kidney": {
+      "label": "Possible kidney infection",
+      "risk": "high",
+      "interpretation": "Fever, chills, or side/back pain with urinary symptoms can mean a kidney infection, which needs prompt treatment.",
+      "recommendation": "Get an exam and urine test today.",
+      "care": {
+        "level": "urgent_care",
+        "within": "Today (within 4 hours)",
+        "where_detail": "Urgent care clinic, or emergency department if you feel very unwell.",
+        "ed_redirect": [
+          "Vomiting and cannot keep fluids down",
+          "Fever with shaking chills or confusion",
+          "Severe side or back pain"
+        ],
+        "finder_specialty": "urgent_care"
+      }
+    },
+    "pregnant": {
+      "label": "Pregnancy: needs same-day evaluation",
+      "risk": "high",
+      "interpretation": "Urinary infections in pregnancy can affect the pregnancy and need testing and treatment. The Bent criteria were not designed for pregnancy.",
+      "recommendation": "Contact your prenatal care clinic today or go to urgent care.",
+      "care": {
+        "level": "primary_care",
+        "within": "Today",
+        "where_detail": "Your obstetric (prenatal) clinic's same-day line, or urgent care.",
+        "ed_redirect": [
+          "Vomiting and cannot keep fluids down",
+          "Fever with shaking chills or confusion",
+          "Severe side or back pain",
+          "Bleeding, cramping, or fluid leaking: go to labor and delivery or the emergency department"
+        ],
+        "finder_specialty": "ob_gyn"
+      }
+    },
+    "male": {
+      "label": "Rule does not apply (male)",
+      "risk": "not_applicable",
+      "interpretation": "The Bent criteria were studied in women. In men, urinary infection is considered complicated and needs an exam and urine test.",
+      "recommendation": "Get an exam and urine test.",
+      "care": {
+        "level": "urgent_care",
+        "within": "Within 24 hours",
+        "where_detail": "Urgent care or primary care clinic.",
+        "ed_redirect": [
+          "Vomiting and cannot keep fluids down",
+          "Fever with shaking chills or confusion",
+          "Severe side or back pain",
+          "Cannot pass urine at all: go to the emergency department"
+        ],
+        "finder_specialty": "urgent_care"
+      }
+    }
+  }
+}

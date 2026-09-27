@@ -1,0 +1,225 @@
+{
+  "rule_id": "centor_sore_throat",
+  "name": "Centor/McIsaac Criteria",
+  "short_name": "McIsaac score",
+  "assessment_title": "Sore throat assessment",
+  "condition": "Sore throat (possible strep throat)",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": 1998,
+  "citations": [
+    {
+      "text": "McIsaac WJ, White D, Tannenbaum D, Low DE. A clinical score to reduce unnecessary antibiotic use in patients with sore throat. CMAJ. 1998;158(1):75-83.",
+      "pmid": "9475915",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/9475915/"
+    },
+    {
+      "text": "Centor RM, Witherspoon JM, Dalton HP, Brody CE, Link K. The diagnosis of strep throat in adults in the emergency room. Med Decis Making. 1981;1(3):239-246.",
+      "pmid": "6763125",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/6763125/"
+    }
+  ],
+  "validated_population": "Children age 3 and older and adults with a sore throat seen in primary care (McIsaac); adults in the emergency room (Centor, 1981).",
+  "self_report_note": "The original studies used findings recorded by a clinician. Swollen glands and throat patches are harder to judge yourself.",
+  "license_note": "Published clinical decision rule; criteria are not a copyrighted instrument. Question wording is original to OLA BOT.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [
+    {
+      "id": "cannot_swallow_saliva",
+      "question": "Are you unable to swallow your own saliva, or are you drooling because it hurts too much to swallow?",
+      "help": "Answer yes if you are spitting out saliva instead of swallowing it.",
+      "action": "go_to_ed"
+    },
+    {
+      "id": "noisy_breathing",
+      "question": "Is there a high-pitched or noisy sound when breathing in, or a muffled \"hot potato\" voice?",
+      "help": "A harsh, whistling sound when breathing in can mean the airway is narrowing.",
+      "action": "call_911"
+    },
+    {
+      "id": "trismus",
+      "question": "Is one side of your throat much worse, with trouble opening your mouth fully?",
+      "help": "This pattern can mean a pocket of pus near the tonsil, which needs an exam today.",
+      "action": "urgent_care_today"
+    }
+  ],
+  "items": [
+    {
+      "id": "age_group",
+      "type": "choice",
+      "question": "How old is the person with the sore throat?",
+      "help": "The chance of strep throat is highest in school-age children and lower after age 45.",
+      "trace_label": "Age group",
+      "options": [
+        {
+          "value": "under_3",
+          "label": "Under 3 years",
+          "points": 0
+        },
+        {
+          "value": "3_14",
+          "label": "3 to 14 years",
+          "points": 1
+        },
+        {
+          "value": "15_44",
+          "label": "15 to 44 years",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "45_plus",
+          "label": "45 years or older",
+          "points": -1
+        }
+      ]
+    },
+    {
+      "id": "fever",
+      "type": "yes_no",
+      "question": "Have you had a fever of 100.4°F (38°C) or higher?",
+      "help": "Count a fever measured with a thermometer during this illness. If you did not measure, choose Not sure.",
+      "trace_label": "Fever ≥38°C (100.4°F)",
+      "points_if_yes": 1
+    },
+    {
+      "id": "no_cough",
+      "type": "yes_no",
+      "question": "Is your cough absent? (Answer yes if you do NOT have a cough.)",
+      "help": "A cough makes a cold virus more likely than strep. Answer yes if you have no cough at all.",
+      "trace_label": "No cough",
+      "points_if_yes": 1
+    },
+    {
+      "id": "tender_nodes",
+      "type": "yes_no",
+      "question": "Are the glands on the front of your neck, just under the jaw, swollen or sore to the touch?",
+      "help": "Press gently on both sides of the neck just below the angle of the jaw. Answer yes if there are tender lumps.",
+      "trace_label": "Tender/swollen front neck glands",
+      "points_if_yes": 1
+    },
+    {
+      "id": "exudate",
+      "type": "yes_no",
+      "question": "Are your tonsils swollen, or do you see white patches on them?",
+      "help": "Use a flashlight and a mirror. Tonsils are at the back of the throat on both sides. Answer yes for swelling or white or yellow spots.",
+      "trace_label": "Tonsil swelling or white patches",
+      "points_if_yes": 1
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "threshold_text": "−1 to 1 = low likelihood; 2 to 3 = moderate likelihood; 4 to 5 = high likelihood of strep",
+    "bands": [
+      {
+        "min": -1,
+        "max": 1,
+        "result": "low"
+      },
+      {
+        "min": 2,
+        "max": 3,
+        "result": "moderate"
+      },
+      {
+        "min": 4,
+        "max": 5,
+        "result": "high"
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "label": "Age under 3 (outside the validated age range)",
+      "when": {
+        "var": "age_group",
+        "equals": "under_3"
+      },
+      "result": "not_applicable"
+    }
+  ],
+  "results": {
+    "low": {
+      "label": "Low likelihood of strep",
+      "risk": "low",
+      "interpretation": "About 1 to 10 in 100 people with this score have strep throat. A virus is the most likely cause.",
+      "recommendation": "No strep test or antibiotics needed. Treat symptoms at home.",
+      "care": {
+        "level": "self_care",
+        "within": "Manage at home; see primary care if not better in 5 to 7 days",
+        "where_detail": "Home care. Book a primary care visit if the sore throat lasts more than 7 days or you get worse.",
+        "ed_redirect": [
+          "Cannot swallow saliva or drooling",
+          "Noisy or difficult breathing",
+          "Cannot open mouth fully"
+        ],
+        "self_care": [
+          "Drink fluids and rest.",
+          "Acetaminophen or ibuprofen as labeled for pain and fever.",
+          "Warm salt-water gargles or throat lozenges."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "moderate": {
+      "label": "Moderate likelihood of strep",
+      "risk": "moderate",
+      "interpretation": "About 11 to 35 in 100 people with this score have strep throat.",
+      "recommendation": "Rapid strep test or throat culture advised. Antibiotics only if the test is positive.",
+      "care": {
+        "level": "urgent_care",
+        "within": "Today or within 24 hours",
+        "where_detail": "Urgent care clinic with an on-site rapid strep test, or a primary care visit within 24 hours.",
+        "ed_redirect": [
+          "Severe throat pain with trouble swallowing liquids",
+          "Cannot swallow saliva or drooling",
+          "Noisy or difficult breathing"
+        ],
+        "finder_specialty": "urgent_care"
+      }
+    },
+    "high": {
+      "label": "High likelihood of strep",
+      "risk": "high",
+      "interpretation": "About 50 in 100 people with this score have strep throat.",
+      "recommendation": "Rapid strep test or throat culture advised today. Antibiotics if the test is positive.",
+      "care": {
+        "level": "urgent_care",
+        "within": "Today (within 12 hours)",
+        "where_detail": "Urgent care clinic with an on-site rapid strep test.",
+        "ed_redirect": [
+          "Severe throat pain with trouble swallowing liquids",
+          "Cannot swallow saliva or drooling",
+          "Noisy or difficult breathing"
+        ],
+        "finder_specialty": "urgent_care"
+      }
+    },
+    "not_applicable": {
+      "label": "Rule does not apply (child under 3)",
+      "risk": "not_applicable",
+      "interpretation": "The McIsaac score was not validated in children under 3. Strep throat is uncommon at this age, but other infections need an exam.",
+      "recommendation": "Have a pediatric clinician examine the child.",
+      "care": {
+        "level": "primary_care",
+        "within": "Within 24 hours",
+        "where_detail": "Pediatric or family medicine clinic, or urgent care that sees young children.",
+        "ed_redirect": [
+          "Fever in a baby under 3 months",
+          "Not drinking or fewer wet diapers",
+          "Hard to wake or breathing fast"
+        ],
+        "finder_specialty": "pediatrics"
+      }
+    }
+  }
+}

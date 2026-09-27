@@ -1,0 +1,455 @@
+{
+  "rule_id": "phq9",
+  "name": "Patient Health Questionnaire-9 (PHQ-9)",
+  "short_name": "PHQ-9",
+  "assessment_title": "Depression check",
+  "condition": "Low mood or depression",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": 2001,
+  "citations": [
+    {
+      "text": "Kroenke K, Spitzer RL, Williams JB. The PHQ-9: validity of a brief depression severity measure. J Gen Intern Med. 2001;16(9):606-613.",
+      "pmid": "11556941",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/11556941/"
+    }
+  ],
+  "validated_population": "Adults in primary care and obstetrics-gynecology clinics. Self-administered.",
+  "license_note": "PHQ-9 was developed by Drs. Robert L. Spitzer, Janet B.W. Williams, Kurt Kroenke and colleagues, with an educational grant from Pfizer Inc. No permission is required to reproduce, translate, display or distribute. Item wording is used verbatim.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [],
+  "items": [
+    {
+      "id": "interest",
+      "type": "choice",
+      "question": "Over the last 2 weeks, how often have you been bothered by: Little interest or pleasure in doing things?",
+      "help": "Not enjoying things you usually like.",
+      "trace_label": "Q1 Little interest or pleasure in doing things",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Several days",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "More than half the days",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "Nearly every day",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "id": "down",
+      "type": "choice",
+      "question": "Over the last 2 weeks, how often have you been bothered by: Feeling down, depressed, or hopeless?",
+      "help": "Feeling sad or that things will not get better.",
+      "trace_label": "Q2 Feeling down",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Several days",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "More than half the days",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "Nearly every day",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "id": "sleep",
+      "type": "choice",
+      "question": "Over the last 2 weeks, how often have you been bothered by: Trouble falling or staying asleep, or sleeping too much?",
+      "help": "Any change in sleep: too little or too much.",
+      "trace_label": "Q3 Trouble falling or staying asleep",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Several days",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "More than half the days",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "Nearly every day",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "id": "tired",
+      "type": "choice",
+      "question": "Over the last 2 weeks, how often have you been bothered by: Feeling tired or having little energy?",
+      "help": "Feeling worn out even without much activity.",
+      "trace_label": "Q4 Feeling tired or having little energy",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Several days",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "More than half the days",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "Nearly every day",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "id": "appetite",
+      "type": "choice",
+      "question": "Over the last 2 weeks, how often have you been bothered by: Poor appetite or overeating?",
+      "help": "Eating a lot less or a lot more than usual.",
+      "trace_label": "Q5 Poor appetite or overeating",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Several days",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "More than half the days",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "Nearly every day",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "id": "failure",
+      "type": "choice",
+      "question": "Over the last 2 weeks, how often have you been bothered by: Feeling bad about yourself — or that you are a failure or have let yourself or your family down?",
+      "help": "Being very hard on yourself.",
+      "trace_label": "Q6 Feeling bad about yourself",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Several days",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "More than half the days",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "Nearly every day",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "id": "concentration",
+      "type": "choice",
+      "question": "Over the last 2 weeks, how often have you been bothered by: Trouble concentrating on things, such as reading the newspaper or watching television?",
+      "help": "Losing your place, or not being able to focus.",
+      "trace_label": "Q7 Trouble concentrating on things",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Several days",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "More than half the days",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "Nearly every day",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "id": "psychomotor",
+      "type": "choice",
+      "question": "Over the last 2 weeks, how often have you been bothered by: Moving or speaking so slowly that other people could have noticed? Or the opposite — being so fidgety or restless that you have been moving around a lot more than usual?",
+      "help": "Others have noticed you are slowed down, or very restless.",
+      "trace_label": "Q8 Moving or speaking so slowly that other people could have noticed",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Several days",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "More than half the days",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "Nearly every day",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "id": "self_harm",
+      "type": "choice",
+      "question": "Over the last 2 weeks, how often have you been bothered by: Thoughts that you would be better off dead or of hurting yourself in some way?",
+      "help": "Any such thought counts, even if brief. If you have these thoughts, call or text 988 any time.",
+      "trace_label": "Q9 Thoughts that you would be better off dead or of hurting yourself in some way",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Several days",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "More than half the days",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "Nearly every day",
+          "points": 3
+        }
+      ],
+      "critical": true
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "threshold_text": "0–4 minimal; 5–9 mild; 10–14 moderate; 15–19 moderately severe; 20–27 severe. Any answer above \"Not at all\" on question 9 triggers crisis resources.",
+    "bands": [
+      {
+        "min": 0,
+        "max": 4,
+        "result": "minimal"
+      },
+      {
+        "min": 5,
+        "max": 9,
+        "result": "mild"
+      },
+      {
+        "min": 10,
+        "max": 14,
+        "result": "moderate"
+      },
+      {
+        "min": 15,
+        "max": 19,
+        "result": "mod_severe"
+      },
+      {
+        "min": 20,
+        "max": 27,
+        "result": "severe"
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "label": "Question 9 (thoughts of self-harm) answered above \"Not at all\"",
+      "when": {
+        "var": "self_harm",
+        "in": [
+          "1",
+          "2",
+          "3"
+        ]
+      },
+      "result": "crisis"
+    }
+  ],
+  "results": {
+    "minimal": {
+      "label": "Minimal depression symptoms",
+      "risk": "low",
+      "interpretation": "Your score is in the minimal range. Symptoms at this level usually do not need treatment.",
+      "recommendation": "No treatment needed now. Repeat this check if symptoms increase.",
+      "care": {
+        "level": "self_care",
+        "within": "Self-care; repeat the check in 2 to 4 weeks if symptoms continue",
+        "where_detail": "Home care. Book a primary care visit if symptoms get worse or last more than 2 weeks.",
+        "ed_redirect": [
+          "Thoughts of harming yourself or ending your life: call or text 988 now",
+          "Immediate danger: call 911"
+        ],
+        "self_care": [
+          "Keep a regular sleep schedule.",
+          "Get daily physical activity and time outside.",
+          "Stay in contact with people you trust."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "mild": {
+      "label": "Mild depression symptoms",
+      "risk": "low",
+      "interpretation": "Your score is in the mild range. Watchful waiting and a follow-up check are usually advised.",
+      "recommendation": "Book a primary care visit to discuss symptoms and repeat the PHQ-9 at follow-up.",
+      "care": {
+        "level": "primary_care",
+        "within": "Within 2 to 4 weeks",
+        "where_detail": "Primary care clinic.",
+        "ed_redirect": [
+          "Thoughts of harming yourself or ending your life: call or text 988 now",
+          "Immediate danger: call 911"
+        ],
+        "self_care": [
+          "Keep a regular sleep schedule.",
+          "Get daily physical activity.",
+          "Stay in contact with people you trust."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "moderate": {
+      "label": "Moderate depression symptoms",
+      "risk": "moderate",
+      "interpretation": "Your score is in the moderate range. Treatment such as counseling, medicine, or both is usually recommended.",
+      "recommendation": "Book a visit with primary care or a mental health clinician to discuss a treatment plan.",
+      "care": {
+        "level": "primary_care",
+        "within": "Within 1 to 2 weeks",
+        "where_detail": "Primary care clinic or a licensed mental health clinician.",
+        "ed_redirect": [
+          "Thoughts of harming yourself or ending your life: call or text 988 now",
+          "Immediate danger: call 911"
+        ],
+        "finder_specialty": "mental_health"
+      }
+    },
+    "mod_severe": {
+      "label": "Moderately severe depression symptoms",
+      "risk": "high",
+      "interpretation": "Your score is in the moderately severe range. Active treatment with counseling and/or medicine is recommended.",
+      "recommendation": "Book a visit with a mental health clinician or primary care within 1 week.",
+      "care": {
+        "level": "mental_health",
+        "within": "Within 1 week",
+        "where_detail": "Licensed mental health clinician (psychiatrist, psychologist, counselor) or primary care.",
+        "ed_redirect": [
+          "Thoughts of harming yourself or ending your life: call or text 988 now",
+          "Immediate danger: call 911"
+        ],
+        "finder_specialty": "mental_health"
+      }
+    },
+    "severe": {
+      "label": "Severe depression symptoms",
+      "risk": "high",
+      "interpretation": "Your score is in the severe range. Prompt treatment is recommended, usually including medicine and counseling.",
+      "recommendation": "See a mental health clinician or primary care within 2 to 3 days.",
+      "care": {
+        "level": "mental_health",
+        "within": "Within 2 to 3 days",
+        "where_detail": "Psychiatrist or mental health clinic; primary care if a mental health clinician is not available.",
+        "ed_redirect": [
+          "Thoughts of harming yourself or ending your life: call or text 988 now",
+          "Immediate danger: call 911"
+        ],
+        "finder_specialty": "mental_health"
+      }
+    },
+    "crisis": {
+      "label": "Thoughts of self-harm reported",
+      "risk": "high",
+      "interpretation": "You reported thoughts of being better off dead or of hurting yourself. This needs attention now, whatever the total score.",
+      "recommendation": "Call or text 988 now to talk with a trained crisis counselor. Call 911 if you are in immediate danger.",
+      "care": {
+        "level": "crisis",
+        "within": "Now",
+        "where_detail": "988 Suicide & Crisis Lifeline (call or text 988, 24 hours). Call 911 for immediate danger.",
+        "ed_redirect": [
+          "Immediate danger or already hurt yourself: call 911"
+        ],
+        "finder_specialty": "mental_health"
+      }
+    }
+  }
+}

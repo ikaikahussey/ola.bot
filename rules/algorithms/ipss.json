@@ -1,0 +1,400 @@
+{
+  "rule_id": "ipss",
+  "name": "International Prostate Symptom Score (IPSS / AUA Symptom Index)",
+  "short_name": "IPSS",
+  "assessment_title": "Urinary symptom check",
+  "condition": "Urinary symptoms (men)",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": 1992,
+  "citations": [
+    {
+      "text": "Barry MJ, Fowler FJ Jr, O'Leary MP, et al. The American Urological Association symptom index for benign prostatic hyperplasia. J Urol. 1992;148(5):1549-1557.",
+      "pmid": "1279218",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/1279218/"
+    }
+  ],
+  "validated_population": "Men with lower urinary tract symptoms (benign prostatic hyperplasia). Self-administered.",
+  "license_note": "The AUA Symptom Index is widely reproduced for clinical use. Verify current terms with the American Urological Association before production deployment. Item wording is used verbatim.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [
+    {
+      "id": "retention",
+      "question": "Are you unable to pass any urine at all, with a painful, full bladder?",
+      "help": "Not being able to urinate at all is an emergency.",
+      "action": "go_to_ed"
+    },
+    {
+      "id": "fever_flank",
+      "question": "Do you have a fever, chills, or pain in your side or back along with the urinary symptoms?",
+      "help": "These can mean a kidney or prostate infection.",
+      "action": "urgent_care_today"
+    }
+  ],
+  "items": [
+    {
+      "id": "emptying",
+      "type": "choice",
+      "question": "Over the past month, how often have you had a sensation of not emptying your bladder completely after you finished urinating?",
+      "help": "Feeling you still need to go right after you finish.",
+      "trace_label": "Incomplete emptying",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Less than 1 time in 5",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "Less than half the time",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "About half the time",
+          "points": 3
+        },
+        {
+          "value": "4",
+          "label": "More than half the time",
+          "points": 4
+        },
+        {
+          "value": "5",
+          "label": "Almost always",
+          "points": 5
+        }
+      ]
+    },
+    {
+      "id": "frequency",
+      "type": "choice",
+      "question": "Over the past month, how often have you had to urinate again less than two hours after you finished urinating?",
+      "help": "Needing to go again soon after going.",
+      "trace_label": "Frequency",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Less than 1 time in 5",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "Less than half the time",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "About half the time",
+          "points": 3
+        },
+        {
+          "value": "4",
+          "label": "More than half the time",
+          "points": 4
+        },
+        {
+          "value": "5",
+          "label": "Almost always",
+          "points": 5
+        }
+      ]
+    },
+    {
+      "id": "intermittency",
+      "type": "choice",
+      "question": "Over the past month, how often have you found you stopped and started again several times when you urinated?",
+      "help": "The stream stops and starts.",
+      "trace_label": "Intermittency",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Less than 1 time in 5",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "Less than half the time",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "About half the time",
+          "points": 3
+        },
+        {
+          "value": "4",
+          "label": "More than half the time",
+          "points": 4
+        },
+        {
+          "value": "5",
+          "label": "Almost always",
+          "points": 5
+        }
+      ]
+    },
+    {
+      "id": "urgency",
+      "type": "choice",
+      "question": "Over the past month, how often have you found it difficult to postpone urination?",
+      "help": "Hard to hold it when you feel the urge.",
+      "trace_label": "Urgency",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Less than 1 time in 5",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "Less than half the time",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "About half the time",
+          "points": 3
+        },
+        {
+          "value": "4",
+          "label": "More than half the time",
+          "points": 4
+        },
+        {
+          "value": "5",
+          "label": "Almost always",
+          "points": 5
+        }
+      ]
+    },
+    {
+      "id": "weak_stream",
+      "type": "choice",
+      "question": "Over the past month, how often have you had a weak urinary stream?",
+      "help": "A slow or weak flow.",
+      "trace_label": "Weak stream",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Less than 1 time in 5",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "Less than half the time",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "About half the time",
+          "points": 3
+        },
+        {
+          "value": "4",
+          "label": "More than half the time",
+          "points": 4
+        },
+        {
+          "value": "5",
+          "label": "Almost always",
+          "points": 5
+        }
+      ]
+    },
+    {
+      "id": "straining",
+      "type": "choice",
+      "question": "Over the past month, how often have you had to push or strain to begin urination?",
+      "help": "Needing to push to start.",
+      "trace_label": "Straining",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Less than 1 time in 5",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "Less than half the time",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "About half the time",
+          "points": 3
+        },
+        {
+          "value": "4",
+          "label": "More than half the time",
+          "points": 4
+        },
+        {
+          "value": "5",
+          "label": "Almost always",
+          "points": 5
+        }
+      ]
+    },
+    {
+      "id": "nocturia",
+      "type": "choice",
+      "question": "Over the past month, how many times did you most typically get up to urinate from the time you went to bed at night until the time you got up in the morning?",
+      "help": "Count the usual number of times per night.",
+      "trace_label": "Nighttime urination",
+      "options": [
+        {
+          "value": "0",
+          "label": "None",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "1 time",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "2 times",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "3 times",
+          "points": 3
+        },
+        {
+          "value": "4",
+          "label": "4 times",
+          "points": 4
+        },
+        {
+          "value": "5",
+          "label": "5 or more times",
+          "points": 5
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "threshold_text": "0–7 mild; 8–19 moderate; 20–35 severe symptoms.",
+    "bands": [
+      {
+        "min": 0,
+        "max": 7,
+        "result": "mild"
+      },
+      {
+        "min": 8,
+        "max": 19,
+        "result": "moderate"
+      },
+      {
+        "min": 20,
+        "max": 35,
+        "result": "severe"
+      }
+    ]
+  },
+  "results": {
+    "mild": {
+      "label": "Mild urinary symptoms",
+      "risk": "low",
+      "interpretation": "Your score is in the mild range. Mild symptoms are often managed with watchful waiting.",
+      "recommendation": "No treatment usually needed. Book a routine visit if symptoms bother you. Visible blood in the urine always needs a visit.",
+      "care": {
+        "level": "self_care",
+        "within": "Routine; primary care within 1 to 2 months if bothersome",
+        "where_detail": "Home care. Book a routine primary care visit if symptoms bother you.",
+        "ed_redirect": [
+          "Cannot pass urine at all: go to the emergency department",
+          "Fever with back or side pain: urgent care today"
+        ],
+        "self_care": [
+          "Limit fluids in the 2 hours before bed.",
+          "Limit caffeine and alcohol."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "moderate": {
+      "label": "Moderate urinary symptoms",
+      "risk": "moderate",
+      "interpretation": "Your score is in the moderate range. Treatment options include lifestyle changes and medicine.",
+      "recommendation": "Book a primary care visit to discuss symptoms and treatment.",
+      "care": {
+        "level": "primary_care",
+        "within": "Within 2 to 4 weeks",
+        "where_detail": "Primary care clinic.",
+        "ed_redirect": [
+          "Cannot pass urine at all: go to the emergency department",
+          "Fever with back or side pain: urgent care today"
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "severe": {
+      "label": "Severe urinary symptoms",
+      "risk": "high",
+      "interpretation": "Your score is in the severe range. Evaluation and treatment are recommended.",
+      "recommendation": "Book a visit with primary care or urology.",
+      "care": {
+        "level": "primary_care",
+        "within": "Within 1 to 2 weeks",
+        "where_detail": "Primary care or urology clinic.",
+        "ed_redirect": [
+          "Cannot pass urine at all: go to the emergency department",
+          "Fever with back or side pain: urgent care today"
+        ],
+        "finder_specialty": "urology"
+      }
+    }
+  }
+}

@@ -1,0 +1,274 @@
+{
+  "rule_id": "canadian_cspine",
+  "name": "Canadian C-Spine Rule",
+  "short_name": "Canadian C-Spine Rule",
+  "assessment_title": "Neck injury assessment",
+  "condition": "Neck injury after an accident or fall",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": 2001,
+  "citations": [
+    {
+      "text": "Stiell IG, Wells GA, Vandemheen KL, et al. The Canadian C-spine rule for radiography in alert and stable trauma patients. JAMA. 2001;286(15):1841-1848.",
+      "pmid": "11597285",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/11597285/"
+    }
+  ],
+  "validated_population": "Alert (fully awake and oriented), stable adults 16 and older with neck pain or injury after trauma, seen in the emergency department.",
+  "self_report_note": "The rule was validated with a clinician performing the exam. \"Sitting up\" was originally assessed in the emergency department. Do not move your neck to test it unless every earlier answer allows it.",
+  "license_note": "Published clinical decision rule; criteria are not a copyrighted instrument. Question wording is original to OLA BOT.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [
+    {
+      "id": "weakness",
+      "question": "Since the injury, is there any weakness in the arms or legs, or loss of bladder or bowel control?",
+      "help": "Answer yes if you cannot lift or grip normally, or cannot control urine or stool.",
+      "action": "call_911"
+    },
+    {
+      "id": "not_alert",
+      "question": "Did the person pass out, or are they drowsy, drunk, or not fully alert?",
+      "help": "The rule only applies to people who are fully alert. Keep the neck still and get emergency care.",
+      "action": "call_911"
+    }
+  ],
+  "items": [
+    {
+      "id": "age_65",
+      "type": "yes_no",
+      "question": "Are you 65 years or older?",
+      "help": "Age 65 or older is a high-risk factor for neck injury.",
+      "trace_label": "High risk: age 65 or older",
+      "critical": true
+    },
+    {
+      "id": "dangerous_mechanism",
+      "type": "yes_no",
+      "question": "Was it a dangerous injury? For example: a fall from 3 feet or 5 stairs or higher, a diving injury, a high-speed or rollover crash, being thrown from a vehicle, or a crash on a bicycle, motorcycle, or ATV.",
+      "help": "Answer yes if any of these happened. A simple low-speed rear-end car collision is a no.",
+      "trace_label": "High risk: dangerous mechanism",
+      "critical": true
+    },
+    {
+      "id": "paresthesias",
+      "type": "yes_no",
+      "question": "Is there numbness, tingling, or pins-and-needles in the arms or legs?",
+      "help": "Answer yes for any new numbness or tingling since the injury.",
+      "trace_label": "High risk: numbness or tingling in arms or legs",
+      "critical": true
+    },
+    {
+      "id": "simple_rear_end",
+      "type": "yes_no",
+      "question": "Was the injury a simple rear-end car collision? (Not pushed into traffic, not hit by a bus or large truck, not a rollover, not high speed.)",
+      "help": "Answer no if the injury was not a car collision at all.",
+      "trace_label": "Low risk: simple rear-end collision",
+      "concerning_answer": "no",
+      "critical": true,
+      "show_if": {
+        "all_no": [
+          "age_65",
+          "dangerous_mechanism",
+          "paresthesias"
+        ]
+      }
+    },
+    {
+      "id": "sitting_up",
+      "type": "yes_no",
+      "question": "Have you been able to sit upright since the injury?",
+      "help": "Answer yes if you have been able to sit up on your own.",
+      "trace_label": "Low risk: able to sit upright",
+      "concerning_answer": "no",
+      "critical": true,
+      "show_if": {
+        "all_no": [
+          "age_65",
+          "dangerous_mechanism",
+          "paresthesias"
+        ]
+      }
+    },
+    {
+      "id": "ambulatory",
+      "type": "yes_no",
+      "question": "Have you been able to walk at any time since the injury?",
+      "help": "Answer yes if you have walked on your own at any point.",
+      "trace_label": "Low risk: walked at any time since injury",
+      "concerning_answer": "no",
+      "critical": true,
+      "show_if": {
+        "all_no": [
+          "age_65",
+          "dangerous_mechanism",
+          "paresthesias"
+        ]
+      }
+    },
+    {
+      "id": "delayed_onset",
+      "type": "yes_no",
+      "question": "Did the neck pain start later, rather than right away at the time of injury?",
+      "help": "Answer yes if the pain began some time after the injury (for example, hours later).",
+      "trace_label": "Low risk: delayed onset of neck pain",
+      "concerning_answer": "no",
+      "critical": true,
+      "show_if": {
+        "all_no": [
+          "age_65",
+          "dangerous_mechanism",
+          "paresthesias"
+        ]
+      }
+    },
+    {
+      "id": "midline_tender",
+      "type": "yes_no",
+      "question": "Gently press on the bones down the MIDDLE of the back of your neck. Is it painful to press?",
+      "help": "Press on the center line of the back of the neck, from the base of the skull down. Muscle soreness to the side does not count.",
+      "trace_label": "Midline neck bone tenderness (absence is low risk)",
+      "concerning_answer": "yes",
+      "critical": true,
+      "show_if": {
+        "all_no": [
+          "age_65",
+          "dangerous_mechanism",
+          "paresthesias"
+        ]
+      }
+    },
+    {
+      "id": "can_rotate",
+      "type": "yes_no",
+      "question": "Slowly turn your head to the left and then to the right. Can you turn it at least halfway (45°) each way? Stop if you feel sharp pain or tingling.",
+      "help": "Only do this if all earlier answers allowed it. Turn slowly and stop if it hurts sharply.",
+      "trace_label": "Able to rotate neck 45° left and right",
+      "concerning_answer": "no",
+      "critical": true,
+      "show_if": {
+        "all": [
+          {
+            "all_no": [
+              "age_65",
+              "dangerous_mechanism",
+              "paresthesias"
+            ]
+          },
+          {
+            "any": [
+              {
+                "any_yes": [
+                  "simple_rear_end",
+                  "sitting_up",
+                  "ambulatory",
+                  "delayed_onset"
+                ]
+              },
+              {
+                "var": "midline_tender",
+                "equals": "no"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "scoring": {
+    "method": "decision",
+    "threshold_text": "Step 1: any high-risk factor → imaging. Step 2: no low-risk factor → imaging. Step 3: unable to turn neck 45° both ways → imaging. Otherwise no imaging.",
+    "steps": [
+      {
+        "label": "Any high-risk factor (age 65+, dangerous mechanism, numbness/tingling)",
+        "when": {
+          "any_yes": [
+            "age_65",
+            "dangerous_mechanism",
+            "paresthesias"
+          ]
+        },
+        "result": "imaging"
+      },
+      {
+        "label": "No low-risk factor present",
+        "when": {
+          "not": {
+            "any": [
+              {
+                "any_yes": [
+                  "simple_rear_end",
+                  "sitting_up",
+                  "ambulatory",
+                  "delayed_onset"
+                ]
+              },
+              {
+                "var": "midline_tender",
+                "equals": "no"
+              }
+            ]
+          }
+        },
+        "result": "imaging"
+      },
+      {
+        "label": "Unable to turn neck 45° left and right",
+        "when": {
+          "var": "can_rotate",
+          "equals": "no"
+        },
+        "result": "imaging"
+      }
+    ],
+    "default_result": "no_imaging"
+  },
+  "results": {
+    "imaging": {
+      "label": "Neck imaging recommended",
+      "risk": "high",
+      "interpretation": "Your answers do not allow neck injury to be ruled out by the Canadian C-Spine Rule. A neck bone injury needs to be excluded with imaging.",
+      "recommendation": "Keep your neck as still as possible and get neck imaging in an emergency department.",
+      "care": {
+        "level": "emergency_department",
+        "within": "Now (within 1 hour)",
+        "where_detail": "Hospital emergency department. After a high-speed crash or fall, call 911 rather than driving.",
+        "ed_redirect": [
+          "Any weakness, numbness, or loss of bladder control: call 911",
+          "Severe pain when moving the neck: keep still and call 911"
+        ],
+        "finder_specialty": "emergency_department"
+      }
+    },
+    "no_imaging": {
+      "label": "Neck imaging not needed",
+      "risk": "low",
+      "interpretation": "The Canadian C-Spine Rule says imaging is not needed. In the original study, the rule identified all important neck injuries (sensitivity 100%).",
+      "recommendation": "Treat neck strain at home. Get an exam if pain is not improving.",
+      "care": {
+        "level": "self_care",
+        "within": "Manage at home; see primary care within 1 week if not improving",
+        "where_detail": "Home care. Book a primary care visit if pain is not improving within 1 week.",
+        "ed_redirect": [
+          "New numbness, tingling, or weakness in arms or legs",
+          "Loss of bladder or bowel control",
+          "Severe or worsening pain"
+        ],
+        "self_care": [
+          "Gentle movement as pain allows.",
+          "Acetaminophen or ibuprofen as labeled.",
+          "Heat or ice for 15 minutes at a time."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    }
+  }
+}

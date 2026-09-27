@@ -1,0 +1,306 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "emergency_keywords": [
+    {
+      "keywords": [
+        "chest pain",
+        "chest pressure",
+        "chest tightness",
+        "heart attack",
+        "crushing chest"
+      ],
+      "red_flag_id": "chest_pain"
+    },
+    {
+      "keywords": [
+        "cant breathe",
+        "cannot breathe",
+        "trouble breathing",
+        "difficulty breathing",
+        "short of breath",
+        "shortness of breath",
+        "choking"
+      ],
+      "red_flag_id": "breathing"
+    },
+    {
+      "keywords": [
+        "heavy bleeding",
+        "wont stop bleeding",
+        "bleeding wont stop",
+        "vomiting blood",
+        "coughing up blood"
+      ],
+      "red_flag_id": "bleeding"
+    },
+    {
+      "keywords": [
+        "confused",
+        "confusion",
+        "unresponsive",
+        "passed out",
+        "unconscious",
+        "seizure"
+      ],
+      "red_flag_id": "mental_status"
+    },
+    {
+      "keywords": [
+        "stroke",
+        "face drooping",
+        "slurred speech",
+        "cant move my arm",
+        "sudden weakness",
+        "one side weak"
+      ],
+      "red_flag_id": "stroke"
+    },
+    {
+      "keywords": [
+        "throat swelling",
+        "tongue swelling",
+        "anaphylaxis",
+        "severe allergic reaction"
+      ],
+      "red_flag_id": "allergic_reaction"
+    },
+    {
+      "keywords": [
+        "severe abdominal pain",
+        "severe stomach pain",
+        "severe belly pain",
+        "worst belly pain"
+      ],
+      "red_flag_id": "abdominal_pain"
+    },
+    {
+      "keywords": [
+        "suicide",
+        "suicidal",
+        "kill myself",
+        "end my life",
+        "want to die",
+        "hurt myself",
+        "self harm"
+      ],
+      "red_flag_id": "self_harm"
+    }
+  ],
+  "complaint_map": [
+    {
+      "keywords": [
+        "sore throat",
+        "throat pain",
+        "throat hurts",
+        "pharyngitis",
+        "strep",
+        "strep throat",
+        "tonsillitis",
+        "painful swallowing"
+      ],
+      "rule_id": "centor_sore_throat"
+    },
+    {
+      "keywords": [
+        "ankle pain",
+        "ankle sprain",
+        "ankle injury",
+        "twisted ankle",
+        "rolled ankle",
+        "sprained ankle",
+        "foot injury",
+        "foot pain",
+        "midfoot pain",
+        "broken ankle",
+        "broken foot"
+      ],
+      "rule_id": "ottawa_ankle"
+    },
+    {
+      "keywords": [
+        "knee pain",
+        "knee injury",
+        "hurt knee",
+        "hurt my knee",
+        "twisted knee",
+        "knee swelling",
+        "knee sprain"
+      ],
+      "rule_id": "ottawa_knee"
+    },
+    {
+      "keywords": [
+        "neck injury",
+        "neck pain after accident",
+        "whiplash",
+        "car accident neck",
+        "hurt my neck",
+        "neck trauma"
+      ],
+      "rule_id": "canadian_cspine"
+    },
+    {
+      "keywords": [
+        "head injury",
+        "hit my head",
+        "hit head",
+        "concussion",
+        "head trauma",
+        "bumped head",
+        "fell and hit head"
+      ],
+      "rule_id": "canadian_ct_head"
+    },
+    {
+      "keywords": [
+        "depression",
+        "depressed",
+        "sad",
+        "hopeless",
+        "low mood",
+        "no interest",
+        "feeling down"
+      ],
+      "rule_id": "phq9"
+    },
+    {
+      "keywords": [
+        "anxiety",
+        "anxious",
+        "worry",
+        "worried",
+        "panic",
+        "nervous",
+        "on edge"
+      ],
+      "rule_id": "gad7"
+    },
+    {
+      "keywords": [
+        "ptsd",
+        "trauma",
+        "flashbacks",
+        "nightmares",
+        "traumatic event"
+      ],
+      "rule_id": "pc_ptsd5"
+    },
+    {
+      "keywords": [
+        "alcohol",
+        "drinking",
+        "drink too much",
+        "drinking problem",
+        "alcoholism",
+        "hangover"
+      ],
+      "rule_id": "audit_c"
+    },
+    {
+      "keywords": [
+        "sleepy",
+        "sleepiness",
+        "daytime sleepiness",
+        "tired all the time",
+        "falling asleep",
+        "drowsy",
+        "fatigue"
+      ],
+      "rule_id": "stop_bang"
+    },
+    {
+      "keywords": [
+        "snoring",
+        "snore",
+        "sleep apnea",
+        "stop breathing at night",
+        "gasping at night"
+      ],
+      "rule_id": "stop_bang"
+    },
+    {
+      "keywords": [
+        "frequent urination",
+        "weak urine stream",
+        "weak stream",
+        "prostate",
+        "urinating at night",
+        "trouble urinating",
+        "dribbling"
+      ],
+      "rule_id": "ipss"
+    },
+    {
+      "keywords": [
+        "burning urination",
+        "painful urination",
+        "burning when i pee",
+        "uti",
+        "bladder infection",
+        "urinary tract infection",
+        "dysuria"
+      ],
+      "rule_id": "uti_bent"
+    },
+    {
+      "keywords": [
+        "back pain",
+        "low back pain",
+        "lower back pain",
+        "backache",
+        "sciatica",
+        "back hurts"
+      ],
+      "rule_id": "start_back"
+    },
+    {
+      "keywords": [
+        "headache",
+        "headaches",
+        "migraine",
+        "migraines",
+        "head pain",
+        "head hurts"
+      ],
+      "rule_id": "id_migraine"
+    },
+    {
+      "keywords": [
+        "sinus",
+        "sinus infection",
+        "sinusitis",
+        "stuffy nose",
+        "sinus pressure",
+        "facial pain",
+        "nasal congestion",
+        "runny nose"
+      ],
+      "rule_id": "idsa_sinusitis"
+    },
+    {
+      "keywords": [
+        "cough",
+        "coughing",
+        "chest cold",
+        "bronchitis",
+        "pneumonia",
+        "cough and fever",
+        "chest infection"
+      ],
+      "rule_id": "crb65_cough"
+    },
+    {
+      "keywords": [
+        "leg swelling",
+        "swollen leg",
+        "calf pain",
+        "calf swelling",
+        "blood clot",
+        "dvt",
+        "leg pain one side"
+      ],
+      "rule_id": "wells_dvt"
+    }
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "rule_id": "id_migraine",
+  "name": "ID Migraine Screener",
+  "short_name": "ID Migraine",
+  "assessment_title": "Headache assessment",
+  "condition": "Recurring headaches",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": 2003,
+  "citations": [
+    {
+      "text": "Lipton RB, Dodick D, Sadovsky R, et al. A self-administered screener for migraine in primary care: The ID Migraine validation study. Neurology. 2003;61(3):375-382.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=%22A%20self-administered%20screener%20for%20migraine%20in%20primary%20care%3A%20The%20ID%20Migraine%20validation%20study%22%5BTitle%5D"
+    }
+  ],
+  "validated_population": "Adults in primary care with two or more headaches in the past 3 months that interfered with work, school, or social life. Self-administered.",
+  "license_note": "Published screening questions. Verify terms of use for the ID Migraine questionnaire before production deployment.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [
+    {
+      "id": "thunderclap",
+      "question": "Is this a sudden, severe headache that reached full strength within about 1 minute — the worst headache of your life?",
+      "help": "A sudden \"thunderclap\" headache can mean bleeding in the brain.",
+      "action": "call_911"
+    },
+    {
+      "id": "fever_neck",
+      "question": "Do you have a headache with fever and a stiff neck?",
+      "help": "Headache with fever and a stiff neck can mean meningitis.",
+      "action": "go_to_ed"
+    },
+    {
+      "id": "after_injury",
+      "question": "Did this headache start after a blow to the head?",
+      "help": "Use the head injury assessment instead, and get checked if the headache is severe or worsening.",
+      "action": "go_to_ed"
+    },
+    {
+      "id": "pregnancy",
+      "question": "Are you pregnant or within 6 weeks after giving birth, with a new severe headache or vision changes?",
+      "help": "This can be a sign of high blood pressure in pregnancy (preeclampsia).",
+      "action": "go_to_ed"
+    },
+    {
+      "id": "gca",
+      "question": "Are you over 50 with a new type of headache plus jaw pain when chewing, scalp tenderness, or any vision change?",
+      "help": "These can be signs of giant cell arteritis, which can cause blindness if untreated.",
+      "action": "urgent_care_today"
+    }
+  ],
+  "items": [
+    {
+      "id": "disability",
+      "type": "yes_no",
+      "question": "During the last 3 months, did your headaches limit your ability to work, study, or do what you needed to do for at least 1 day?",
+      "help": "Answer yes if a headache kept you from normal activities on at least one day.",
+      "trace_label": "Headaches limited activity ≥1 day",
+      "points_if_yes": 1
+    },
+    {
+      "id": "nausea",
+      "type": "yes_no",
+      "question": "During the last 3 months, did you feel nauseated or sick to your stomach when you had a headache?",
+      "help": "Feeling like you might throw up counts.",
+      "trace_label": "Nausea with headache",
+      "points_if_yes": 1
+    },
+    {
+      "id": "photophobia",
+      "type": "yes_no",
+      "question": "During the last 3 months, did light bother you when you had a headache (a lot more than when you do not have headaches)?",
+      "help": "Needing to avoid bright light during a headache.",
+      "trace_label": "Light sensitivity with headache",
+      "points_if_yes": 1
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "threshold_text": "2 or 3 \"yes\" answers = positive screen for migraine; 0 or 1 = negative.",
+    "bands": [
+      {
+        "min": 0,
+        "max": 1,
+        "result": "negative"
+      },
+      {
+        "min": 2,
+        "max": 3,
+        "result": "positive"
+      }
+    ]
+  },
+  "results": {
+    "positive": {
+      "label": "Positive migraine screen",
+      "risk": "moderate",
+      "interpretation": "Your answers match the pattern of migraine. In the validation study, 93 in 100 people with a positive screen had migraine.",
+      "recommendation": "Book a primary care visit to confirm the diagnosis and discuss treatment and prevention.",
+      "care": {
+        "level": "primary_care",
+        "within": "Within 2 to 4 weeks",
+        "where_detail": "Primary care clinic.",
+        "ed_redirect": [
+          "Sudden, worst-ever headache: call 911",
+          "Headache with fever and stiff neck",
+          "New weakness, numbness, vision loss, or trouble speaking: call 911"
+        ],
+        "self_care": [
+          "Rest in a dark, quiet room during attacks.",
+          "Over-the-counter pain relievers early in an attack, no more than 2 to 3 days a week.",
+          "Keep a headache diary: dates, triggers, and treatments."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "negative": {
+      "label": "Negative migraine screen",
+      "risk": "low",
+      "interpretation": "Your answers do not match the typical migraine pattern. Tension-type headache is the most common other cause.",
+      "recommendation": "Self-care. Book a visit if headaches are frequent or changing.",
+      "care": {
+        "level": "self_care",
+        "within": "Self-care; primary care within 4 weeks if headaches happen 4+ days a month",
+        "where_detail": "Home care. Book a primary care visit if headaches are frequent, getting worse, or you use pain relievers more than 2 to 3 days a week.",
+        "ed_redirect": [
+          "Sudden, worst-ever headache: call 911",
+          "Headache with fever and stiff neck",
+          "New weakness, numbness, vision loss, or trouble speaking: call 911"
+        ],
+        "self_care": [
+          "Regular sleep, meals, and fluids.",
+          "Over-the-counter pain relievers as labeled, no more than 2 to 3 days a week."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    }
+  }
+}

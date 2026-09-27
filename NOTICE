@@ -1,0 +1,10 @@
+OLA BOT
+Copyright 2026 OLA BOT contributors
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Clinical instruments referenced in rules/algorithms/ are the work of their
+original authors and are subject to their own terms of use. Each rule file's
+"license_note" field states those terms. The Apache License applies to the
+OLA BOT source code and to question wording written for OLA BOT; it does not
+grant rights in third-party instruments.

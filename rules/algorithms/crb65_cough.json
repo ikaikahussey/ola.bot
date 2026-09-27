@@ -1,0 +1,158 @@
+{
+  "rule_id": "crb65_cough",
+  "name": "CRB-65 Score",
+  "short_name": "CRB-65",
+  "assessment_title": "Cough and fever assessment",
+  "condition": "Cough with fever (possible chest infection)",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": 2003,
+  "citations": [
+    {
+      "text": "Lim WS, van der Eerden MM, Laing R, et al. Defining community acquired pneumonia severity on presentation to hospital: an international derivation and validation study. Thorax. 2003;58(5):377-382.",
+      "pmid": "12728155",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/12728155/"
+    }
+  ],
+  "validated_population": "Adults with community-acquired pneumonia presenting to hospital. CRB-65 is the version without a blood test, intended for community settings.",
+  "self_report_note": "The score was validated in people already diagnosed with pneumonia. Here it is used to judge how urgently to be seen. Breathing rate and blood pressure need to be measured.",
+  "license_note": "Published clinical score; not a copyrighted instrument. Question wording is original to OLA BOT.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [
+    {
+      "id": "low_oxygen",
+      "question": "If you have a home pulse oximeter, is your oxygen level below 92%?",
+      "help": "Low oxygen needs emergency care.",
+      "action": "go_to_ed"
+    },
+    {
+      "id": "blood",
+      "question": "Are you coughing up more than a teaspoon of blood?",
+      "help": "Coughing up blood needs prompt evaluation.",
+      "action": "go_to_ed"
+    }
+  ],
+  "items": [
+    {
+      "id": "confusion",
+      "type": "yes_no",
+      "question": "Is there any new confusion (not knowing the date, place, or people who are normally familiar)?",
+      "help": "Ask a family member if unsure.",
+      "trace_label": "C: New confusion",
+      "points_if_yes": 1,
+      "critical": true
+    },
+    {
+      "id": "resp_rate",
+      "type": "yes_no",
+      "question": "Count your breaths for 30 seconds while resting, then double it. Is it 30 or more breaths per minute?",
+      "help": "One breath = one rise and fall of the chest. Have someone else count if possible.",
+      "trace_label": "R: Breathing rate ≥30 per minute",
+      "points_if_yes": 1,
+      "critical": true
+    },
+    {
+      "id": "low_bp",
+      "type": "yes_no",
+      "question": "If you can measure your blood pressure: is the top number below 90, or the bottom number 60 or lower?",
+      "help": "Choose Not sure if you have no blood pressure monitor.",
+      "trace_label": "B: Blood pressure <90 systolic or ≤60 diastolic",
+      "points_if_yes": 1
+    },
+    {
+      "id": "age_65",
+      "type": "yes_no",
+      "question": "Are you 65 years or older?",
+      "help": "Your age in years.",
+      "trace_label": "65: Age 65 or older",
+      "points_if_yes": 1
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "threshold_text": "0 = low risk; 1–2 = intermediate risk; 3–4 = high risk.",
+    "bands": [
+      {
+        "min": 0,
+        "max": 0,
+        "result": "low"
+      },
+      {
+        "min": 1,
+        "max": 2,
+        "result": "intermediate"
+      },
+      {
+        "min": 3,
+        "max": 4,
+        "result": "high"
+      }
+    ]
+  },
+  "results": {
+    "low": {
+      "label": "Low risk",
+      "risk": "low",
+      "interpretation": "In the validation study, people with a CRB-65 score of 0 had a low risk of death (about 1 in 100). Home treatment is usually possible if pneumonia is confirmed.",
+      "recommendation": "See a clinician to check whether you have pneumonia or a simpler chest infection.",
+      "care": {
+        "level": "telehealth",
+        "within": "Within 24 to 48 hours",
+        "where_detail": "Telehealth or primary care visit; urgent care if you cannot be seen within 48 hours.",
+        "ed_redirect": [
+          "Lips or face turning blue or gray: call 911",
+          "Oxygen below 92% or severe shortness of breath",
+          "New confusion"
+        ],
+        "self_care": [
+          "Rest and fluids.",
+          "Acetaminophen or ibuprofen as labeled for fever."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "intermediate": {
+      "label": "Intermediate risk",
+      "risk": "moderate",
+      "interpretation": "Your score is in the intermediate range. The study authors advised clinical assessment to decide between home and hospital care.",
+      "recommendation": "Get an in-person exam today, which may include a chest X-ray.",
+      "care": {
+        "level": "urgent_care",
+        "within": "Today (within 4 to 6 hours)",
+        "where_detail": "Urgent care clinic with X-ray, or emergency department if you are 65 or older and feel very unwell.",
+        "ed_redirect": [
+          "Lips or face turning blue or gray: call 911",
+          "Oxygen below 92% or severe shortness of breath",
+          "New confusion"
+        ],
+        "finder_specialty": "urgent_care"
+      }
+    },
+    "high": {
+      "label": "High risk",
+      "risk": "high",
+      "interpretation": "Your score is in the high range. People with scores of 3 or 4 usually need hospital care.",
+      "recommendation": "Go to an emergency department now.",
+      "care": {
+        "level": "emergency_department",
+        "within": "Now",
+        "where_detail": "Hospital emergency department. Call 911 if you are too short of breath to travel safely.",
+        "ed_redirect": [
+          "Lips or face turning blue or gray: call 911",
+          "Oxygen below 92% or severe shortness of breath",
+          "New confusion"
+        ],
+        "finder_specialty": "emergency_department"
+      }
+    }
+  }
+}

@@ -1,0 +1,350 @@
+{
+  "rule_id": "gad7",
+  "name": "Generalized Anxiety Disorder-7 (GAD-7)",
+  "short_name": "GAD-7",
+  "assessment_title": "Anxiety check",
+  "condition": "Anxiety or worry",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": 2006,
+  "citations": [
+    {
+      "text": "Spitzer RL, Kroenke K, Williams JB, Löwe B. A brief measure for assessing generalized anxiety disorder: the GAD-7. Arch Intern Med. 2006;166(10):1092-1097.",
+      "pmid": "16717171",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/16717171/"
+    }
+  ],
+  "validated_population": "Adults in primary care clinics. Self-administered.",
+  "license_note": "GAD-7 was developed by Drs. Robert L. Spitzer, Janet B.W. Williams, Kurt Kroenke and colleagues, with an educational grant from Pfizer Inc. No permission is required to reproduce, translate, display or distribute. Item wording is used verbatim.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [
+    {
+      "id": "panic_chest",
+      "question": "Right now, do you have chest pain, a racing heart that will not slow down, or feel you might pass out?",
+      "help": "These can be caused by panic, but heart problems must be ruled out first.",
+      "action": "call_911"
+    }
+  ],
+  "items": [
+    {
+      "id": "nervous",
+      "type": "choice",
+      "question": "Over the last 2 weeks, how often have you been bothered by: Feeling nervous, anxious, or on edge?",
+      "help": "Feeling tense or keyed up.",
+      "trace_label": "Q1 Feeling nervous, anxious, or on edge",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Several days",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "More than half the days",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "Nearly every day",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "id": "control",
+      "type": "choice",
+      "question": "Over the last 2 weeks, how often have you been bothered by: Not being able to stop or control worrying?",
+      "help": "Worry that keeps going even when you try to stop it.",
+      "trace_label": "Q2 Not being able to stop or control worrying",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Several days",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "More than half the days",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "Nearly every day",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "id": "worry_much",
+      "type": "choice",
+      "question": "Over the last 2 weeks, how often have you been bothered by: Worrying too much about different things?",
+      "help": "Worry about many areas of life.",
+      "trace_label": "Q3 Worrying too much about different things",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Several days",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "More than half the days",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "Nearly every day",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "id": "relax",
+      "type": "choice",
+      "question": "Over the last 2 weeks, how often have you been bothered by: Trouble relaxing?",
+      "help": "Hard to calm down or unwind.",
+      "trace_label": "Q4 Trouble relaxing",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Several days",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "More than half the days",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "Nearly every day",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "id": "restless",
+      "type": "choice",
+      "question": "Over the last 2 weeks, how often have you been bothered by: Being so restless that it is hard to sit still?",
+      "help": "Needing to keep moving.",
+      "trace_label": "Q5 Being so restless that it is hard to sit still",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Several days",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "More than half the days",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "Nearly every day",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "id": "irritable",
+      "type": "choice",
+      "question": "Over the last 2 weeks, how often have you been bothered by: Becoming easily annoyed or irritable?",
+      "help": "Getting upset more easily than usual.",
+      "trace_label": "Q6 Becoming easily annoyed or irritable",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Several days",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "More than half the days",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "Nearly every day",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "id": "afraid",
+      "type": "choice",
+      "question": "Over the last 2 weeks, how often have you been bothered by: Feeling afraid, as if something awful might happen?",
+      "help": "A sense of dread.",
+      "trace_label": "Q7 Feeling afraid, as if something awful might happen",
+      "options": [
+        {
+          "value": "0",
+          "label": "Not at all",
+          "points": 0,
+          "benign": true
+        },
+        {
+          "value": "1",
+          "label": "Several days",
+          "points": 1
+        },
+        {
+          "value": "2",
+          "label": "More than half the days",
+          "points": 2
+        },
+        {
+          "value": "3",
+          "label": "Nearly every day",
+          "points": 3
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "threshold_text": "0–4 minimal; 5–9 mild; 10–14 moderate; 15–21 severe. 10 or more warrants further evaluation.",
+    "bands": [
+      {
+        "min": 0,
+        "max": 4,
+        "result": "minimal"
+      },
+      {
+        "min": 5,
+        "max": 9,
+        "result": "mild"
+      },
+      {
+        "min": 10,
+        "max": 14,
+        "result": "moderate"
+      },
+      {
+        "min": 15,
+        "max": 21,
+        "result": "severe"
+      }
+    ]
+  },
+  "results": {
+    "minimal": {
+      "label": "Minimal anxiety symptoms",
+      "risk": "low",
+      "interpretation": "Your score is in the minimal range.",
+      "recommendation": "No treatment needed now. Repeat this check if symptoms increase.",
+      "care": {
+        "level": "self_care",
+        "within": "Self-care; repeat the check in 2 to 4 weeks if symptoms continue",
+        "where_detail": "Home care. Book a primary care visit if symptoms get worse.",
+        "ed_redirect": [
+          "Thoughts of harming yourself or ending your life: call or text 988 now",
+          "Immediate danger: call 911"
+        ],
+        "self_care": [
+          "Regular physical activity and sleep.",
+          "Limit caffeine and alcohol.",
+          "Slow breathing: in for 4 seconds, out for 6 seconds, for 5 minutes."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "mild": {
+      "label": "Mild anxiety symptoms",
+      "risk": "low",
+      "interpretation": "Your score is in the mild range. Monitoring and self-help are usually advised.",
+      "recommendation": "Book a primary care visit if symptoms continue or affect daily life.",
+      "care": {
+        "level": "primary_care",
+        "within": "Within 2 to 4 weeks",
+        "where_detail": "Primary care clinic.",
+        "ed_redirect": [
+          "Thoughts of harming yourself or ending your life: call or text 988 now",
+          "Immediate danger: call 911"
+        ],
+        "self_care": [
+          "Regular physical activity and sleep.",
+          "Limit caffeine and alcohol."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "moderate": {
+      "label": "Moderate anxiety symptoms",
+      "risk": "moderate",
+      "interpretation": "Your score is in the moderate range. In the original study, a score of 10 or more identified most people with generalized anxiety disorder.",
+      "recommendation": "Book a visit with primary care or a mental health clinician for evaluation.",
+      "care": {
+        "level": "primary_care",
+        "within": "Within 1 to 2 weeks",
+        "where_detail": "Primary care clinic or a licensed mental health clinician.",
+        "ed_redirect": [
+          "Thoughts of harming yourself or ending your life: call or text 988 now",
+          "Immediate danger: call 911"
+        ],
+        "finder_specialty": "mental_health"
+      }
+    },
+    "severe": {
+      "label": "Severe anxiety symptoms",
+      "risk": "high",
+      "interpretation": "Your score is in the severe range. Treatment with counseling and/or medicine is recommended.",
+      "recommendation": "See a mental health clinician or primary care within 1 week.",
+      "care": {
+        "level": "mental_health",
+        "within": "Within 1 week",
+        "where_detail": "Licensed mental health clinician or primary care.",
+        "ed_redirect": [
+          "Thoughts of harming yourself or ending your life: call or text 988 now",
+          "Immediate danger: call 911"
+        ],
+        "finder_specialty": "mental_health"
+      }
+    }
+  }
+}

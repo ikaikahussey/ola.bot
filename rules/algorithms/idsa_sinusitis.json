@@ -1,0 +1,150 @@
+{
+  "rule_id": "idsa_sinusitis",
+  "name": "IDSA Criteria for Acute Bacterial Rhinosinusitis",
+  "short_name": "IDSA sinusitis criteria",
+  "assessment_title": "Sinus symptom assessment",
+  "condition": "Sinus or nasal congestion symptoms",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": 2012,
+  "citations": [
+    {
+      "text": "Chow AW, Benninger MS, Brook I, et al. IDSA clinical practice guideline for acute bacterial rhinosinusitis in children and adults. Clin Infect Dis. 2012;54(8):e72-e112.",
+      "pmid": "22438350",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/22438350/"
+    }
+  ],
+  "validated_population": "Children and adults with acute sinus symptoms (clinical practice guideline).",
+  "license_note": "Published guideline criteria; not a copyrighted instrument. Question wording is original to OLA BOT.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [
+    {
+      "id": "orbital",
+      "question": "Is there swelling or redness around the eye, pain when moving the eye, or double vision or vision loss?",
+      "help": "Infection spreading to the eye area is an emergency.",
+      "action": "go_to_ed"
+    },
+    {
+      "id": "neuro",
+      "question": "Do you have a severe headache with a stiff neck, or new confusion?",
+      "help": "Infection may have spread beyond the sinuses.",
+      "action": "go_to_ed"
+    }
+  ],
+  "items": [
+    {
+      "id": "persistent_10",
+      "type": "yes_no",
+      "question": "Have your sinus symptoms (stuffy or runny nose, facial pain or pressure) lasted 10 days or more without getting better?",
+      "help": "Count from the first day of symptoms.",
+      "trace_label": "Symptoms ≥10 days without improvement",
+      "critical": true
+    },
+    {
+      "id": "high_fever",
+      "type": "yes_no",
+      "question": "In the first few days of this illness, did you have a fever of 102.2°F (39°C) or higher?",
+      "help": "Measured with a thermometer.",
+      "trace_label": "Fever ≥39°C (102.2°F) at onset"
+    },
+    {
+      "id": "purulent_early",
+      "type": "yes_no",
+      "question": "For the first 3 to 4 days in a row, did you have thick yellow or green nasal discharge, or facial pain?",
+      "help": "Thick, colored mucus or pain in the face every day at the start.",
+      "trace_label": "Thick colored discharge or facial pain for first 3–4 days"
+    },
+    {
+      "id": "double_sickening",
+      "type": "yes_no",
+      "question": "Did you start to get better and then get worse again (new fever, headache, or more discharge) after about 5 to 6 days?",
+      "help": "This is sometimes called \"double sickening.\"",
+      "trace_label": "Worsened after initial improvement"
+    }
+  ],
+  "scoring": {
+    "method": "decision",
+    "threshold_text": "Bacterial sinusitis likely if any: (1) symptoms ≥10 days without improvement; (2) severe onset — fever ≥39°C plus thick colored discharge or facial pain for 3–4 consecutive days; (3) worsening after initial improvement. Otherwise a virus is likely.",
+    "steps": [
+      {
+        "label": "Persistent symptoms ≥10 days without improvement",
+        "when": {
+          "var": "persistent_10",
+          "equals": "yes"
+        },
+        "result": "bacterial"
+      },
+      {
+        "label": "Severe onset (fever ≥39°C plus discharge or facial pain for 3–4 days)",
+        "when": {
+          "all_yes": [
+            "high_fever",
+            "purulent_early"
+          ]
+        },
+        "result": "bacterial"
+      },
+      {
+        "label": "Worsening after initial improvement (double sickening)",
+        "when": {
+          "var": "double_sickening",
+          "equals": "yes"
+        },
+        "result": "bacterial"
+      }
+    ],
+    "default_result": "viral"
+  },
+  "results": {
+    "bacterial": {
+      "label": "Bacterial sinusitis likely",
+      "risk": "moderate",
+      "interpretation": "Your symptoms meet IDSA criteria for acute bacterial sinusitis.",
+      "recommendation": "A clinician visit is advised to discuss antibiotics or a short period of watchful waiting.",
+      "care": {
+        "level": "telehealth",
+        "within": "Within 24 to 48 hours",
+        "where_detail": "Telehealth or primary care visit. Urgent care if neither is available within 48 hours.",
+        "ed_redirect": [
+          "Swelling or redness around the eye, or vision changes",
+          "Severe headache with stiff neck, or confusion"
+        ],
+        "self_care": [
+          "Saline nasal rinses.",
+          "Acetaminophen or ibuprofen as labeled."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "viral": {
+      "label": "Viral sinusitis likely",
+      "risk": "low",
+      "interpretation": "Your symptoms do not meet IDSA criteria for bacterial sinusitis. Most sinus infections are caused by viruses and improve without antibiotics.",
+      "recommendation": "Treat at home. Antibiotics are not recommended now.",
+      "care": {
+        "level": "self_care",
+        "within": "Self-care; telehealth or primary care if symptoms reach 10 days or worsen",
+        "where_detail": "Home care. Book a visit if symptoms last 10 days or you get worse after starting to improve.",
+        "ed_redirect": [
+          "Swelling or redness around the eye, or vision changes",
+          "Severe headache with stiff neck, or confusion"
+        ],
+        "self_care": [
+          "Saline nasal spray or rinses.",
+          "Acetaminophen or ibuprofen as labeled.",
+          "Rest and fluids."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    }
+  }
+}
