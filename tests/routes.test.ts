@@ -32,13 +32,18 @@ describe("parsePath / pathFor", () => {
 
   it("every rule has a detail page and an assessment page", () => {
     for (const r of RULES) {
-      expect(parsePath(`/rules/${r.rule_id}`)).toEqual({ page: "rule_detail", rule: r.rule_id });
+      expect(parsePath(`/assessments/${r.rule_id}`)).toEqual({ page: "rule_detail", rule: r.rule_id });
       expect(parsePath(`/assess/${r.rule_id}`)).toEqual({ page: "confirm", rule: r.rule_id });
     }
   });
 
   it("ignores a trailing slash", () => {
-    expect(parsePath("/rules/")).toEqual({ page: "rules" });
+    expect(parsePath("/assessments/")).toEqual({ page: "rules" });
+  });
+
+  it("old /rules addresses still parse and canonicalize to /assessments", () => {
+    expect(pathFor(parsePath("/rules"))).toBe("/assessments");
+    expect(pathFor(parsePath("/rules/phq9"))).toBe("/assessments/phq9");
   });
 
   it.each(["/nope", "/assess/not_a_rule", "/rules/../etc", "/safety/0", "/stop/not_a_flag", "/assess/phq9/q/0"])("%s is not found", (p) => {
@@ -91,6 +96,7 @@ describe("guard", () => {
 describe("titles", () => {
   it("are page-specific", () => {
     expect(titleFor({ page: "question", rule: "centor_sore_throat", n: 2 }, 5)).toBe("Sore throat assessment: question 2 of 5 · OLA BOT");
-    expect(titleFor({ page: "rule_detail", rule: "ottawa_ankle" })).toBe("Ottawa Ankle Rules · OLA BOT");
+    expect(titleFor({ page: "rule_detail", rule: "ottawa_ankle" })).toBe("Ankle and foot injury assessment · OLA BOT");
+    expect(titleFor({ page: "rules" })).toBe("Assessments · OLA BOT");
   });
 });

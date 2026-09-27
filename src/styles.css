@@ -141,3 +141,6 @@ fieldset.invalid { border-left: 3px solid var(--alert); padding-left: 0.75rem; }
 .fullscreen-emergency h1 { color: var(--alert); font-size: 2.4rem; margin-bottom: 1rem; }
 .fullscreen-emergency .call { font-size: 1.6rem; min-height: 72px; width: 100%; margin: 1rem 0; }
 .fullscreen-emergency .box { text-align: left; margin-top: 1rem; }
+
+/* Headings receive focus after navigation for screen readers; no visible ring. */
+h1[tabindex="-1"]:focus, legend:focus { outline: none; }

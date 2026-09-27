@@ -40,6 +40,9 @@ const PATTERNS: [RegExp, (m: RegExpMatchArray) => Route][] = [
   [new RegExp(`^/assess/${ID}/check$`), (m) => ({ page: "check", rule: m[1] })],
   [new RegExp(`^/assess/${ID}/review$`), (m) => ({ page: "review", rule: m[1] })],
   [new RegExp(`^/assess/${ID}/result$`), (m) => ({ page: "result", rule: m[1] })],
+  [/^\/assessments$/, () => ({ page: "rules" })],
+  [new RegExp(`^/assessments/${ID}$`), (m) => ({ page: "rule_detail", rule: m[1] })],
+  // Old addresses from before "rules" were renamed "assessments"; App redirects them.
   [/^\/rules$/, () => ({ page: "rules" })],
   [new RegExp(`^/rules/${ID}$`), (m) => ({ page: "rule_detail", rule: m[1] })],
   [/^\/about$/, () => ({ page: "about" })],
@@ -85,9 +88,9 @@ export function pathFor(r: Route): string {
     case "result":
       return `/assess/${r.rule}/result`;
     case "rules":
-      return "/rules";
+      return "/assessments";
     case "rule_detail":
-      return `/rules/${r.rule}`;
+      return `/assessments/${r.rule}`;
     case "about":
       return "/about";
     case "find":
@@ -190,9 +193,9 @@ export function titleFor(r: Route, questionCount?: number): string {
       case "result":
         return `${rule!.assessment_title}: result`;
       case "rules":
-        return "Rules library";
+        return "Assessments";
       case "rule_detail":
-        return rule!.name;
+        return rule!.assessment_title;
       case "about":
         return "How it works";
       case "find":

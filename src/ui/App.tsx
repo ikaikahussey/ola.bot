@@ -9,7 +9,8 @@ import { YesNoButtons } from "./Questions";
 import { Result } from "./Result";
 import { guard, parsePath, pathFor, titleFor, findFlag, type Route } from "./routes";
 import { ComplaintInput, Intake, Mapping, Review, RuleMenu, StopScreen } from "./Screens";
-import { CardiacEmergency, PatternCheck } from "./Pattern";
+import { CardiacEmergency, PatternCheck, TYPE_GROUP_LABEL, TYPE_ICON } from "./Pattern";
+import type { AssessmentType } from "../engine/types";
 import { Finder } from "./Finder";
 
 const STORAGE_KEY = "olabot.session.v1";
@@ -75,6 +76,11 @@ export function App() {
   useEffect(() => saveSession(session), [session]);
 
   const route = parsePath(path);
+  // Old /rules addresses move to /assessments.
+  const legacy = path.startsWith("/rules") && route.page !== "not_found" ? pathFor(route) : null;
+  useLayoutEffect(() => {
+    if (legacy) navigate(legacy, { replace: true });
+  }, [legacy, navigate]);
   const redirect = guard(route, session);
 
   useLayoutEffect(() => {
@@ -119,14 +125,14 @@ export function App() {
           </a>
           <nav className="site">
             <a href="/find">Find care</a>
-            <a href="/rules">Rules library</a>
+            <a href="/assessments">Assessments</a>
             <a href="/about">How it works</a>
           </nav>
         </div>
       </header>
       <div className="banner" role="note">
         <div className="wrap">
-          <strong>Prototype.</strong> The rules have not yet been reviewed by a licensed clinician. Do not rely on this site for medical decisions. In an
+          <strong>Prototype.</strong> The assessments have not yet been reviewed by a licensed clinician. Do not rely on this site for medical decisions. In an
           emergency, call 911.
         </div>
       </div>
@@ -144,7 +150,7 @@ export function App() {
             In an emergency, call 911.
           </p>
           <p>
-            <a href="https://github.com/ikaikahussey/ola.bot">Source code</a> · Apache License 2.0 · <a href="/rules">Rule versions and citations</a>
+            <a href="https://github.com/ikaikahussey/ola.bot">Source code</a> · Apache License 2.0 · <a href="/assessments">Assessment versions and citations</a>
           </p>
         </div>
       </footer>
@@ -193,11 +199,17 @@ function Page({ route, session, setSession, navigate, restart }: PageProps) {
             <a className="btn primary" href="/safety/1">
               Start assessment
             </a>
-            <a className="btn" href="/rules">
-              Browse the {RULES.length} rules
+            <a className="btn" href="/find">
+              Find a provider
             </a>
           </div>
           <p className="small sub">Nothing you enter is stored on a server unless you choose to share it at the end.</p>
+
+          <h2 id="all-assessments">All {RULES.length} assessments</h2>
+          <p className="small sub">
+            Choose one to start it directly. The emergency safety check always runs first. “Details” shows the questions, scoring, and source rule.
+          </p>
+          <AssessmentIndex />
         </div>
       );
 
@@ -395,7 +407,7 @@ function Page({ route, session, setSession, navigate, restart }: PageProps) {
         <div className="stack">
           <h1 tabIndex={-1}>Page not found</h1>
           <p>
-            <a href="/">Start an assessment</a> or browse the <a href="/rules">rules library</a>.
+            <a href="/">Start an assessment</a> or browse <a href="/assessments">all assessments</a>.
           </p>
           <details>
             <summary style={{ color: "var(--link)", cursor: "pointer" }}>All assessments</summary>
@@ -404,4 +416,41 @@ function Page({ route, session, setSession, navigate, restart }: PageProps) {
         </div>
       );
   }
+}
+
+const INDEX_ORDER: AssessmentType[] = ["red_flag", "diagnostic_confirmation", "scoring_algorithm"];
+
+/** Links to every assessment, grouped by type (front page). */
+function AssessmentIndex() {
+  return (
+    <div>
+      {INDEX_ORDER.map((type) => {
+        const group = RULES.filter((r) => r.assessment_type === type);
+        if (!group.length) return null;
+        return (
+          <section key={type} aria-labelledby={`group-${type}`}>
+            <h3 id={`group-${type}`} className="group-title">
+              <span aria-hidden>{TYPE_ICON[type]}</span> {TYPE_GROUP_LABEL[type]}
+            </h3>
+            <ul className="list-plain">
+              {group.map((r) => (
+                <li key={r.rule_id} className="spread" style={{ flexWrap: "nowrap", alignItems: "flex-start" }}>
+                  <span style={{ flex: 1 }}>
+                    <a href={`/assess/${r.rule_id}`}>
+                      <strong>{r.assessment_title}</strong>
+                    </a>
+                    <br />
+                    <span className="small sub">{r.condition}</span>
+                  </span>
+                  <a className="small" href={`/assessments/${r.rule_id}`} aria-label={`Details: ${r.assessment_title}`}>
+                    Details
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      })}
+    </div>
+  );
 }

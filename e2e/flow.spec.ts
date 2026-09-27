@@ -150,14 +150,15 @@ test("unmatched complaint shows a menu", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "No exact match" })).toBeVisible();
 });
 
-test("rules library lists every rule with version and citation", async ({ page }) => {
-  await page.goto("/rules");
-  await expect(page.getByRole("heading", { name: "Rules library" })).toBeVisible();
+test("assessments page lists every assessment; detail page names the source rule", async ({ page }) => {
+  await page.goto("/assessments");
+  await expect(page.getByRole("heading", { name: "Assessments", exact: true })).toBeVisible();
   await expect(page.locator("tbody tr")).toHaveCount(21);
   await page.getByRole("link", { name: "Ankle and foot injury assessment" }).click();
-  await expect(page.getByRole("heading", { name: "Ottawa Ankle Rules" })).toBeVisible();
-  await expect(page).toHaveURL("/rules/ottawa_ankle");
-  await expect(page).toHaveTitle("Ottawa Ankle Rules · OLA BOT");
+  await expect(page).toHaveURL("/assessments/ottawa_ankle");
+  await expect(page.getByRole("heading", { level: 1, name: "Ankle and foot injury assessment" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Source rule: Ottawa Ankle Rules" })).toBeVisible();
+  await expect(page).toHaveTitle("Ankle and foot injury assessment · OLA BOT");
   await expect(page.getByRole("heading", { name: "Version history" })).toBeVisible();
 });
 
@@ -310,4 +311,26 @@ test("provider finder works without an assessment", async ({ page }) => {
   await page.getByLabel("Near ZIP code").fill("96813");
   await expect(page.getByRole("heading", { name: /Example Urgent Care LLC/ })).toBeVisible();
   await expect(page.getByLabel(/Share my symptom assessment/)).toHaveCount(0);
+});
+
+test("front page links to every assessment, grouped by type", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "All 21 assessments" })).toBeVisible();
+  for (const g of ["Emergency screening", "Diagnostic patterns", "Scoring assessments"]) {
+    await expect(page.getByRole("heading", { name: new RegExp(g) })).toBeVisible();
+  }
+  await expect(page.getByRole("link", { name: /^Details:/ })).toHaveCount(21);
+  await expect(page.getByRole("link", { name: "Rules library" })).toHaveCount(0);
+  // Starting from the list still runs the safety check first, then opens the assessment.
+  await page.getByRole("link", { name: "Sore throat assessment", exact: true }).click();
+  await expect(page).toHaveURL("/safety/1");
+  for (let i = 0; i < 8; i++) await page.getByRole("button", { name: "No", exact: true }).click();
+  await expect(page).toHaveURL("/assess/centor_sore_throat");
+});
+
+test("old /rules addresses redirect to /assessments", async ({ page }) => {
+  await page.goto("/rules/phq9");
+  await expect(page).toHaveURL("/assessments/phq9");
+  await page.goto("/rules");
+  await expect(page).toHaveURL("/assessments");
 });

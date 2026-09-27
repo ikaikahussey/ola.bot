@@ -34,7 +34,7 @@ Every screen has its own path, so the back button, reloads, and shared links wor
 | `/assess/:rule/warning/:n` | Rule-specific warning sign *n* |
 | `/assess/:rule/q/:n` | Question *n* |
 | `/assess/:rule/review`, `/assess/:rule/result` | Review and result |
-| `/rules`, `/rules/:rule` | Rules library and rule detail (version history, raw JSON) |
+| `/assessments`, `/assessments/:rule` | All assessments, and assessment detail with its source rule (version history, raw JSON). Old `/rules` addresses redirect here |
 | `/about` | How it works |
 
 Answers are never placed in URLs. They are kept in memory and in `sessionStorage` for the current tab only, so a reload keeps progress and closing the tab clears it. A deep link to any assessment page runs the safety check first and then returns to the requested page ([`src/ui/routes.ts`](src/ui/routes.ts)).

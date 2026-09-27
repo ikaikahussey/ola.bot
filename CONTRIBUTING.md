@@ -5,7 +5,7 @@ Changes to rule files are clinical changes. Every rule change needs a citation, 
 ## Principles
 
 1. **Deterministic.** Same answers, same result. No randomness, network calls, or generated text in `src/engine/`.
-2. **Nothing hidden.** Every field in a rule file is shown to users somewhere (result screen, rules library, or PDF).
+2. **Nothing hidden.** Every field in a rule file is shown to users somewhere (result screen, assessment pages, or PDF).
 3. **Specific routing.** Every result names a care level, a time frame, and where to go. "Call your doctor" is rejected by the validator.
 4. **Validated instruments keep their wording.** Questionnaires such as PHQ-9 must use the published item wording. Plain-language explanations go in `help`.
 
@@ -19,7 +19,7 @@ Changes to rule files are clinical changes. Every rule change needs a citation, 
 
 ## Changing a rule
 
-Bump `version` (semver: patch for wording, minor for routing or time frames, major for scoring or thresholds), update `last_updated`, and add a `changelog` entry. The rules library publishes the history.
+Bump `version` (semver: patch for wording, minor for routing or time frames, major for scoring or thresholds), update `last_updated`, and add a `changelog` entry. The assessment detail page publishes the history.
 
 ## Rule file format
 

@@ -63,7 +63,7 @@ export function ComplaintInput({ initial, onSubmit, onPick }: { initial: string;
           Continue
         </button>
       </form>
-      <p className="small sub">Your words are matched to a rule with a fixed keyword list. They are not stored or sent anywhere.</p>
+      <p className="small sub">Your words are matched to an assessment with a fixed keyword list. They are not stored or sent anywhere.</p>
       <details>
         <summary style={{ color: "var(--link)", cursor: "pointer" }}>Or choose from all {RULES.length} assessments</summary>
         <RuleMenu ids={RULES.map((r) => r.rule_id)} onChoose={onPick} />
@@ -172,7 +172,7 @@ export function Mapping({ route, onChoose, onBack }: { route: RouteResult; onCho
           <RuleMenu ids={others} onChoose={onChoose} />
         </details>
         <div className="box small">
-          If none fits, OLA BOT has no validated rule for your symptom. Book a primary care or telehealth visit within 1 to 3 days, or go to urgent care today
+          If none fits, OLA BOT has no assessment for your symptom. Book a primary care or telehealth visit within 1 to 3 days, or go to urgent care today
           if symptoms are getting worse.
         </div>
         <button className="link" onClick={onBack}>
@@ -244,7 +244,7 @@ export function Review({ rule, session, goto, onSubmit }: { rule: Rule; session:
       <h1 tabIndex={-1}>Review your answers</h1>
       {ev.blocked ? (
         <div className="box alert" role="alert">
-          <strong>{ev.missing.length} questions are unanswered.</strong> The rule needs all but at most one answered. Go back and answer these (“Not sure” is
+          <strong>{ev.missing.length} questions are unanswered.</strong> This assessment needs all but at most one answered. Go back and answer these (“Not sure” is
           an answer):
           <ul>
             {ev.missing.map((m) => (

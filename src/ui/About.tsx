@@ -11,11 +11,11 @@ export function About() {
           instructions.
         </li>
         <li>
-          <strong>Symptom routing.</strong> What you type is matched against a fixed keyword list. You see which rule was chosen and why, and you can change
+          <strong>Symptom routing.</strong> What you type is matched against a fixed keyword list. You see which assessment was chosen and why, and you can change
           it.
         </li>
         <li>
-          <strong>Questions.</strong> Only the items the rule needs. Every question has a “Not sure” option.
+          <strong>Questions.</strong> Only the items the assessment needs. Every question has a “Not sure” option.
         </li>
         <li>
           <strong>Scoring.</strong> Points and decision steps come from the rule file. The result screen shows every item, every point, the total, and the
@@ -70,9 +70,9 @@ export function About() {
 
       <h2>Limits</h2>
       <ul>
-        <li>Most rules were validated with clinicians collecting the answers. Self-reported answers are less accurate; each rule page notes this.</li>
-        <li>OLA BOT covers {RULES.length} common complaints. It has no rule for many symptoms.</li>
-        <li>Rule files are marked “clinical review: pending” until a licensed clinician signs off on the version.</li>
+        <li>Most source rules were validated with clinicians collecting the answers. Self-reported answers are less accurate; each assessment page notes this.</li>
+        <li>OLA BOT has {RULES.length} assessments for common complaints. It has no assessment for many symptoms.</li>
+        <li>Assessments are marked “clinical review: pending” until a licensed clinician signs off on the version.</li>
       </ul>
     </div>
   );

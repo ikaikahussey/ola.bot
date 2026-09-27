@@ -13,16 +13,16 @@ export function Library({ ruleId }: { ruleId?: string }) {
   if (rule) return <RuleDetail rule={rule} />;
   return (
     <div className="stack">
-      <h1 tabIndex={-1}>Rules library</h1>
+      <h1 tabIndex={-1}>Assessments</h1>
       <p>
-        Every assessment in OLA BOT is a static, human-readable JSON file. This page lists each rule, its version, and its source. Each rule links to its
-        full definition: questions, points, thresholds, and care routing.
+        Every assessment in OLA BOT is a static, human-readable JSON file built on a published clinical rule or guideline. This page lists each
+        assessment, its version, and its source rule. Each assessment links to its full definition: questions, points, thresholds, and care routing.
       </p>
       <table className="trace-table">
         <thead>
           <tr>
             <th>Assessment</th>
-            <th>Rule</th>
+            <th>Source rule</th>
             <th>Type</th>
             <th>Validated</th>
             <th>Version</th>
@@ -32,7 +32,7 @@ export function Library({ ruleId }: { ruleId?: string }) {
           {RULES.map((r) => (
             <tr key={r.rule_id}>
               <td>
-                <a href={`/rules/${r.rule_id}`}>{r.assessment_title}</a>
+                <a href={`/assessments/${r.rule_id}`}>{r.assessment_title}</a>
                 <div className="small sub">{r.condition}</div>
               </td>
               <td>{r.short_name}</td>
@@ -71,10 +71,16 @@ function RuleDetail({ rule }: { rule: Rule }) {
   return (
     <div className="stack">
       <p className="small">
-        <a href="/rules">← All rules</a>
+        <a href="/assessments">← All assessments</a>
       </p>
-      <h1 tabIndex={-1}>{rule.name}</h1>
+      <h1 tabIndex={-1}>{rule.assessment_title}</h1>
       <p className="sub">{rule.condition}</p>
+      <p>
+        <a className="btn primary" href={`/assess/${rule.rule_id}`}>
+          Start this assessment
+        </a>
+      </p>
+      <h2>Source rule: {rule.name}</h2>
       <RuleInfo rule={rule} />
       {rule.self_report_note && <p className="small">{rule.self_report_note}</p>}
 

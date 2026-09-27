@@ -336,7 +336,7 @@ export function RuleInfo({ rule }: { rule: Rule }) {
       </dd>
       <dt>Rule</dt>
       <dd>
-        <a href={`/rules/${rule.rule_id}`}>{rule.name}</a>
+        <a href={`/assessments/${rule.rule_id}`}>{rule.name}</a>
       </dd>
       <dt>Year validated</dt>
       <dd>{rule.year_validated ?? "Not a validated score (pattern based on published guidance)"}</dd>
