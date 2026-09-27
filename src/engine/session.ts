@@ -10,6 +10,10 @@ export interface Session {
   rule_red_flags_cleared: string[];
   answers: Answers;
   completed_at: string | null;
+  /** Page the user asked for before the safety check redirected them. */
+  pending_path: string | null;
+  /** Complaint keyword that triggered an emergency stop, shown on the stop page. */
+  stop_keyword: string | null;
 }
 
 export function newSessionId(): string {
@@ -26,6 +30,8 @@ export function newSession(): Session {
     rule_red_flags_cleared: [],
     answers: {},
     completed_at: null,
+    pending_path: null,
+    stop_keyword: null,
   };
 }
 

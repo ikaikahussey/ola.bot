@@ -1,82 +1,118 @@
-import { useEffect, useMemo, useState } from "react";
-import { stopMessage } from "../engine/careLevels";
-import { evaluate, visibleItems } from "../engine/evaluate";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { visibleItems } from "../engine/evaluate";
 import { routeComplaint, type RouteResult } from "../engine/router";
 import { newSession, type Session } from "../engine/session";
-import type { RedFlagAction, Rule } from "../engine/types";
 import { COMPLAINT_MAP, GLOBAL_RED_FLAGS, RULES, RULES_BY_ID } from "../rules";
 import { About } from "./About";
 import { Library } from "./Library";
-import { QuestionField, YesNoButtons } from "./Questions";
+import { YesNoButtons } from "./Questions";
 import { Result } from "./Result";
+import { guard, parsePath, pathFor, titleFor, findFlag, type Route } from "./routes";
+import { ComplaintInput, Intake, Mapping, Review, RuleMenu, StopScreen } from "./Screens";
 
-type Step =
-  | { name: "home" }
-  | { name: "redflag"; index: number }
-  | { name: "stop"; action: RedFlagAction; trigger: string; back: Step }
-  | { name: "complaint" }
-  | { name: "mapping"; route: RouteResult }
-  | { name: "rule_redflag"; index: number }
-  | { name: "intake"; index: number }
-  | { name: "review" }
-  | { name: "result" };
+const STORAGE_KEY = "olabot.session.v1";
 
-function useHashRoute(): string {
-  const [hash, setHash] = useState(() => window.location.hash);
-  useEffect(() => {
-    const on = () => setHash(window.location.hash);
-    window.addEventListener("hashchange", on);
-    return () => window.removeEventListener("hashchange", on);
-  }, []);
-  return hash.replace(/^#/, "");
+function loadSession(): Session {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (raw) return { ...newSession(), ...(JSON.parse(raw) as Partial<Session>) };
+  } catch {
+    // Storage unavailable (private mode, blocked): fall back to memory only.
+  }
+  return newSession();
+}
+
+function saveSession(s: Session) {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+  } catch {
+    // ignore
+  }
+}
+
+function initialPath(): string {
+  // Links from before page-level URLs used "#/rules" and "#/about".
+  if (window.location.hash.startsWith("#/")) {
+    const p = window.location.hash.slice(1);
+    window.history.replaceState(null, "", p);
+    return p;
+  }
+  return window.location.pathname;
 }
 
 export function App() {
-  const route = useHashRoute();
-  const [session, setSession] = useState<Session>(newSession);
-  const [step, setStep] = useState<Step>({ name: "home" });
+  const [path, setPath] = useState(initialPath);
+  const [session, setSession] = useState<Session>(loadSession);
+
+  const navigate = useCallback((to: string, opts: { replace?: boolean } = {}) => {
+    if (opts.replace) window.history.replaceState(null, "", to);
+    else window.history.pushState(null, "", to);
+    setPath(to);
+  }, []);
 
   useEffect(() => {
+    const onPop = () => setPath(window.location.pathname);
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  // Same-origin links navigate without a full page load.
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = (e.target as Element).closest?.("a");
+      const href = a?.getAttribute("href");
+      if (!a || !href || !href.startsWith("/") || href.startsWith("//") || a.target) return;
+      e.preventDefault();
+      navigate(href);
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, [navigate]);
+
+  useEffect(() => saveSession(session), [session]);
+
+  const route = parsePath(path);
+  const redirect = guard(route, session);
+
+  useLayoutEffect(() => {
+    if (!redirect) return;
+    if (redirect.remember) setSession((s) => ({ ...s, pending_path: redirect.remember! }));
+    navigate(redirect.to, { replace: true });
+  }, [redirect?.to, redirect?.remember, navigate]);
+
+  const questionCount = route.page === "question" ? visibleItems(RULES_BY_ID[route.rule], session.answers).length : undefined;
+  useEffect(() => {
+    if (redirect) return;
+    document.title = titleFor(route, questionCount);
     window.scrollTo(0, 0);
     document.querySelector<HTMLElement>("main h1, main legend")?.focus?.();
-  }, [step, route]);
+  }, [path, redirect === null]);
 
-  const rule = session.rule_id ? RULES_BY_ID[session.rule_id] : null;
-
-  const restart = (keepRedFlags: boolean) => {
+  const restart = (keepSafety: boolean) => {
     const s = newSession();
-    if (keepRedFlags) s.red_flags_cleared = session.red_flags_cleared;
+    if (keepSafety) s.red_flags_cleared = session.red_flags_cleared;
     setSession(s);
-    setStep(keepRedFlags ? { name: "complaint" } : { name: "home" });
-    window.location.hash = "";
+    navigate(keepSafety ? "/symptom" : "/");
   };
-
-  let body: React.ReactNode;
-  if (route.startsWith("/rules")) body = <Library ruleId={route.split("/")[2]} />;
-  else if (route === "/about") body = <About />;
-  else
-    body = (
-      <Flow
-        step={step}
-        setStep={setStep}
-        session={session}
-        setSession={setSession}
-        rule={rule}
-        onStartOver={() => restart(false)}
-        onNewSymptom={() => restart(true)}
-      />
-    );
 
   return (
     <>
       <header className="site">
         <div className="wrap">
-          <a className="brand" href="#" onClick={() => restart(false)}>
+          <a
+            className="brand"
+            href="/"
+            onClick={(e) => {
+              e.preventDefault();
+              restart(false);
+            }}
+          >
             OLA BOT
           </a>
           <nav className="site">
-            <a href="#/rules">Rules library</a>
-            <a href="#/about">How it works</a>
+            <a href="/rules">Rules library</a>
+            <a href="/about">How it works</a>
           </nav>
         </div>
       </header>
@@ -87,7 +123,11 @@ export function App() {
         </div>
       </div>
       <main>
-        <div className="wrap">{body}</div>
+        <div className="wrap">
+          {redirect ? null : (
+            <Page route={route} session={session} setSession={setSession} navigate={navigate} restart={restart} />
+          )}
+        </div>
       </main>
       <footer className="site">
         <div className="wrap stack">
@@ -96,7 +136,7 @@ export function App() {
             In an emergency, call 911.
           </p>
           <p>
-            <a href="https://github.com/ikaikahussey/ola.bot">Source code</a> · Apache License 2.0 · <a href="#/rules">Rule versions and citations</a>
+            <a href="https://github.com/ikaikahussey/ola.bot">Source code</a> · Apache License 2.0 · <a href="/rules">Rule versions and citations</a>
           </p>
         </div>
       </footer>
@@ -104,24 +144,26 @@ export function App() {
   );
 }
 
-interface FlowProps {
-  step: Step;
-  setStep: (s: Step) => void;
+interface PageProps {
+  route: Route;
   session: Session;
   setSession: React.Dispatch<React.SetStateAction<Session>>;
-  rule: Rule | null;
-  onStartOver: () => void;
-  onNewSymptom: () => void;
+  navigate: (to: string, opts?: { replace?: boolean }) => void;
+  restart: (keepSafety: boolean) => void;
 }
 
-function Flow({ step, setStep, session, setSession, rule, onStartOver, onNewSymptom }: FlowProps) {
-  const chooseRule = (id: string) => {
-    setSession((s) => ({ ...s, rule_id: id, answers: {}, rule_red_flags_cleared: [], completed_at: null }));
-    const r = RULES_BY_ID[id];
-    setStep(r.red_flags.length ? { name: "rule_redflag", index: 0 } : { name: "intake", index: 0 });
+function Page({ route, session, setSession, navigate, restart }: PageProps) {
+  const go = (r: Route, replace = false) => navigate(pathFor(r), { replace });
+
+  const startRule = (id: string) => {
+    const rule = RULES_BY_ID[id];
+    setSession((s) =>
+      s.rule_id === id ? s : { ...s, rule_id: id, answers: {}, rule_red_flags_cleared: [], completed_at: null },
+    );
+    go(rule.red_flags.length ? { page: "warning", rule: id, n: 1 } : { page: "question", rule: id, n: 1 });
   };
 
-  switch (step.name) {
+  switch (route.page) {
     case "home":
       return (
         <div className="stack">
@@ -137,391 +179,183 @@ function Flow({ step, setStep, session, setSession, rule, onStartOver, onNewSymp
             <li>Get the score, the care level, how soon to go, and nearby providers.</li>
           </ol>
           <div className="row">
-            <button className="primary" onClick={() => setStep({ name: "redflag", index: 0 })}>
+            <a className="btn primary" href="/safety/1">
               Start assessment
-            </button>
-            <a className="btn" href="#/rules">
+            </a>
+            <a className="btn" href="/rules">
               Browse the {RULES.length} rules
             </a>
           </div>
-          <p className="small sub">Nothing you enter is stored unless you choose to share it at the end.</p>
+          <p className="small sub">Nothing you enter is stored on a server unless you choose to share it at the end.</p>
         </div>
       );
 
-    case "redflag": {
-      const flag = GLOBAL_RED_FLAGS[step.index];
+    case "safety": {
       const n = GLOBAL_RED_FLAGS.length;
+      const flag = GLOBAL_RED_FLAGS[route.n - 1];
       return (
         <div>
           <p className="sub small">
-            Safety check {step.index + 1} of {n}
+            Safety check {route.n} of {n}
           </p>
           <div className="progress" aria-hidden>
-            <div style={{ width: `${((step.index + 1) / n) * 100}%` }} />
+            <div style={{ width: `${(route.n / n) * 100}%` }} />
           </div>
           <h1 tabIndex={-1}>{flag.question}</h1>
           <p className="sub">{flag.help} If you are not sure, choose Yes.</p>
           <YesNoButtons
-            onYes={() => setStep({ name: "stop", action: flag.action, trigger: flag.question, back: step })}
+            onYes={() => {
+              setSession((s) => ({ ...s, stop_keyword: null }));
+              go({ page: "stop", flag: flag.id });
+            }}
             onNo={() => {
-              setSession((s) => ({ ...s, red_flags_cleared: [...new Set([...s.red_flags_cleared, flag.id])] }));
-              setStep(step.index + 1 < n ? { name: "redflag", index: step.index + 1 } : { name: "complaint" });
+              setSession((s) => ({
+                ...s,
+                red_flags_cleared: [...new Set([...s.red_flags_cleared, flag.id])],
+                pending_path: route.n < n ? s.pending_path : null,
+              }));
+              if (route.n < n) go({ page: "safety", n: route.n + 1 });
+              else navigate(session.pending_path ?? "/symptom");
             }}
           />
           <div className="nav-buttons">
-            <button className="link" onClick={() => setStep(step.index > 0 ? { name: "redflag", index: step.index - 1 } : { name: "home" })}>
-              ← Back
-            </button>
+            <a href={route.n > 1 ? `/safety/${route.n - 1}` : "/"}>← Back</a>
           </div>
         </div>
       );
     }
 
-    case "stop":
-      return <StopScreen action={step.action} trigger={step.trigger} onBack={() => setStep(step.back)} />;
+    case "stop": {
+      const flag = findFlag(route.flag, route.rule)!;
+      const ruleFlags = route.rule ? RULES_BY_ID[route.rule].red_flags : GLOBAL_RED_FLAGS;
+      const index = ruleFlags.findIndex((f) => f.id === route.flag) + 1;
+      const fromKeyword = !route.rule && session.stop_keyword;
+      const trigger = fromKeyword ? `You wrote "${session.stop_keyword}". ${flag.question}` : flag.question;
+      const back = fromKeyword ? "/symptom" : route.rule ? `/assess/${route.rule}/warning/${index}` : `/safety/${index}`;
+      return <StopScreen action={flag.action} trigger={trigger} onBack={() => navigate(back)} />;
+    }
 
-    case "complaint":
+    case "symptom":
       return (
         <ComplaintInput
           initial={session.complaint_text}
           onSubmit={(text) => {
-            setSession((s) => ({ ...s, complaint_text: text }));
             const r = routeComplaint(text, COMPLAINT_MAP, RULES);
-            if (r.kind === "emergency") {
-              const flag = GLOBAL_RED_FLAGS.find((f) => f.id === r.red_flag_id)!;
-              setStep({ name: "stop", action: flag.action, trigger: `You wrote "${r.keyword}". ${flag.question}`, back: { name: "complaint" } });
-            } else setStep({ name: "mapping", route: r });
+            setSession((s) => ({ ...s, complaint_text: text, stop_keyword: r.kind === "emergency" ? r.keyword : null }));
+            if (r.kind === "emergency") go({ page: "stop", flag: r.red_flag_id });
+            else if (r.kind === "match") go({ page: "confirm", rule: r.rule_id });
+            else go({ page: "choose" });
           }}
-          onPick={chooseRule}
+          onPick={startRule}
         />
       );
 
-    case "mapping":
-      return <Mapping route={step.route} onChoose={chooseRule} onBack={() => setStep({ name: "complaint" })} />;
+    case "choose": {
+      const r = routeComplaint(session.complaint_text, COMPLAINT_MAP, RULES);
+      return <Mapping route={r} onChoose={(id) => go({ page: "confirm", rule: id })} onBack={() => navigate("/symptom")} />;
+    }
 
-    case "rule_redflag": {
-      if (!rule) return null;
-      const flag = rule.red_flags[step.index];
+    case "confirm": {
+      const fromText = session.complaint_text ? routeComplaint(session.complaint_text, COMPLAINT_MAP, RULES) : null;
+      const r: RouteResult =
+        fromText?.kind === "match" && fromText.rule_id === route.rule ? fromText : { kind: "match", rule_id: route.rule, keyword: "" };
+      return <Mapping route={r} onChoose={startRule} onBack={() => navigate("/symptom")} />;
+    }
+
+    case "warning": {
+      const rule = RULES_BY_ID[route.rule];
+      const flag = rule.red_flags[route.n - 1];
       const n = rule.red_flags.length;
       return (
         <div>
           <p className="sub small">
-            {rule.assessment_title} · Warning sign {step.index + 1} of {n}
+            {rule.assessment_title} · Warning sign {route.n} of {n}
           </p>
           <div className="progress" aria-hidden>
-            <div style={{ width: `${((step.index + 1) / n) * 100}%` }} />
+            <div style={{ width: `${(route.n / n) * 100}%` }} />
           </div>
           <h1 tabIndex={-1}>{flag.question}</h1>
           <p className="sub">{flag.help} If you are not sure, choose Yes.</p>
           <YesNoButtons
-            onYes={() => setStep({ name: "stop", action: flag.action, trigger: flag.question, back: step })}
+            onYes={() => go({ page: "stop", rule: rule.rule_id, flag: flag.id })}
             onNo={() => {
               setSession((s) => ({ ...s, rule_red_flags_cleared: [...new Set([...s.rule_red_flags_cleared, flag.id])] }));
-              setStep(step.index + 1 < n ? { name: "rule_redflag", index: step.index + 1 } : { name: "intake", index: 0 });
+              go(route.n < n ? { page: "warning", rule: rule.rule_id, n: route.n + 1 } : { page: "question", rule: rule.rule_id, n: 1 });
             }}
           />
           <div className="nav-buttons">
-            <button className="link" onClick={() => setStep(step.index > 0 ? { name: "rule_redflag", index: step.index - 1 } : { name: "complaint" })}>
-              ← Back
-            </button>
+            <a href={route.n > 1 ? `/assess/${rule.rule_id}/warning/${route.n - 1}` : `/assess/${rule.rule_id}`}>← Back</a>
           </div>
         </div>
       );
     }
 
-    case "intake":
-      if (!rule) return null;
+    case "question": {
+      const rule = RULES_BY_ID[route.rule];
+      const count = visibleItems(rule, session.answers).length;
+      if (route.n > count) {
+        queueMicrotask(() => go({ page: "question", rule: rule.rule_id, n: count }, true));
+        return null;
+      }
       return (
         <Intake
           rule={rule}
-          index={step.index}
+          index={route.n - 1}
           answers={session.answers}
-          setAnswer={(id, v) => setSession((s) => ({ ...s, answers: { ...s.answers, [id]: v } }))}
-          goto={(i) => setStep({ name: "intake", index: i })}
-          onBack={() => setStep(rule.red_flags.length ? { name: "rule_redflag", index: rule.red_flags.length - 1 } : { name: "complaint" })}
-          onDone={() => setStep({ name: "review" })}
+          setAnswer={(id, v) => setSession((s) => ({ ...s, answers: { ...s.answers, [id]: v }, completed_at: null }))}
+          goto={(i) => go({ page: "question", rule: rule.rule_id, n: i + 1 })}
+          onBack={() =>
+            go(rule.red_flags.length ? { page: "warning", rule: rule.rule_id, n: rule.red_flags.length } : { page: "confirm", rule: rule.rule_id })
+          }
+          onDone={() => go({ page: "review", rule: rule.rule_id })}
         />
       );
+    }
 
-    case "review":
-      if (!rule) return null;
+    case "review": {
+      const rule = RULES_BY_ID[route.rule];
       return (
         <Review
           rule={rule}
           session={session}
-          goto={(i) => setStep({ name: "intake", index: i })}
+          goto={(i) => go({ page: "question", rule: rule.rule_id, n: i + 1 })}
           onSubmit={() => {
             setSession((s) => ({ ...s, completed_at: new Date().toISOString() }));
-            setStep({ name: "result" });
+            go({ page: "result", rule: rule.rule_id });
           }}
         />
       );
+    }
 
     case "result":
-      if (!rule) return null;
       return (
         <Result
-          rule={rule}
+          rule={RULES_BY_ID[route.rule]}
           session={session}
-          onStartOver={onStartOver}
-          onNewSymptom={onNewSymptom}
-          onEdit={() => setStep({ name: "review" })}
+          onStartOver={() => restart(false)}
+          onNewSymptom={() => restart(true)}
+          onEdit={() => go({ page: "review", rule: route.rule })}
         />
       );
-  }
-}
 
-export function StopScreen({ action, trigger, onBack }: { action: RedFlagAction; trigger: string; onBack: () => void }) {
-  const m = stopMessage(action);
-  return (
-    <div className="stop stack" role="alert">
-      <h1 tabIndex={-1} style={m.emergency ? undefined : { color: "var(--ink)" }}>
-        {m.emergency ? "🚨 " : ""}
-        {m.heading}
-      </h1>
-      <p style={{ fontSize: "1.2rem" }}>{m.body}</p>
-      <div className="row actions">
-        <a className={`btn ${m.emergency ? "danger" : "primary"}`} href={m.primary.href}>
-          {m.primary.label}
-        </a>
-        <a className="btn" href={m.secondary.href} target={m.secondary.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer">
-          {m.secondary.label}
-        </a>
-      </div>
-      <div className="box">
-        <p className="small">
-          <strong>Why we stopped:</strong> you answered yes to: “{trigger}”
-        </p>
-        <p className="small sub">
-          This is a fixed safety rule. When this warning sign is present, no score can make it safe to wait, so the assessment ends here.
-        </p>
-      </div>
-      <button className="link" onClick={onBack}>
-        I answered by mistake — go back
-      </button>
-    </div>
-  );
-}
-
-function ComplaintInput({ initial, onSubmit, onPick }: { initial: string; onSubmit: (t: string) => void; onPick: (id: string) => void }) {
-  const [text, setText] = useState(initial);
-  return (
-    <div className="stack">
-      <h1 tabIndex={-1}>What is your main symptom?</h1>
-      <p className="sub">Describe it in a few words, for example “sore throat”, “twisted ankle”, or “burning when I pee”.</p>
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (text.trim()) onSubmit(text.trim());
-        }}
-      >
-        <label className="sr-only" htmlFor="complaint">
-          Main symptom
-        </label>
-        <input id="complaint" type="text" className="wide" style={{ flex: "1 1 260px" }} value={text} onChange={(e) => setText(e.target.value)} maxLength={200} autoComplete="off" />
-        <button className="primary" type="submit" disabled={!text.trim()}>
-          Continue
-        </button>
-      </form>
-      <p className="small sub">Your words are matched to a rule with a fixed keyword list. They are not stored or sent anywhere.</p>
-      <details>
-        <summary style={{ color: "var(--link)", cursor: "pointer" }}>Or choose from all {RULES.length} assessments</summary>
-        <RuleMenu ids={RULES.map((r) => r.rule_id)} onChoose={onPick} />
-      </details>
-    </div>
-  );
-}
-
-function RuleMenu({ ids, onChoose }: { ids: string[]; onChoose: (id: string) => void }) {
-  return (
-    <ul className="list-plain">
-      {ids.map((id) => {
-        const r = RULES_BY_ID[id];
-        return (
-          <li key={id} className="spread">
-            <span>
-              <strong>{r.assessment_title}</strong>
-              <br />
-              <span className="small sub">
-                {r.condition} · {r.short_name} ({r.year_validated})
-              </span>
-            </span>
-            <button onClick={() => onChoose(id)}>Select</button>
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-function Mapping({ route, onChoose, onBack }: { route: RouteResult; onChoose: (id: string) => void; onBack: () => void }) {
-  if (route.kind === "match") {
-    const r = RULES_BY_ID[route.rule_id];
-    return (
-      <div className="stack">
-        <h1 tabIndex={-1}>
-          Mapping to: {r.assessment_title.toLowerCase()} ({r.short_name})
-        </h1>
-        <p className="sub">Matched the phrase “{route.keyword}” in our keyword list.</p>
-        <div className="box">
+    case "rules":
+      return <Library />;
+    case "rule_detail":
+      return <Library ruleId={route.rule} />;
+    case "about":
+      return <About />;
+    case "not_found":
+      return (
+        <div className="stack">
+          <h1 tabIndex={-1}>Page not found</h1>
           <p>
-            <strong>{r.name}</strong>, validated {r.year_validated}.
+            <a href="/">Start an assessment</a> or browse the <a href="/rules">rules library</a>.
           </p>
-          <p className="small sub">Validated in: {r.validated_population}</p>
+          <details>
+            <summary style={{ color: "var(--link)", cursor: "pointer" }}>All assessments</summary>
+            <RuleMenu ids={RULES.map((r) => r.rule_id)} onChoose={(id) => go({ page: "confirm", rule: id })} />
+          </details>
         </div>
-        <div className="row">
-          <button className="primary" onClick={() => onChoose(r.rule_id)}>
-            Continue
-          </button>
-          <button onClick={onBack}>Not right — change</button>
-        </div>
-        <details>
-          <summary style={{ color: "var(--link)", cursor: "pointer" }}>Choose a different assessment</summary>
-          <RuleMenu ids={RULES.map((x) => x.rule_id).filter((id) => id !== r.rule_id)} onChoose={onChoose} />
-        </details>
-      </div>
-    );
+      );
   }
-  if (route.kind === "ambiguous") {
-    return (
-      <div className="stack">
-        <h1 tabIndex={-1}>Which is closest?</h1>
-        <p className="sub">Your words matched more than one assessment. Choose the one that fits your main concern.</p>
-        <RuleMenu ids={route.candidates.map((c) => c.rule_id)} onChoose={onChoose} />
-        <button className="link" onClick={onBack}>
-          ← Change what I typed
-        </button>
-      </div>
-    );
-  }
-  if (route.kind === "none") {
-    const others = RULES.map((r) => r.rule_id).filter((id) => !route.suggestions.includes(id));
-    return (
-      <div className="stack">
-        <h1 tabIndex={-1}>No exact match</h1>
-        <p className="sub">We could not match your words to a rule. {route.suggestions.length ? "These are the closest matches:" : "Choose from the list below."}</p>
-        {route.suggestions.length > 0 && <RuleMenu ids={route.suggestions} onChoose={onChoose} />}
-        <details open={route.suggestions.length === 0}>
-          <summary style={{ color: "var(--link)", cursor: "pointer" }}>All assessments</summary>
-          <RuleMenu ids={others} onChoose={onChoose} />
-        </details>
-        <div className="box small">
-          If none fits, OLA BOT has no validated rule for your symptom. Book a primary care or telehealth visit within 1 to 3 days, or go to urgent care today
-          if symptoms are getting worse.
-        </div>
-        <button className="link" onClick={onBack}>
-          ← Change what I typed
-        </button>
-      </div>
-    );
-  }
-  return null;
-}
-
-function Intake({
-  rule,
-  index,
-  answers,
-  setAnswer,
-  goto,
-  onBack,
-  onDone,
-}: {
-  rule: Rule;
-  index: number;
-  answers: Session["answers"];
-  setAnswer: (id: string, v: string) => void;
-  goto: (i: number) => void;
-  onBack: () => void;
-  onDone: () => void;
-}) {
-  const items = useMemo(() => visibleItems(rule, answers), [rule, answers]);
-  const i = Math.min(index, items.length - 1);
-  const item = items[i];
-  const value = answers[item.id];
-  return (
-    <div>
-      <h1 tabIndex={-1} style={{ fontSize: "1.5rem" }}>
-        {rule.assessment_title}
-      </h1>
-      <p className="sub">
-        We'll ask {items.length} questions based on the {rule.short_name} (validated {rule.year_validated}).
-      </p>
-      <p className="small" aria-live="polite">
-        Question {i + 1} of {items.length}
-      </p>
-      <div className="progress" aria-hidden>
-        <div style={{ width: `${((i + 1) / items.length) * 100}%` }} />
-      </div>
-      <QuestionField key={item.id} item={item} value={value} onChange={(v) => setAnswer(item.id, v)} />
-      <div className="nav-buttons">
-        <button onClick={() => (i === 0 ? onBack() : goto(i - 1))}>← Back</button>
-        <button className="primary" onClick={() => (i + 1 < items.length ? goto(i + 1) : onDone())}>
-          {value === undefined ? "Skip" : i + 1 < items.length ? "Next →" : "Review answers →"}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function Review({ rule, session, goto, onSubmit }: { rule: Rule; session: Session; goto: (i: number) => void; onSubmit: () => void }) {
-  const items = visibleItems(rule, session.answers);
-  const ev = evaluate(rule, session.answers);
-  const label = (id: string, v: string | undefined) => {
-    if (v === undefined) return <span className="tag warn">Not answered</span>;
-    if (v === "unsure") return <span className="tag">Not sure</span>;
-    const it = items.find((x) => x.id === id)!;
-    return it.type === "yes_no" ? (v === "yes" ? "Yes" : "No") : it.options.find((o) => o.value === v)?.label;
-  };
-  return (
-    <div className="stack">
-      <h1 tabIndex={-1}>Review your answers</h1>
-      {ev.blocked ? (
-        <div className="box alert" role="alert">
-          <strong>{ev.missing.length} questions are unanswered.</strong> The rule needs all but at most one answered. Go back and answer these (“Not sure” is
-          an answer):
-          <ul>
-            {ev.missing.map((m) => (
-              <li key={m.id}>
-                <button className="link" onClick={() => goto(items.findIndex((x) => x.id === m.id))}>
-                  {m.question}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : ev.limited ? (
-        <div className="box">Some answers are missing or “Not sure”. The result will show how this could change it.</div>
-      ) : null}
-      <table className="trace-table">
-        <thead>
-          <tr>
-            <th>Question</th>
-            <th>Your answer</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((it, i) => (
-            <tr key={it.id}>
-              <td>{it.question}</td>
-              <td>{label(it.id, session.answers[it.id])}</td>
-              <td>
-                <button className="link" onClick={() => goto(i)}>
-                  Change
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="nav-buttons">
-        <button onClick={() => goto(items.length - 1)}>← Back</button>
-        <button className="primary" disabled={ev.blocked} onClick={onSubmit}>
-          See my result
-        </button>
-      </div>
-    </div>
-  );
 }

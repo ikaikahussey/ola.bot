@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 async function passSafetyChecks(page: Page) {
-  await page.getByRole("button", { name: "Start assessment" }).click();
+  await page.getByRole("link", { name: "Start assessment" }).click();
   for (let i = 0; i < 8; i++) {
     await expect(page.getByText(`Safety check ${i + 1} of 8`)).toBeVisible();
     await page.getByRole("button", { name: "No", exact: true }).click();
@@ -87,8 +87,9 @@ test("sore throat: full flow to an auditable result, finder, and PDF", async ({ 
 
 test("a red flag stops the assessment and offers 911", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Start assessment" }).click();
+  await page.getByRole("link", { name: "Start assessment" }).click();
   await page.getByRole("button", { name: "Yes", exact: true }).click();
+  await expect(page).toHaveURL("/stop/chest_pain");
   await expect(page.getByRole("heading", { name: /SEEK EMERGENCY CARE/ })).toBeVisible();
   await expect(page.getByRole("link", { name: "Call 911" })).toHaveAttribute("href", "tel:911");
   await expect(page.getByRole("link", { name: "Find nearest ED" })).toBeVisible();
@@ -125,10 +126,68 @@ test("unmatched complaint shows a menu", async ({ page }) => {
 });
 
 test("rules library lists every rule with version and citation", async ({ page }) => {
-  await page.goto("/#/rules");
+  await page.goto("/rules");
   await expect(page.getByRole("heading", { name: "Rules library" })).toBeVisible();
   await expect(page.locator("tbody tr")).toHaveCount(17);
   await page.getByRole("link", { name: "Ankle and foot injury assessment" }).click();
   await expect(page.getByRole("heading", { name: "Ottawa Ankle Rules" })).toBeVisible();
+  await expect(page).toHaveURL("/rules/ottawa_ankle");
+  await expect(page).toHaveTitle("Ottawa Ankle Rules · OLA BOT");
   await expect(page.getByRole("heading", { name: "Version history" })).toBeVisible();
+});
+
+test("every step has its own URL, and back/reload work", async ({ page }) => {
+  await page.goto("/");
+  await passSafetyChecks(page);
+  await expect(page).toHaveURL("/symptom");
+  await page.getByLabel("Main symptom").fill("sore throat");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL("/assess/centor_sore_throat");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL("/assess/centor_sore_throat/warning/1");
+  for (let i = 0; i < 3; i++) await page.getByRole("button", { name: "No", exact: true }).click();
+  await expect(page).toHaveURL("/assess/centor_sore_throat/q/1");
+  await answer(page, "15 to 44 years");
+  await expect(page).toHaveURL("/assess/centor_sore_throat/q/2");
+  await expect(page).toHaveTitle("Sore throat assessment: question 2 of 5 · OLA BOT");
+
+  // Browser back returns to the previous question with the answer kept.
+  await page.goBack();
+  await expect(page).toHaveURL("/assess/centor_sore_throat/q/1");
+  await expect(page.getByRole("radio", { name: "15 to 44 years" })).toBeChecked();
+
+  // Reload keeps the session for this tab.
+  await page.reload();
+  await expect(page.getByRole("radio", { name: "15 to 44 years" })).toBeChecked();
+  await page.getByRole("button", { name: /Next/ }).click();
+  for (const a of ["Yes", "Yes", "Yes", "No"]) await answer(page, a);
+  await expect(page).toHaveURL("/assess/centor_sore_throat/review");
+  await page.getByRole("button", { name: "See my result" }).click();
+  await expect(page).toHaveURL("/assess/centor_sore_throat/result");
+  await page.reload();
+  await expect(page.getByRole("heading", { level: 1, name: "Moderate likelihood of strep" })).toBeVisible();
+
+  // Answers never appear in the URL.
+  expect(page.url()).not.toMatch(/fever|yes|15_44/);
+});
+
+test("a deep link runs the safety check first, then returns to the requested page", async ({ page }) => {
+  await page.goto("/assess/ottawa_knee");
+  await expect(page).toHaveURL("/safety/1");
+  for (let i = 0; i < 8; i++) await page.getByRole("button", { name: "No", exact: true }).click();
+  await expect(page).toHaveURL("/assess/ottawa_knee");
+  await expect(page.getByRole("heading", { name: /Mapping to: knee injury assessment/ })).toBeVisible();
+});
+
+test("result URL without a completed assessment redirects", async ({ page }) => {
+  await page.goto("/assess/phq9/result");
+  await expect(page).toHaveURL("/safety/1");
+});
+
+test("old hash links still work, unknown paths show not found", async ({ page }) => {
+  await page.goto("/#/about");
+  await expect(page).toHaveURL("/about");
+  await expect(page.getByRole("heading", { name: "How OLA BOT works" })).toBeVisible();
+  await page.goto("/no/such/page");
+  await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
 });

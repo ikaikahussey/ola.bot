@@ -20,6 +20,25 @@ OLA BOT asks a short set of emergency questions, maps the user's main symptom to
 | 6. Care routing | Each result in the rule file names a care level, a time frame, where to go, and when to go to the ED instead. | `results` in each rule |
 | 7. Output | Audit trail, care box, provider finder, what was asked, citation, caveats, PDF, handoff summary, session ID and timestamp. | [`src/ui/Result.tsx`](src/ui/Result.tsx), [`src/ui/pdf.ts`](src/ui/pdf.ts) |
 
+### Page URLs
+
+Every screen has its own path, so the back button, reloads, and shared links work:
+
+| Path | Page |
+|---|---|
+| `/` | Start |
+| `/safety/:n` | Emergency question *n* |
+| `/stop/:flag`, `/stop/:rule/:flag` | Emergency / urgent stop screen |
+| `/symptom`, `/symptom/choose` | Symptom entry; menu when there is no single match |
+| `/assess/:rule` | Rule confirmation ("Mapping to: …"). Linkable entry point for each assessment |
+| `/assess/:rule/warning/:n` | Rule-specific warning sign *n* |
+| `/assess/:rule/q/:n` | Question *n* |
+| `/assess/:rule/review`, `/assess/:rule/result` | Review and result |
+| `/rules`, `/rules/:rule` | Rules library and rule detail (version history, raw JSON) |
+| `/about` | How it works |
+
+Answers are never placed in URLs. They are kept in memory and in `sessionStorage` for the current tab only, so a reload keeps progress and closing the tab clears it. A deep link to any assessment page runs the safety check first and then returns to the requested page ([`src/ui/routes.ts`](src/ui/routes.ts)).
+
 ### Missing answers
 
 - More than one unanswered item: the user must go back before seeing a result.

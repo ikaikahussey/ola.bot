@@ -30,7 +30,7 @@ export function Library({ ruleId }: { ruleId?: string }) {
           {RULES.map((r) => (
             <tr key={r.rule_id}>
               <td>
-                <a href={`#/rules/${r.rule_id}`}>{r.assessment_title}</a>
+                <a href={`/rules/${r.rule_id}`}>{r.assessment_title}</a>
                 <div className="small sub">{r.condition}</div>
               </td>
               <td>{r.short_name}</td>
@@ -66,7 +66,7 @@ function RuleDetail({ rule }: { rule: Rule }) {
   return (
     <div className="stack">
       <p className="small">
-        <a href="#/rules">← All rules</a>
+        <a href="/rules">← All rules</a>
       </p>
       <h1 tabIndex={-1}>{rule.name}</h1>
       <p className="sub">{rule.condition}</p>

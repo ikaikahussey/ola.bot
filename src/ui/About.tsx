@@ -41,7 +41,7 @@ export function About() {
 
       <h2>Privacy</h2>
       <ul>
-        <li>Your answers stay in your browser. No account is needed.</li>
+        <li>Your answers stay in your browser tab (memory and session storage, cleared when you close the tab) and are never put in page addresses. No account is needed.</li>
         <li>The provider finder sends only the specialty, distance, and ZIP code (or approximate location).</li>
         <li>Your assessment is shared with a provider only if you copy the summary yourself.</li>
         <li>Outcome logging happens only if you tick the consent box and press the button. It stores multiple-choice answers, never typed text or IP address.</li>

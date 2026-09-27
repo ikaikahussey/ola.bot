@@ -324,7 +324,7 @@ export function RuleInfo({ rule }: { rule: Rule }) {
     <dl className="kv">
       <dt>Rule</dt>
       <dd>
-        <a href={`#/rules/${rule.rule_id}`}>{rule.name}</a>
+        <a href={`/rules/${rule.rule_id}`}>{rule.name}</a>
       </dd>
       <dt>Year validated</dt>
       <dd>{rule.year_validated}</dd>
