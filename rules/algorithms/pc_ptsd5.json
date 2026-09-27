@@ -4,6 +4,7 @@
   "short_name": "PC-PTSD-5",
   "assessment_title": "Trauma stress check",
   "condition": "Stress after a traumatic event",
+  "assessment_type": "scoring_algorithm",
   "version": "1.0.0",
   "last_updated": "2026-09-27",
   "changelog": [

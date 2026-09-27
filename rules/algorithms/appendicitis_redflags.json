@@ -1,0 +1,507 @@
+{
+  "rule_id": "appendicitis_redflags",
+  "name": "Appendicitis red flags",
+  "short_name": "Appendicitis pattern check",
+  "assessment_title": "Belly pain pattern check",
+  "condition": "Belly pain (possible appendicitis)",
+  "assessment_type": "diagnostic_confirmation",
+  "description": "Belly pain with certain patterns may mean appendicitis, which needs imaging and urgent evaluation. This is not a diagnosis. Only a clinician with blood tests and imaging can confirm it.",
+  "time_criticality": "Hours to days — the risk of rupture increases with time",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": null,
+  "citations": [
+    {
+      "text": "Mayo Clinic. Appendicitis: symptoms and causes.",
+      "url": "https://www.mayoclinic.org/diseases-conditions/appendicitis/symptoms-causes/syc-20369543"
+    },
+    {
+      "text": "Wagner JM, McKinney WP, Carpenter JL. Does this patient have appendicitis? JAMA. 1996;276(19):1589-1594.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=%22Does%20this%20patient%20have%20appendicitis%3F%22%5BTitle%5D"
+    }
+  ],
+  "validated_population": "Not a validated score. Validated appendicitis scores (such as Alvarado) need blood tests. This pattern uses the classic findings reviewed in the JAMA Rational Clinical Examination series.",
+  "self_report_note": "No home check can rule appendicitis in or out. Children, older adults, and pregnant people often have atypical symptoms.",
+  "license_note": "Pattern logic and question wording are original to OLA BOT, based on the public guidance cited. Not a validated scoring instrument.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [
+    {
+      "id": "rigid",
+      "question": "Is your belly hard like a board, or too painful to touch or move at all?",
+      "help": "A rigid belly can mean a burst appendix or other emergency.",
+      "action": "go_to_ed"
+    }
+  ],
+  "items": [
+    {
+      "id": "pain_location",
+      "type": "choice",
+      "question": "Where is your belly pain right now?",
+      "help": "Point to where it hurts most.",
+      "trace_label": "Pain location",
+      "options": [
+        {
+          "value": "periumbilical",
+          "label": "Around my belly button (center)"
+        },
+        {
+          "value": "rlq",
+          "label": "Lower right side (between hip bone and ribs)",
+          "concerning": true
+        },
+        {
+          "value": "llq",
+          "label": "Lower left side"
+        },
+        {
+          "value": "lower_center",
+          "label": "Lower center"
+        },
+        {
+          "value": "upper",
+          "label": "Upper belly",
+          "benign": true
+        },
+        {
+          "value": "diffuse",
+          "label": "All over"
+        }
+      ],
+      "finding_weight": "essential",
+      "critical": true
+    },
+    {
+      "id": "pain_migration",
+      "type": "yes_no",
+      "question": "Did the pain start around your belly button and then move to your lower right side?",
+      "help": "This shift is a classic sign of appendicitis.",
+      "trace_label": "Pain moved from belly button to lower right",
+      "finding_weight": "critical",
+      "required": false,
+      "critical": true
+    },
+    {
+      "id": "fever",
+      "type": "yes_no",
+      "question": "Do you have a fever?",
+      "help": "100.4°F (38°C) or higher, or feeling feverish with chills.",
+      "trace_label": "Fever",
+      "finding_weight": "supporting"
+    },
+    {
+      "id": "vomiting",
+      "type": "yes_no",
+      "question": "Are you vomiting or unable to keep food or liquids down?",
+      "help": "Throwing up, or unable to keep down even sips of water.",
+      "trace_label": "Vomiting",
+      "finding_weight": "supporting",
+      "required": false
+    },
+    {
+      "id": "pain_severity",
+      "type": "choice",
+      "question": "How bad is the pain on a scale of 1 to 10?",
+      "help": "1 is barely noticeable; 10 is the worst pain you can imagine.",
+      "trace_label": "Pain severity",
+      "options": [
+        {
+          "value": "mild",
+          "label": "1–3 (mild, I can function)",
+          "benign": true
+        },
+        {
+          "value": "moderate",
+          "label": "4–6 (moderate, hard to function)"
+        },
+        {
+          "value": "severe",
+          "label": "7–10 (severe, very hard to function)",
+          "concerning": true
+        }
+      ],
+      "finding_weight": "supporting",
+      "critical": true
+    },
+    {
+      "id": "symptom_onset",
+      "type": "choice",
+      "question": "When did the pain start?",
+      "help": "Your best estimate of when the belly pain began.",
+      "trace_label": "Pain onset",
+      "options": [
+        {
+          "value": "less_6h",
+          "label": "Less than 6 hours ago",
+          "concerning": true
+        },
+        {
+          "value": "6_to_24h",
+          "label": "6–24 hours ago"
+        },
+        {
+          "value": "1_to_3d",
+          "label": "1–3 days ago"
+        },
+        {
+          "value": "over_3d",
+          "label": "More than 3 days ago",
+          "benign": true
+        }
+      ],
+      "finding_weight": "critical"
+    },
+    {
+      "id": "complication_flags",
+      "type": "checkbox",
+      "question": "Do any of these apply? (Select all that apply)",
+      "help": "Leave all unchecked if none apply.",
+      "trace_label": "Complication signs",
+      "options": [
+        {
+          "value": "distension",
+          "label": "Severe belly swelling",
+          "concerning": true
+        },
+        {
+          "value": "high_fever",
+          "label": "Very high fever (over 102°F / 39°C)",
+          "concerning": true
+        },
+        {
+          "value": "mass",
+          "label": "Lower-right pain that feels hard or lumpy",
+          "concerning": true
+        },
+        {
+          "value": "shock_signs",
+          "label": "Signs of shock (dizziness, rapid heartbeat, pale skin)",
+          "concerning": true
+        }
+      ],
+      "finding_weight": "critical",
+      "critical": true,
+      "required": false
+    }
+  ],
+  "scoring": {
+    "method": "pattern",
+    "pattern_text": "HIGH suspicion: (lower-right pain OR pain that moved there from the belly button) AND (fever OR vomiting) AND moderate-to-severe pain. MODERATE suspicion: lower-right or belly-button pain that is moderate-to-severe. Otherwise LOW.",
+    "threshold_text": "Pattern check, not a score. Routing: signs of shock → call 911; other complication signs, moderate-to-severe lower-right pain, pain migration, or fever with vomiting and moderate-to-severe pain → emergency department today; moderate-to-severe belly-button pain → urgent care or ED today; mild pain within 24 hours → primary care today.",
+    "levels": [
+      {
+        "id": "high",
+        "label": "Pattern: HIGH suspicion for appendicitis",
+        "matched": true,
+        "interpretation": "Your symptoms raise significant concern for appendicitis.",
+        "when": {
+          "all": [
+            {
+              "any": [
+                {
+                  "var": "pain_location",
+                  "equals": "rlq"
+                },
+                {
+                  "var": "pain_migration",
+                  "equals": "yes"
+                }
+              ]
+            },
+            {
+              "any_yes": [
+                "fever",
+                "vomiting"
+              ]
+            },
+            {
+              "var": "pain_severity",
+              "in": [
+                "moderate",
+                "severe"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "moderate",
+        "label": "Pattern: MODERATE suspicion for appendicitis",
+        "matched": true,
+        "interpretation": "Your symptoms could represent appendicitis, but other conditions are also possible.",
+        "when": {
+          "all": [
+            {
+              "var": "pain_location",
+              "in": [
+                "rlq",
+                "periumbilical"
+              ]
+            },
+            {
+              "var": "pain_severity",
+              "in": [
+                "moderate",
+                "severe"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "low",
+        "label": "Pattern: LOW suspicion (not typical of appendicitis)",
+        "matched": false,
+        "interpretation": "Your symptoms do not match the typical pattern of appendicitis."
+      }
+    ],
+    "steps": [
+      {
+        "label": "Signs of shock",
+        "when": {
+          "var": "complication_flags",
+          "includes": "shock_signs"
+        },
+        "result": "call_911"
+      },
+      {
+        "label": "Severe belly swelling, very high fever, or hard lower-right lump",
+        "when": {
+          "any": [
+            {
+              "var": "complication_flags",
+              "includes": "distension"
+            },
+            {
+              "var": "complication_flags",
+              "includes": "high_fever"
+            },
+            {
+              "var": "complication_flags",
+              "includes": "mass"
+            }
+          ]
+        },
+        "result": "ed_today"
+      },
+      {
+        "label": "Lower-right pain, moderate or severe",
+        "when": {
+          "all": [
+            {
+              "var": "pain_location",
+              "equals": "rlq"
+            },
+            {
+              "var": "pain_severity",
+              "in": [
+                "moderate",
+                "severe"
+              ]
+            }
+          ]
+        },
+        "result": "ed_today"
+      },
+      {
+        "label": "Pain moved from belly button to lower right",
+        "when": {
+          "var": "pain_migration",
+          "equals": "yes"
+        },
+        "result": "ed_today"
+      },
+      {
+        "label": "Fever and vomiting with moderate or severe pain",
+        "when": {
+          "all": [
+            {
+              "all_yes": [
+                "fever",
+                "vomiting"
+              ]
+            },
+            {
+              "var": "pain_severity",
+              "in": [
+                "moderate",
+                "severe"
+              ]
+            }
+          ]
+        },
+        "result": "ed_today"
+      },
+      {
+        "label": "Belly-button pain, moderate or severe",
+        "when": {
+          "all": [
+            {
+              "var": "pain_location",
+              "equals": "periumbilical"
+            },
+            {
+              "var": "pain_severity",
+              "in": [
+                "moderate",
+                "severe"
+              ]
+            }
+          ]
+        },
+        "result": "urgent_or_ed"
+      },
+      {
+        "label": "Mild pain that started within 24 hours",
+        "when": {
+          "all": [
+            {
+              "var": "pain_severity",
+              "equals": "mild"
+            },
+            {
+              "var": "symptom_onset",
+              "in": [
+                "less_6h",
+                "6_to_24h"
+              ]
+            }
+          ]
+        },
+        "result": "primary_today"
+      },
+      {
+        "label": "Moderate or severe pain elsewhere in the belly",
+        "when": {
+          "var": "pain_severity",
+          "in": [
+            "moderate",
+            "severe"
+          ]
+        },
+        "result": "urgent_today"
+      }
+    ],
+    "default_result": "primary_soon"
+  },
+  "results": {
+    "call_911": {
+      "label": "Emergency: signs of shock",
+      "risk": "high",
+      "interpretation": "Dizziness, a rapid heartbeat, or pale skin with belly pain can mean internal bleeding, a burst appendix, or severe infection.",
+      "recommendation": "Call 911 now.",
+      "care": {
+        "level": "emergency_911",
+        "within": "Now",
+        "where_detail": "Call 911. Lie down while you wait.",
+        "ed_redirect": [
+          "Do not drive yourself"
+        ],
+        "self_care": [
+          "Do not eat or drink anything until you are examined (you may need surgery)."
+        ]
+      }
+    },
+    "ed_today": {
+      "label": "Pattern suggests possible appendicitis: go to the ER today",
+      "risk": "high",
+      "interpretation": "Appendicitis is a surgical emergency. You need imaging (ultrasound or CT) and evaluation by a surgeon. The risk of rupture increases with time, and a ruptured appendix is dangerous.",
+      "recommendation": "Go to the emergency room today for evaluation and imaging.",
+      "care": {
+        "level": "emergency_department",
+        "within": "Today (go now if pain is getting worse)",
+        "where_detail": "Hospital emergency department with ultrasound or CT and a surgeon on call.",
+        "ed_redirect": [
+          "Pain becomes unbearable: call 911",
+          "Signs of shock (dizziness, rapid heartbeat, very pale skin): call 911",
+          "Fever above 103°F (39.4°C)"
+        ],
+        "self_care": [
+          "Do not eat or drink anything until you are examined (you may need surgery)."
+        ],
+        "finder_specialty": "emergency_department"
+      }
+    },
+    "urgent_or_ed": {
+      "label": "Belly pain needs same-day evaluation",
+      "risk": "moderate",
+      "interpretation": "Your symptoms could represent appendicitis, but other conditions are also possible.",
+      "recommendation": "See urgent care or go to the emergency room today. Depending on findings, you may need imaging.",
+      "care": {
+        "level": "urgent_care",
+        "within": "Today (same day)",
+        "where_detail": "Urgent care clinic that can do blood tests and imaging, or an emergency department. Call ahead.",
+        "ed_redirect": [
+          "Pain becomes unbearable: call 911",
+          "Signs of shock (dizziness, rapid heartbeat, very pale skin): call 911",
+          "Fever above 103°F (39.4°C)",
+          "Pain moves to the lower right side: go to the emergency department"
+        ],
+        "self_care": [
+          "Do not eat or drink anything until you are examined (you may need surgery)."
+        ],
+        "finder_specialty": "urgent_care"
+      }
+    },
+    "urgent_today": {
+      "label": "Belly pain needs same-day evaluation",
+      "risk": "moderate",
+      "interpretation": "Your pain is not in the typical location for appendicitis, but moderate or severe belly pain needs same-day evaluation to find the cause.",
+      "recommendation": "See urgent care or an emergency department today.",
+      "care": {
+        "level": "urgent_care",
+        "within": "Today (same day)",
+        "where_detail": "Urgent care clinic, or emergency department if pain is severe or worsening.",
+        "ed_redirect": [
+          "Pain becomes unbearable: call 911",
+          "Signs of shock (dizziness, rapid heartbeat, very pale skin): call 911",
+          "Fever above 103°F (39.4°C)",
+          "Pain moves to the lower right side: go to the emergency department"
+        ],
+        "finder_specialty": "urgent_care"
+      }
+    },
+    "primary_today": {
+      "label": "Mild belly pain: see primary care today",
+      "risk": "low",
+      "interpretation": "Your symptoms do not match the typical pattern of appendicitis. Early appendicitis can start mildly, so new belly pain should be checked.",
+      "recommendation": "See your primary care clinician today. Call ahead to explain your symptoms.",
+      "care": {
+        "level": "primary_care",
+        "within": "Today",
+        "where_detail": "Primary care same-day appointment. Urgent care if no same-day appointment is available.",
+        "ed_redirect": [
+          "Pain worsens or moves to the lower right side",
+          "Fever or vomiting develops",
+          "Signs of shock: call 911"
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "primary_soon": {
+      "label": "Mild belly pain: see primary care soon",
+      "risk": "low",
+      "interpretation": "Your symptoms do not match the typical pattern of appendicitis.",
+      "recommendation": "Book a primary care visit within 1 to 2 days, sooner if pain worsens.",
+      "care": {
+        "level": "primary_care",
+        "within": "Within 1 to 2 days",
+        "where_detail": "Primary care clinic or telehealth visit.",
+        "ed_redirect": [
+          "Pain worsens or moves to the lower right side",
+          "Fever or vomiting develops",
+          "Signs of shock: call 911"
+        ],
+        "finder_specialty": "primary_care"
+      }
+    }
+  }
+}

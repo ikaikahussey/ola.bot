@@ -20,6 +20,15 @@ function conditionVars(c: Condition): string[] {
   return [];
 }
 
+function patternRefs(c: Condition): string[] {
+  if ("all" in c) return c.all.flatMap(patternRefs);
+  if ("any" in c) return c.any.flatMap(patternRefs);
+  if ("not" in c) return patternRefs(c.not);
+  if ("pattern" in c) return [c.pattern];
+  if ("pattern_in" in c) return c.pattern_in;
+  return [];
+}
+
 export function validateRule(rule: Rule): string[] {
   const errors: string[] = [];
   const err = (m: string) => errors.push(`${rule.rule_id}: ${m}`);
@@ -29,6 +38,14 @@ export function validateRule(rule: Rule): string[] {
   if (!/^\d+\.\d+\.\d+$/.test(rule.version)) err("version must be semver");
   if (!rule.changelog?.some((c) => c.version === rule.version)) err("changelog has no entry for current version");
   if (!rule.citations?.length) err("needs at least one citation");
+  if (!["scoring_algorithm", "diagnostic_confirmation", "red_flag"].includes(rule.assessment_type)) err("unknown assessment_type");
+  if (rule.assessment_type !== "scoring_algorithm" && rule.scoring.method !== "pattern") err("diagnostic and red flag rules use the pattern method");
+  if (rule.assessment_type === "scoring_algorithm" && rule.scoring.method === "pattern") err("scoring rules cannot use the pattern method");
+  if (rule.time_window) {
+    const item = rule.items.find((i) => i.id === rule.time_window!.item);
+    if (!item || item.type !== "choice") err("time_window.item must be a choice item");
+    else for (const o of item.options) if (!rule.time_window.status[o.value]) err(`time_window has no status for option ${o.value}`);
+  }
   for (const c of rule.citations ?? []) if (!/^https:\/\//.test(c.url)) err(`citation url must be https: ${c.url}`);
 
   const ids = new Set<string>();
@@ -38,6 +55,7 @@ export function validateRule(rule: Rule): string[] {
     ids.add(item.id);
     if (isAsked(item)) {
       if (!item.question || !item.trace_label) err(`${item.id}: needs question and trace_label`);
+      if (item.type === "checkbox" && item.options.length < 1) err(`${item.id}: checkbox needs options`);
       if (item.type === "choice") {
         if (item.options.length < 2) err(`${item.id}: choice needs 2+ options`);
         if (item.options.filter((o) => o.benign).length !== 1) err(`${item.id}: choice needs exactly one benign option`);
@@ -54,8 +72,10 @@ export function validateRule(rule: Rule): string[] {
 
   const results = new Set(Object.keys(rule.results));
   const referenced = new Set<string>();
+  const levelIds = new Set(rule.scoring.method === "pattern" ? rule.scoring.levels.map((l) => l.id) : []);
   const checkCond = (c: Condition, where: string) => {
     for (const v of conditionVars(c)) if (!ids.has(v)) err(`${where}: unknown variable ${v}`);
+    for (const p of patternRefs(c)) if (!levelIds.has(p)) err(`${where}: unknown pattern level ${p}`);
     try {
       evalCondition(c, { answers: {}, score: 0, subscales: {} });
     } catch (e) {
@@ -81,6 +101,16 @@ export function validateRule(rule: Rule): string[] {
       for (const id of list) if (!ids.has(id)) err(`subscale ${name}: unknown item ${id}`);
     }
   } else {
+    if (rule.scoring.method === "pattern") {
+      const levels = rule.scoring.levels;
+      if (levels.length < 2) err("pattern needs at least 2 levels");
+      levels.forEach((l, i) => {
+        if (i < levels.length - 1 && !l.when) err(`pattern level ${l.id}: only the last level may omit "when"`);
+        if (i === levels.length - 1 && l.when) err(`pattern level ${l.id}: the last level must omit "when" (it is the default)`);
+        if (l.when) checkCond(l.when, `pattern level ${l.id}`);
+      });
+      if (!rule.description) err("pattern rules need a description");
+    }
     for (const s of rule.scoring.steps) {
       referenced.add(s.result);
       checkCond(s.when, `step "${s.label}"`);

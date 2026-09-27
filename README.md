@@ -45,7 +45,17 @@ Answers are never placed in URLs. They are kept in memory and in `sessionStorage
 - Unknown items (unanswered or "Not sure") score 0. The engine also computes the result with every unknown at its most concerning value, and shows the difference ("could raise the score to 4, which would be: High likelihood of strep").
 - Items marked `critical` route to the cautious result when unknown (for example, weight bearing in the Ottawa Ankle Rules, or PHQ-9 question 9).
 
-## Rules included (17)
+## Assessment types
+
+| Type | Examples | Logic | Screen | Result |
+|---|---|---|---|---|
+| 📊 Scoring algorithm | Centor, Ottawa, PHQ-9 | Sum of points → threshold, or ordered decision steps | One question per screen with progress bar | Item-by-item points, total, threshold, risk category |
+| 📋 Diagnostic confirmation | Shingles, angle-closure glaucoma, appendicitis | Pattern level (first matching condition), then ordered routing steps | All questions on one screen, then Submit | ✓/○ checklist of findings present/absent, pattern conclusion, routing path |
+| 🚨 Red flag | Chest pain (cardiac) | Any "yes" → stop | One screen; a "yes" leaves immediately | Full-screen 911 prompt that replaces the entire app |
+
+Each rule file sets `assessment_type`. Pattern rules use `"scoring": { "method": "pattern", "levels": [...], "steps": [...] }`; see [CONTRIBUTING.md](CONTRIBUTING.md). The assessment picker groups rules by type.
+
+## Rules included (21)
 
 | Complaint | Rule | Validated | File |
 |---|---|---|---|
@@ -66,6 +76,12 @@ Answers are never placed in URLs. They are kept in memory and in `sessionStorage
 | Trauma stress | PC-PTSD-5 | 2016 | `pc_ptsd5.json` |
 | Alcohol use | AUDIT-C | 1998 | `audit_c.json` |
 | Snoring / sleep apnea | STOP-Bang | 2008 | `stop_bang.json` |
+| Painful one-sided rash | 📋 Shingles pattern check (CDC guidance), with 72-hour antiviral window | Guidance | `herpes_zoster_confirmation.json` |
+| Sudden eye pain | 📋 Acute angle-closure glaucoma pattern (AAO guidance) | Guidance | `acute_angle_closure_glaucoma.json` |
+| Belly pain | 📋 Appendicitis red-flag pattern (classic findings; JAMA Rational Clinical Exam) | Guidance | `appendicitis_redflags.json` |
+| Chest discomfort | 🚨 Heart attack warning signs (AHA) | Guidance | `ami_redflags.json` |
+
+The four guidance-based checks are not validated scores (`year_validated: null`); the UI says so wherever a validation year would appear.
 
 The Epworth Sleepiness Scale was deliberately left out: it is licensed through Mapi Research Trust, which is incompatible with unrestricted open-source distribution.
 
@@ -80,9 +96,15 @@ The finder is shown with results that call for a provider. It searches the publi
 
 **Adding data sources.** `server/npi.ts` defines the `ProviderSearch` response shape. A Healthgrades adapter (ratings, insurance) or an EHR scheduling adapter (Athenahealth, Epic, Cerner availability) can return the same shape and fill `unavailable_fields` accordingly. Neither is implemented, because both require commercial agreements and credentials.
 
+## API
+
+`POST /api/assessments/:rule_id/submit` runs any rule on the server with the same engine the browser uses. Answers may be booleans (`true` → yes), option values, `"unsure"`, or arrays for "select all that apply" items. The response includes the result, pattern (if any), routing (care level, time frame, where, when to go to the ED instead), and an audit trail (findings present/absent/unknown, routing path, plain-text trace). Red flag emergencies add `"ui_action": "show_emergency_screen_only"`. More than one missing required answer returns 422. Set `"user_consent_logged": true` to store the record (where logging is enabled).
+
+The web app itself evaluates in the browser and does not call this endpoint, so answers leave the device only when the user allows logging.
+
 ## Logging (opt-in)
 
-At the end of an assessment the user can tick a consent box and press a button to store: session ID, timestamp, rule ID and version, multiple-choice answers, score, result, and care level. Typed text, IP address, user agent, and location are never stored. Records are appended to `$LOG_DIR/outcome-log.jsonl` (default `data/`). See [`server/log.ts`](server/log.ts).
+At the end of an assessment the user is asked "Would you like us to log this assessment?" with **Allow logging** / **No thanks**. Allowing stores: session ID, timestamp, rule ID and version, assessment type, multiple-choice answers, score, result, and care level. Typed text, IP address, user agent, and location are never stored. Records are appended to `$LOG_DIR/outcome-log.jsonl` (default `data/`). See [`server/log.ts`](server/log.ts).
 
 ## Running it
 

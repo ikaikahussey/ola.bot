@@ -79,9 +79,40 @@ Bump `version` (semver: patch for wording, minor for routing or time frames, maj
 }
 ```
 
+### Pattern rules (diagnostic confirmation and red flag)
+
+```jsonc
+"assessment_type": "diagnostic_confirmation",   // or "red_flag"
+"description": "Shown at the top of the check",
+"time_criticality": "72 hours — ...",
+"time_window": {                                 // optional, keyed on a choice item
+  "label": "Antiviral treatment window", "item": "rash_onset_days", "hours": 72,
+  "status": { "<option value>": { "state": "open | closing | closed", "text": "...", "timeline_day": "Day 1–3" } },
+  "timeline": [{ "label": "Day 0–2: maximum effectiveness", "strength": 3 }]
+},
+"items": [
+  // "required": false marks optional items; "finding_weight": "essential | supporting | critical" labels the checklist
+  { "id": "red_flag_symptoms", "type": "checkbox", "question": "...", "help": "...", "trace_label": "...",
+    "options": [{ "value": "eye_pain", "label": "Eye pain or vision changes", "concerning": true }] }
+],
+"scoring": {
+  "method": "pattern",
+  "pattern_text": "Plain statement of the pattern",
+  "threshold_text": "Plain statement of the routing",
+  "levels": [
+    { "id": "consistent", "label": "Pattern CONSISTENT with ...", "matched": true, "interpretation": "...", "when": { "all_yes": ["rash_present", "dermatomal_distribution"] } },
+    { "id": "inconsistent", "label": "Pattern NOT CONSISTENT ...", "matched": false, "interpretation": "..." }   // last level: no "when"
+  ],
+  "steps": [{ "label": "...", "when": { "all": [{ "pattern": "consistent" }, { "var": "rash_onset_days", "in": ["0_to_24h"] }] }, "result": "antiviral_today" }],
+  "default_result": "evaluate"
+}
+```
+
+Checkbox answers are stored as comma-separated option values; `""` means none selected. Unknown checkbox answers assume none (base) or every `concerning` option (cautious).
+
 ### Conditions
 
-`{ "var": id, "equals": value }`, `{ "var": id, "in": [values] }`, `{ "any_yes": [ids] }`, `{ "all_yes": [ids] }`, `{ "all_no": [ids] }`, `{ "score_gte": n }`, `{ "score_lte": n }`, `{ "subscale": name, "gte": n, "lte": n }`, `{ "all": [conditions] }`, `{ "any": [conditions] }`, `{ "not": condition }`.
+`{ "var": id, "equals": value }`, `{ "var": id, "in": [values] }`, `{ "var": id, "includes": option }` (checkbox), `{ "pattern": level }`, `{ "pattern_in": [levels] }`, `{ "any_yes": [ids] }`, `{ "all_yes": [ids] }`, `{ "all_no": [ids] }`, `{ "score_gte": n }`, `{ "score_lte": n }`, `{ "subscale": name, "gte": n, "lte": n }`, `{ "all": [conditions] }`, `{ "any": [conditions] }`, `{ "not": condition }`.
 
 ### Unknown answers
 

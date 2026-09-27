@@ -4,6 +4,7 @@
   "short_name": "IDSA sinusitis criteria",
   "assessment_title": "Sinus symptom assessment",
   "condition": "Sinus or nasal congestion symptoms",
+  "assessment_type": "scoring_algorithm",
   "version": "1.0.0",
   "last_updated": "2026-09-27",
   "changelog": [

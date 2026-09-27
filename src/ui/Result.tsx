@@ -6,6 +6,7 @@ import { fmtPoints, handoffSummary, tellProvider, traceLines } from "../engine/t
 import type { Rule } from "../engine/types";
 import { GLOBAL_RED_FLAGS } from "../rules";
 import { Finder } from "./Finder";
+import { PatternFindings, TypeBadge } from "./Pattern";
 import { copyText } from "./util";
 
 export const CAVEAT =
@@ -94,8 +95,15 @@ export function Result({
       )}
 
       <section aria-labelledby="how">
-        <h2 id="how">How we scored it</h2>
-        <AuditTrail rule={rule} ev={ev} />
+        <h2 id="how">{ev.method === "pattern" ? "How we checked the pattern" : "How we scored it"}</h2>
+        {ev.method === "pattern" ? (
+          <>
+            <PatternFindings rule={rule} ev={ev} answers={session.answers} />
+            <PlainTrace rule={rule} ev={ev} answers={session.answers} />
+          </>
+        ) : (
+          <AuditTrail rule={rule} ev={ev} />
+        )}
       </section>
 
       <section aria-labelledby="care">
@@ -322,12 +330,16 @@ export function WhatWeAsked({ rule, session, ev }: { rule: Rule; session: Sessio
 export function RuleInfo({ rule }: { rule: Rule }) {
   return (
     <dl className="kv">
+      <dt>Assessment type</dt>
+      <dd>
+        <TypeBadge type={rule.assessment_type} />
+      </dd>
       <dt>Rule</dt>
       <dd>
         <a href={`/rules/${rule.rule_id}`}>{rule.name}</a>
       </dd>
       <dt>Year validated</dt>
-      <dd>{rule.year_validated}</dd>
+      <dd>{rule.year_validated ?? "Not a validated score (pattern based on published guidance)"}</dd>
       <dt>Citation</dt>
       <dd>
         {rule.citations.map((c) => (
@@ -352,8 +364,7 @@ export function RuleInfo({ rule }: { rule: Rule }) {
 }
 
 function ShareAndLog({ rule, ev, session, summary }: { rule: Rule; ev: Evaluation; session: Session; summary: string }) {
-  const [consent, setConsent] = useState(false);
-  const [logState, setLogState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [logState, setLogState] = useState<"idle" | "sending" | "sent" | "error" | "declined">("idle");
   const [copied, setCopied] = useState(false);
   const [loggingEnabled, setLoggingEnabled] = useState<boolean | null>(null);
   useEffect(() => {
@@ -388,20 +399,43 @@ function ShareAndLog({ rule, ev, session, summary }: { rule: Rule; ev: Evaluatio
       {loggingEnabled === false && <p className="small sub">Outcome logging is turned off on this deployment. Nothing from this session is stored.</p>}
       {loggingEnabled && (
       <div className="box">
-        <h3>Help improve these rules (optional)</h3>
-        <label className="row" style={{ alignItems: "flex-start", flexWrap: "nowrap" }}>
-          <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} style={{ marginTop: 4 }} disabled={logState === "sent"} />
-          <span className="small">
-            I agree to store this session ID, the rule used, my multiple-choice answers, the score, and the result for outcome tracking and validation
-            studies. My typed symptom, location, IP address, and device details are not stored.
-          </span>
-        </label>
-        <button onClick={send} disabled={!consent || logState === "sending" || logState === "sent"} style={{ marginTop: "0.5rem" }}>
-          {logState === "sent" ? "Stored — thank you" : logState === "sending" ? "Sending…" : "Store my anonymous result"}
-        </button>
+        <h3>Would you like us to log this assessment?</h3>
+        <p className="small">
+          Logging helps us improve and validate our assessments. We would store the session ID, the assessment used, your multiple-choice answers, the
+          result, and the care level. Your typed symptom, location, IP address, and device details are never stored. Your session data will not be shared
+          without consent.
+        </p>
+        {logState === "sent" ? (
+          <p className="small">
+            <strong>Logged — thank you.</strong>
+          </p>
+        ) : logState === "declined" ? (
+          <p className="small">Not logged. Nothing from this session was stored.</p>
+        ) : (
+          <div className="row">
+            <button className="primary" onClick={send} disabled={logState === "sending"}>
+              {logState === "sending" ? "Sending…" : "Allow logging"}
+            </button>
+            <button onClick={() => setLogState("declined")} disabled={logState === "sending"}>
+              No thanks
+            </button>
+          </div>
+        )}
         {logState === "error" && <p className="small" style={{ color: "var(--alert)" }}>Could not store the record. Nothing was saved.</p>}
       </div>
       )}
+    </div>
+  );
+}
+
+function PlainTrace({ rule, ev, answers }: { rule: Rule; ev: Evaluation; answers: Session["answers"] }) {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="stack">
+      <button className="link no-print" onClick={() => setShow((x) => !x)}>
+        {show ? "Hide" : "Show"} plain-text audit trace
+      </button>
+      {show && <pre className="trace">{traceLines(rule, ev, answers).join("\n")}</pre>}
     </div>
   );
 }

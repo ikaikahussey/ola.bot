@@ -9,6 +9,8 @@ import { YesNoButtons } from "./Questions";
 import { Result } from "./Result";
 import { guard, parsePath, pathFor, titleFor, findFlag, type Route } from "./routes";
 import { ComplaintInput, Intake, Mapping, Review, RuleMenu, StopScreen } from "./Screens";
+import { CardiacEmergency, PatternCheck } from "./Pattern";
+import { Finder } from "./Finder";
 
 const STORAGE_KEY = "olabot.session.v1";
 
@@ -89,6 +91,11 @@ export function App() {
     document.querySelector<HTMLElement>("main h1, main legend")?.focus?.();
   }, [path, redirect === null]);
 
+  // Chest pain replaces the entire app with a single call-to-action screen.
+  if (!redirect && route.page === "stop" && route.flag === "chest_pain" && !route.rule) {
+    return <CardiacEmergency onBack={() => window.history.back()} />;
+  }
+
   const restart = (keepSafety: boolean) => {
     const s = newSession();
     if (keepSafety) s.red_flags_cleared = session.red_flags_cleared;
@@ -111,6 +118,7 @@ export function App() {
             OLA BOT
           </a>
           <nav className="site">
+            <a href="/find">Find care</a>
             <a href="/rules">Rules library</a>
             <a href="/about">How it works</a>
           </nav>
@@ -155,12 +163,15 @@ interface PageProps {
 function Page({ route, session, setSession, navigate, restart }: PageProps) {
   const go = (r: Route, replace = false) => navigate(pathFor(r), { replace });
 
+  const firstStep = (id: string): Route =>
+    RULES_BY_ID[id].assessment_type === "scoring_algorithm" ? { page: "question", rule: id, n: 1 } : { page: "check", rule: id };
+
   const startRule = (id: string) => {
     const rule = RULES_BY_ID[id];
     setSession((s) =>
       s.rule_id === id ? s : { ...s, rule_id: id, answers: {}, rule_red_flags_cleared: [], completed_at: null },
     );
-    go(rule.red_flags.length ? { page: "warning", rule: id, n: 1 } : { page: "question", rule: id, n: 1 });
+    go(rule.red_flags.length ? { page: "warning", rule: id, n: 1 } : firstStep(id));
   };
 
   switch (route.page) {
@@ -280,7 +291,7 @@ function Page({ route, session, setSession, navigate, restart }: PageProps) {
             onYes={() => go({ page: "stop", rule: rule.rule_id, flag: flag.id })}
             onNo={() => {
               setSession((s) => ({ ...s, rule_red_flags_cleared: [...new Set([...s.rule_red_flags_cleared, flag.id])] }));
-              go(route.n < n ? { page: "warning", rule: rule.rule_id, n: route.n + 1 } : { page: "question", rule: rule.rule_id, n: 1 });
+              go(route.n < n ? { page: "warning", rule: rule.rule_id, n: route.n + 1 } : firstStep(rule.rule_id));
             }}
           />
           <div className="nav-buttons">
@@ -308,6 +319,33 @@ function Page({ route, session, setSession, navigate, restart }: PageProps) {
             go(rule.red_flags.length ? { page: "warning", rule: rule.rule_id, n: rule.red_flags.length } : { page: "confirm", rule: rule.rule_id })
           }
           onDone={() => go({ page: "review", rule: rule.rule_id })}
+        />
+      );
+    }
+
+    case "check": {
+      const rule = RULES_BY_ID[route.rule];
+      return (
+        <PatternCheck
+          rule={rule}
+          answers={session.answers}
+          setAnswer={(id, v) => setSession((s) => ({ ...s, answers: { ...s.answers, [id]: v }, completed_at: null }))}
+          onRedFlag={() => {
+            setSession((s) => ({ ...s, stop_keyword: null }));
+            go({ page: "stop", flag: "chest_pain" });
+          }}
+          onBack={() =>
+            go(rule.red_flags.length ? { page: "warning", rule: rule.rule_id, n: rule.red_flags.length } : { page: "confirm", rule: rule.rule_id })
+          }
+          onSubmit={() => {
+            setSession((s) => {
+              const answers = { ...s.answers };
+              // An untouched "select all that apply" list means none selected.
+              for (const i of visibleItems(rule, answers)) if (i.type === "checkbox" && answers[i.id] === undefined) answers[i.id] = "";
+              return { ...s, answers, completed_at: new Date().toISOString() };
+            });
+            go({ page: "result", rule: rule.rule_id });
+          }}
         />
       );
     }
@@ -344,6 +382,14 @@ function Page({ route, session, setSession, navigate, restart }: PageProps) {
       return <Library ruleId={route.rule} />;
     case "about":
       return <About />;
+    case "find":
+      return (
+        <div className="stack">
+          <h1 tabIndex={-1}>Find a provider</h1>
+          <p className="sub">Search licensed providers near you. No assessment is needed. In an emergency, call 911.</p>
+          <Finder defaultSpecialty="urgent_care" />
+        </div>
+      );
     case "not_found":
       return (
         <div className="stack">

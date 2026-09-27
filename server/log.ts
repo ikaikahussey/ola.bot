@@ -12,6 +12,7 @@ export interface LogEntry {
   timestamp: string;
   rule_id: string;
   rule_version: string;
+  assessment_type: string;
   answers: Record<string, string>;
   score: number | null;
   result: string;
@@ -19,6 +20,9 @@ export interface LogEntry {
 }
 
 const ID = /^[a-z0-9_-]{1,64}$/i;
+// Answer values: option ids, or comma-separated option ids for checkbox items ("" = none).
+const ANSWER = /^[a-z0-9_,-]{0,300}$/i;
+const TYPES = ["scoring_algorithm", "diagnostic_confirmation", "red_flag"];
 
 export function validateLogEntry(body: unknown): LogEntry {
   const b = body as Partial<LogEntry> | null;
@@ -31,10 +35,12 @@ export function validateLogEntry(body: unknown): LogEntry {
   }
   if (typeof b.rule_version !== "string" || !/^\d+\.\d+\.\d+$/.test(b.rule_version)) throw new HttpError(400, "Invalid rule_version");
   if (b.score !== null && typeof b.score !== "number") throw new HttpError(400, "Invalid score");
+  const assessmentType = b.assessment_type ?? "scoring_algorithm";
+  if (!TYPES.includes(assessmentType)) throw new HttpError(400, "Invalid assessment_type");
   const answers: Record<string, string> = {};
   if (!b.answers || typeof b.answers !== "object") throw new HttpError(400, "Invalid answers");
   for (const [k, v] of Object.entries(b.answers)) {
-    if (!ID.test(k) || typeof v !== "string" || !ID.test(v)) throw new HttpError(400, "Invalid answers");
+    if (!ID.test(k) || typeof v !== "string" || !ANSWER.test(v)) throw new HttpError(400, "Invalid answers");
     answers[k] = v;
   }
   return {
@@ -43,6 +49,7 @@ export function validateLogEntry(body: unknown): LogEntry {
     timestamp: b.timestamp,
     rule_id: b.rule_id!,
     rule_version: b.rule_version,
+    assessment_type: assessmentType,
     answers,
     score: b.score ?? null,
     result: b.result!,

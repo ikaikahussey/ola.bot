@@ -15,11 +15,13 @@ export type Route =
   | { page: "confirm"; rule: string }
   | { page: "warning"; rule: string; n: number }
   | { page: "question"; rule: string; n: number }
+  | { page: "check"; rule: string }
   | { page: "review"; rule: string }
   | { page: "result"; rule: string }
   | { page: "rules" }
   | { page: "rule_detail"; rule: string }
   | { page: "about" }
+  | { page: "find" }
   | { page: "not_found" };
 
 const ID = "([a-z0-9_]+)";
@@ -35,11 +37,13 @@ const PATTERNS: [RegExp, (m: RegExpMatchArray) => Route][] = [
   [new RegExp(`^/assess/${ID}$`), (m) => ({ page: "confirm", rule: m[1] })],
   [new RegExp(`^/assess/${ID}/warning/${N}$`), (m) => ({ page: "warning", rule: m[1], n: Number(m[2]) })],
   [new RegExp(`^/assess/${ID}/q/${N}$`), (m) => ({ page: "question", rule: m[1], n: Number(m[2]) })],
+  [new RegExp(`^/assess/${ID}/check$`), (m) => ({ page: "check", rule: m[1] })],
   [new RegExp(`^/assess/${ID}/review$`), (m) => ({ page: "review", rule: m[1] })],
   [new RegExp(`^/assess/${ID}/result$`), (m) => ({ page: "result", rule: m[1] })],
   [/^\/rules$/, () => ({ page: "rules" })],
   [new RegExp(`^/rules/${ID}$`), (m) => ({ page: "rule_detail", rule: m[1] })],
   [/^\/about$/, () => ({ page: "about" })],
+  [/^\/find$/, () => ({ page: "find" })],
 ];
 
 export function parsePath(path: string): Route {
@@ -74,6 +78,8 @@ export function pathFor(r: Route): string {
       return `/assess/${r.rule}/warning/${r.n}`;
     case "question":
       return `/assess/${r.rule}/q/${r.n}`;
+    case "check":
+      return `/assess/${r.rule}/check`;
     case "review":
       return `/assess/${r.rule}/review`;
     case "result":
@@ -84,6 +90,8 @@ export function pathFor(r: Route): string {
       return `/rules/${r.rule}`;
     case "about":
       return "/about";
+    case "find":
+      return "/find";
     case "not_found":
       return "/404";
   }
@@ -123,7 +131,7 @@ export function guard(r: Route, s: Session): Redirect | null {
     return null;
   }
 
-  const needsSafety = ["symptom", "choose", "confirm", "warning", "question", "review", "result"].includes(r.page);
+  const needsSafety = ["symptom", "choose", "confirm", "warning", "question", "check", "review", "result"].includes(r.page);
   if (needsSafety) {
     const first = firstUnclearedSafety(s);
     if (first !== null) return { to: pathFor({ page: "safety", n: first }), remember: pathFor(r) };
@@ -131,7 +139,7 @@ export function guard(r: Route, s: Session): Redirect | null {
 
   if (r.page === "choose" && !s.complaint_text) return { to: "/symptom" };
 
-  if (r.page === "warning" || r.page === "question" || r.page === "review" || r.page === "result") {
+  if (r.page === "warning" || r.page === "question" || r.page === "check" || r.page === "review" || r.page === "result") {
     if (s.rule_id !== r.rule) return { to: pathFor({ page: "confirm", rule: r.rule }) };
     const firstWarning = firstUnclearedWarning(s, r.rule);
     const nWarnings = RULES_BY_ID[r.rule].red_flags.length;
@@ -141,11 +149,16 @@ export function guard(r: Route, s: Session): Redirect | null {
       return null;
     }
     if (firstWarning !== null) return { to: pathFor({ page: "warning", rule: r.rule, n: firstWarning }) };
+    // Pattern checks and red flag screens use one screen; scoring rules use one question per screen.
+    const single = RULES_BY_ID[r.rule].assessment_type !== "scoring_algorithm";
+    if (single && (r.page === "question" || r.page === "review")) return { to: pathFor({ page: "check", rule: r.rule }) };
+    if (!single && r.page === "check") return { to: pathFor({ page: "question", rule: r.rule, n: 1 }) };
   }
 
   if (r.page === "result") {
     const ev = evaluate(RULES_BY_ID[r.rule], s.answers);
-    if (!s.completed_at || ev.blocked) return { to: pathFor({ page: "review", rule: r.rule }) };
+    const single = RULES_BY_ID[r.rule].assessment_type !== "scoring_algorithm";
+    if (!s.completed_at || ev.blocked) return { to: pathFor({ page: single ? "check" : "review", rule: r.rule }) };
   }
   return null;
 }
@@ -170,6 +183,8 @@ export function titleFor(r: Route, questionCount?: number): string {
         return `${rule!.assessment_title}: warning sign ${r.n} of ${rule!.red_flags.length}`;
       case "question":
         return `${rule!.assessment_title}: question ${r.n}${questionCount ? ` of ${questionCount}` : ""}`;
+      case "check":
+        return rule!.assessment_type === "red_flag" ? `Emergency screening: ${rule!.condition}` : `${rule!.assessment_title} (${rule!.name})`;
       case "review":
         return `${rule!.assessment_title}: review answers`;
       case "result":
@@ -180,6 +195,8 @@ export function titleFor(r: Route, questionCount?: number): string {
         return rule!.name;
       case "about":
         return "How it works";
+      case "find":
+        return "Find a provider";
       case "not_found":
         return "Page not found";
     }

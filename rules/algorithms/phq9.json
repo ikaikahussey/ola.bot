@@ -4,6 +4,7 @@
   "short_name": "PHQ-9",
   "assessment_title": "Depression check",
   "condition": "Low mood or depression",
+  "assessment_type": "scoring_algorithm",
   "version": "1.0.0",
   "last_updated": "2026-09-27",
   "changelog": [

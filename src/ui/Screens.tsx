@@ -5,9 +5,10 @@ import { stopMessage } from "../engine/careLevels";
 import { evaluate, visibleItems } from "../engine/evaluate";
 import type { RouteResult } from "../engine/router";
 import type { Session } from "../engine/session";
-import type { RedFlagAction, Rule } from "../engine/types";
+import type { AssessmentType, RedFlagAction, Rule } from "../engine/types";
 import { RULES, RULES_BY_ID } from "../rules";
 import { QuestionField } from "./Questions";
+import { TYPE_GROUP_LABEL, TYPE_ICON, TypeBadge } from "./Pattern";
 
 export function StopScreen({ action, trigger, onBack }: { action: RedFlagAction; trigger: string; onBack: () => void }) {
   const m = stopMessage(action);
@@ -71,25 +72,43 @@ export function ComplaintInput({ initial, onSubmit, onPick }: { initial: string;
   );
 }
 
+const TYPE_ORDER: AssessmentType[] = ["red_flag", "diagnostic_confirmation", "scoring_algorithm"];
+
+/** Assessment picker, grouped by type so scores, patterns, and emergency screens look different. */
 export function RuleMenu({ ids, onChoose }: { ids: string[]; onChoose: (id: string) => void }) {
   return (
-    <ul className="list-plain">
-      {ids.map((id) => {
-        const r = RULES_BY_ID[id];
+    <div>
+      {TYPE_ORDER.map((type) => {
+        const group = ids.filter((id) => RULES_BY_ID[id].assessment_type === type);
+        if (!group.length) return null;
         return (
-          <li key={id} className="spread">
-            <span>
-              <strong>{r.assessment_title}</strong>
-              <br />
-              <span className="small sub">
-                {r.condition} · {r.short_name} ({r.year_validated})
-              </span>
-            </span>
-            <button onClick={() => onChoose(id)}>Select</button>
-          </li>
+          <section key={type} className="box" style={{ marginBottom: "0.75rem" }}>
+            <h3 className="group-title" style={{ marginTop: 0 }}>
+              <span aria-hidden>{TYPE_ICON[type]}</span> {TYPE_GROUP_LABEL[type]}
+            </h3>
+            <ul className="list-plain">
+              {group.map((id) => {
+                const r = RULES_BY_ID[id];
+                return (
+                  <li key={id} className="spread">
+                    <span>
+                      <span aria-hidden>{TYPE_ICON[type]} </span>
+                      <strong>{r.assessment_title}</strong>
+                      <br />
+                      <span className="small sub">
+                        {r.condition} · {r.short_name}
+                        {r.year_validated ? ` (${r.year_validated})` : ""}
+                      </span>
+                    </span>
+                    <button onClick={() => onChoose(id)}>Select</button>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
         );
       })}
-    </ul>
+    </div>
   );
 }
 
@@ -108,7 +127,11 @@ export function Mapping({ route, onChoose, onBack }: { route: RouteResult; onCho
         )}
         <div className="box">
           <p>
-            <strong>{r.name}</strong>, validated {r.year_validated}.
+            <strong>{r.name}</strong>
+            {r.year_validated ? `, validated ${r.year_validated}.` : ""}
+          </p>
+          <p>
+            <TypeBadge type={r.assessment_type} />
           </p>
           <p className="small sub">Validated in: {r.validated_population}</p>
         </div>
@@ -188,7 +211,7 @@ export function Intake({
         {rule.assessment_title}
       </h1>
       <p className="sub">
-        We'll ask {items.length} questions based on the {rule.short_name} (validated {rule.year_validated}).
+        We'll ask {items.length} questions based on the {rule.short_name}{rule.year_validated ? ` (validated ${rule.year_validated})` : ""}.
       </p>
       <p className="small" aria-live="polite">
         Question {i + 1} of {items.length}

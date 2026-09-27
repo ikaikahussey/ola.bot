@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "last_updated": "2026-09-27",
   "emergency_keywords": [
     {
@@ -301,6 +301,66 @@
         "leg pain one side"
       ],
       "rule_id": "wells_dvt"
+    },
+    {
+      "keywords": [
+        "shingles",
+        "zoster",
+        "herpes zoster",
+        "rash on one side",
+        "one sided rash",
+        "painful rash",
+        "blistering rash",
+        "blisters",
+        "rash"
+      ],
+      "rule_id": "herpes_zoster_confirmation"
+    },
+    {
+      "keywords": [
+        "eye pain",
+        "painful eye",
+        "eye hurts",
+        "halos",
+        "halos around lights",
+        "glaucoma",
+        "red painful eye",
+        "blurry vision",
+        "blurred vision"
+      ],
+      "rule_id": "acute_angle_closure_glaucoma"
+    },
+    {
+      "keywords": [
+        "appendicitis",
+        "appendix",
+        "belly pain",
+        "abdominal pain",
+        "stomach pain",
+        "stomach ache",
+        "stomachache",
+        "belly ache",
+        "stomach hurts",
+        "belly hurts",
+        "lower right pain",
+        "right side pain",
+        "pain lower right"
+      ],
+      "rule_id": "appendicitis_redflags"
+    },
+    {
+      "keywords": [
+        "chest discomfort",
+        "chest hurts",
+        "chest hurt",
+        "chest ache",
+        "left arm pain",
+        "jaw pain",
+        "cold sweat",
+        "cold sweats",
+        "heart"
+      ],
+      "rule_id": "ami_redflags"
     }
   ]
 }

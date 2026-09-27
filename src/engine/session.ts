@@ -50,6 +50,7 @@ export function logPayload(session: Session, rule: Rule, ev: Evaluation) {
     timestamp: session.completed_at ?? new Date().toISOString(),
     rule_id: rule.rule_id,
     rule_version: rule.version,
+    assessment_type: rule.assessment_type,
     answers,
     score: ev.score,
     result: ev.result,

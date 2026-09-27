@@ -1,0 +1,432 @@
+{
+  "rule_id": "herpes_zoster_confirmation",
+  "name": "Herpes zoster (shingles) confirmation",
+  "short_name": "Shingles pattern check",
+  "assessment_title": "Shingles pattern check",
+  "condition": "Shingles (herpes zoster)",
+  "assessment_type": "diagnostic_confirmation",
+  "description": "This is not a risk score. We're checking whether your symptoms match the typical pattern of shingles. If they do, you need antiviral treatment as soon as possible.",
+  "time_criticality": "72 hours — antivirals are most effective if started within 3 days of rash onset",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": null,
+  "citations": [
+    {
+      "text": "Centers for Disease Control and Prevention. Shingles (Herpes Zoster): clinical overview for health care providers.",
+      "url": "https://www.cdc.gov/shingles/"
+    },
+    {
+      "text": "Cohen JI. Clinical practice: Herpes zoster. N Engl J Med. 2013;369(3):255-263.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=%22Clinical%20practice%3A%20Herpes%20zoster%22%5BTitle%5D"
+    }
+  ],
+  "validated_population": "Not a validated score. The pattern (painful one-sided rash in a band) follows CDC clinical guidance on typical herpes zoster.",
+  "self_report_note": "Early shingles can be hard to recognize, and rashes from other causes can look similar. A clinician confirms the diagnosis by examining the rash.",
+  "license_note": "Pattern logic and question wording are original to OLA BOT, based on the public guidance cited. Not a validated scoring instrument.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [],
+  "time_window": {
+    "label": "Antiviral treatment window",
+    "item": "rash_onset_days",
+    "hours": 72,
+    "status": {
+      "0_to_24h": {
+        "state": "open",
+        "timeline_day": "Day 0–1",
+        "text": "Rash started less than 24 hours ago. About 2 days remain in the 72-hour window."
+      },
+      "1_to_3d": {
+        "state": "closing",
+        "timeline_day": "Day 1–3",
+        "text": "Rash started 1–3 days ago. The 72-hour window is closing and may end today. Start treatment today."
+      },
+      "4_to_7d": {
+        "state": "closed",
+        "timeline_day": "Day 4–7",
+        "text": "The 72-hour window has passed. Antivirals may still be offered, for example if new blisters are still forming. Pain control is now the priority."
+      },
+      "over_7d": {
+        "state": "closed",
+        "timeline_day": "Day 8+",
+        "text": "Rash started more than a week ago. Treatment focuses on pain control and preventing long-term nerve pain (postherpetic neuralgia)."
+      }
+    },
+    "timeline": [
+      {
+        "label": "Day 0–2: maximum effectiveness",
+        "strength": 3
+      },
+      {
+        "label": "Day 3: still effective",
+        "strength": 2
+      },
+      {
+        "label": "Day 4+: less effective; focus on pain control",
+        "strength": 1
+      }
+    ]
+  },
+  "items": [
+    {
+      "id": "rash_present",
+      "type": "yes_no",
+      "question": "Do you have a painful rash or blistering on your skin?",
+      "help": "Fluid-filled bumps or open sores, usually with burning or stabbing pain.",
+      "trace_label": "Painful rash or blisters",
+      "finding_weight": "essential",
+      "critical": true
+    },
+    {
+      "id": "dermatomal_distribution",
+      "type": "yes_no",
+      "question": "Does the rash follow a band or stripe on one side of your body (not crossing the middle)?",
+      "help": "One arm? One side of your chest or back? One side of your face? Not both sides, and not all over.",
+      "trace_label": "Rash in a one-sided band (dermatomal)",
+      "finding_weight": "essential",
+      "critical": true
+    },
+    {
+      "id": "prodromal_pain",
+      "type": "yes_no",
+      "question": "Did you have burning, tingling, or severe pain in that area before the rash appeared?",
+      "help": "Typically 1–2 days before the blisters appear.",
+      "trace_label": "Pain or tingling before the rash (not required)",
+      "finding_weight": "supporting",
+      "required": false
+    },
+    {
+      "id": "rash_onset_days",
+      "type": "choice",
+      "question": "When did the rash first appear?",
+      "help": "Antiviral medicine works best if started within 72 hours of the rash appearing.",
+      "trace_label": "Rash onset",
+      "options": [
+        {
+          "value": "0_to_24h",
+          "label": "Less than 24 hours ago"
+        },
+        {
+          "value": "1_to_3d",
+          "label": "1–3 days ago",
+          "concerning": true
+        },
+        {
+          "value": "4_to_7d",
+          "label": "4–7 days ago"
+        },
+        {
+          "value": "over_7d",
+          "label": "More than 1 week ago",
+          "benign": true
+        }
+      ],
+      "finding_weight": "critical",
+      "critical": true
+    },
+    {
+      "id": "ophthalmic_involvement",
+      "type": "yes_no",
+      "question": "Is the rash near your eye, on your forehead, or on the tip of your nose?",
+      "help": "Shingles near the eye can damage vision and needs emergency care.",
+      "trace_label": "Rash near eye, forehead, or tip of nose",
+      "finding_weight": "critical",
+      "critical": true
+    },
+    {
+      "id": "red_flag_symptoms",
+      "type": "checkbox",
+      "question": "Do you have any of these? (Select all that apply)",
+      "help": "Leave all unchecked if none apply.",
+      "trace_label": "Warning signs",
+      "options": [
+        {
+          "value": "eye_pain",
+          "label": "Eye pain or vision changes",
+          "concerning": true
+        },
+        {
+          "value": "spreading",
+          "label": "Rash spreading beyond one band",
+          "concerning": true
+        },
+        {
+          "value": "infection",
+          "label": "Signs of skin infection (pus, severe warmth, spreading redness)",
+          "concerning": true
+        },
+        {
+          "value": "high_fever",
+          "label": "High fever (over 102°F / 39°C)",
+          "concerning": true
+        },
+        {
+          "value": "neuro_symptoms",
+          "label": "Confusion or severe headache",
+          "concerning": true
+        }
+      ],
+      "finding_weight": "critical",
+      "critical": true,
+      "required": false
+    }
+  ],
+  "scoring": {
+    "method": "pattern",
+    "pattern_text": "Consistent with shingles if BOTH: a painful rash or blisters AND a one-sided band (dermatomal) distribution. Pain before the rash supports the pattern but is not required.",
+    "threshold_text": "Pattern check, not a score. Routing: eye involvement, eye pain, or confusion/severe headache → emergency department; spreading rash, high fever, or infection → urgent care today; consistent pattern → antiviral treatment urgency set by days since rash onset.",
+    "levels": [
+      {
+        "id": "consistent",
+        "label": "Pattern CONSISTENT with herpes zoster (shingles)",
+        "matched": true,
+        "interpretation": "Your symptoms match the typical pattern of herpes zoster (shingles).",
+        "when": {
+          "all_yes": [
+            "rash_present",
+            "dermatomal_distribution"
+          ]
+        }
+      },
+      {
+        "id": "inconsistent",
+        "label": "Pattern NOT CONSISTENT with typical shingles",
+        "matched": false,
+        "interpretation": "Your symptoms do not match the typical pattern of shingles. This does not rule it out, but the pattern is atypical."
+      }
+    ],
+    "steps": [
+      {
+        "label": "Rash near the eye, forehead, or tip of the nose",
+        "when": {
+          "var": "ophthalmic_involvement",
+          "equals": "yes"
+        },
+        "result": "ed_eye"
+      },
+      {
+        "label": "Eye pain or vision changes",
+        "when": {
+          "var": "red_flag_symptoms",
+          "includes": "eye_pain"
+        },
+        "result": "ed_eye"
+      },
+      {
+        "label": "Confusion or severe headache",
+        "when": {
+          "var": "red_flag_symptoms",
+          "includes": "neuro_symptoms"
+        },
+        "result": "ed_neuro"
+      },
+      {
+        "label": "Rash spreading beyond one band, high fever, or signs of skin infection",
+        "when": {
+          "any": [
+            {
+              "var": "red_flag_symptoms",
+              "includes": "spreading"
+            },
+            {
+              "var": "red_flag_symptoms",
+              "includes": "high_fever"
+            },
+            {
+              "var": "red_flag_symptoms",
+              "includes": "infection"
+            }
+          ]
+        },
+        "result": "urgent_complication"
+      },
+      {
+        "label": "Pattern consistent and rash started within 3 days (72-hour window open)",
+        "when": {
+          "all": [
+            {
+              "pattern": "consistent"
+            },
+            {
+              "var": "rash_onset_days",
+              "in": [
+                "0_to_24h",
+                "1_to_3d"
+              ]
+            }
+          ]
+        },
+        "result": "antiviral_today"
+      },
+      {
+        "label": "Pattern consistent and rash started 4–7 days ago",
+        "when": {
+          "all": [
+            {
+              "pattern": "consistent"
+            },
+            {
+              "var": "rash_onset_days",
+              "equals": "4_to_7d"
+            }
+          ]
+        },
+        "result": "primary_week"
+      },
+      {
+        "label": "Pattern consistent and rash started more than 1 week ago",
+        "when": {
+          "all": [
+            {
+              "pattern": "consistent"
+            },
+            {
+              "var": "rash_onset_days",
+              "equals": "over_7d"
+            }
+          ]
+        },
+        "result": "primary_routine"
+      }
+    ],
+    "default_result": "evaluate"
+  },
+  "results": {
+    "ed_eye": {
+      "label": "Emergency: shingles may involve the eye",
+      "risk": "high",
+      "interpretation": "Shingles on the forehead, near the eye, or on the tip of the nose, or with eye pain or vision changes, can damage the eye and cause vision loss.",
+      "recommendation": "Go to the emergency room now. Herpes zoster affecting the eye needs urgent evaluation, usually including an eye doctor.",
+      "care": {
+        "level": "emergency_department",
+        "within": "Now",
+        "where_detail": "Hospital emergency department. An ophthalmologist (eye doctor) may need to examine the eye.",
+        "ed_redirect": [
+          "Sudden vision loss: call 911"
+        ],
+        "finder_specialty": "emergency_department"
+      }
+    },
+    "ed_neuro": {
+      "label": "Emergency: possible nerve or brain complication",
+      "risk": "high",
+      "interpretation": "Confusion or a severe headache with a shingles-like rash can mean the infection is affecting the brain or its lining.",
+      "recommendation": "Go to the emergency room now.",
+      "care": {
+        "level": "emergency_department",
+        "within": "Now",
+        "where_detail": "Hospital emergency department. Call 911 if the person is very drowsy or confused.",
+        "ed_redirect": [
+          "Very drowsy, hard to wake, or seizure: call 911"
+        ],
+        "finder_specialty": "emergency_department"
+      }
+    },
+    "urgent_complication": {
+      "label": "Needs same-day care: possible complication",
+      "risk": "high",
+      "interpretation": "A rash spreading beyond one band, high fever, or signs of skin infection can mean a more serious or widespread infection. This is more common in people with weak immune systems.",
+      "recommendation": "See a clinician today, in person.",
+      "care": {
+        "level": "urgent_care",
+        "within": "Today (within 4 to 6 hours)",
+        "where_detail": "Urgent care clinic, or emergency department if you feel very unwell or have a weak immune system (for example, cancer treatment or transplant medicines).",
+        "ed_redirect": [
+          "Rash near the eye, eye pain, or vision changes",
+          "Confusion, severe headache, or stiff neck",
+          "Weakness of the face or limbs"
+        ],
+        "finder_specialty": "urgent_care"
+      }
+    },
+    "antiviral_today": {
+      "label": "Shingles pattern: start antivirals today",
+      "risk": "high",
+      "interpretation": "Your symptoms match the typical pattern of shingles, and you are within or at the edge of the 72-hour antiviral window.",
+      "recommendation": "See a clinician today or tomorrow to start antiviral medication. The 72-hour window for maximum effectiveness is closing.",
+      "care": {
+        "level": "urgent_care",
+        "within": "Today or tomorrow (within 24 hours)",
+        "where_detail": "Urgent care, a same-day primary care visit, or a telehealth urgent care visit (shingles can often be diagnosed by video).",
+        "ed_redirect": [
+          "Rash near the eye, eye pain, or vision changes",
+          "Confusion, severe headache, or stiff neck",
+          "Weakness of the face or limbs"
+        ],
+        "self_care": [
+          "Keep the rash clean and covered.",
+          "Avoid contact with pregnant people, newborns, and people with weak immune systems until the blisters crust over; the virus can spread to them as chickenpox.",
+          "Acetaminophen or ibuprofen as labeled for pain."
+        ],
+        "finder_specialty": "urgent_care"
+      }
+    },
+    "primary_week": {
+      "label": "Shingles pattern: see primary care this week",
+      "risk": "moderate",
+      "interpretation": "Your symptoms match the typical pattern of shingles. The 72-hour window has passed, but treatment can still help.",
+      "recommendation": "See your primary care clinician this week. Pain management is now the priority.",
+      "care": {
+        "level": "primary_care",
+        "within": "This week (within 2 to 3 days)",
+        "where_detail": "Primary care clinic or telehealth visit.",
+        "ed_redirect": [
+          "Rash near the eye, eye pain, or vision changes",
+          "Confusion, severe headache, or stiff neck",
+          "Weakness of the face or limbs"
+        ],
+        "self_care": [
+          "Keep the rash clean and covered until it crusts over.",
+          "Avoid contact with pregnant people, newborns, and people with weak immune systems until the blisters crust over."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "primary_routine": {
+      "label": "Shingles pattern: focus on pain and recovery",
+      "risk": "low",
+      "interpretation": "Your symptoms match the typical pattern of shingles. The rash began more than a week ago.",
+      "recommendation": "See your primary care clinician within the next 1 to 2 weeks. Focus is on managing pain and preventing long-term nerve pain (postherpetic neuralgia).",
+      "care": {
+        "level": "primary_care",
+        "within": "Within 1 to 2 weeks",
+        "where_detail": "Primary care clinic.",
+        "ed_redirect": [
+          "Rash near the eye, eye pain, or vision changes",
+          "Confusion, severe headache, or stiff neck",
+          "Weakness of the face or limbs"
+        ],
+        "self_care": [
+          "Ask about the shingles vaccine once you recover; it lowers the chance of shingles returning."
+        ],
+        "finder_specialty": "primary_care"
+      }
+    },
+    "evaluate": {
+      "label": "Rash pattern is not typical of shingles",
+      "risk": "moderate",
+      "interpretation": "Your symptoms do not match the typical pattern of shingles. This does not rule it out, but the pattern is atypical.",
+      "recommendation": "See a clinician to identify what is causing your rash.",
+      "care": {
+        "level": "primary_care",
+        "within": "Within 2 to 3 days",
+        "where_detail": "Primary care or urgent care clinic.",
+        "ed_redirect": [
+          "Rash near the eye, eye pain, or vision changes",
+          "Confusion, severe headache, or stiff neck",
+          "Weakness of the face or limbs",
+          "Rash with fever that spreads quickly, or skin that turns purple or blisters widely"
+        ],
+        "finder_specialty": "primary_care"
+      }
+    }
+  }
+}

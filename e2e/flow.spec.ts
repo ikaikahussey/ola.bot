@@ -8,6 +8,29 @@ async function passSafetyChecks(page: Page) {
   }
 }
 
+async function expectCardiacFullScreen(page: Page) {
+  await expect(page.getByRole("heading", { name: /CALL 911 NOW/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: "CALL 911" })).toHaveAttribute("href", "tel:911");
+  await expect(page.getByText("Tell the 911 operator:")).toBeVisible();
+  // Nothing else: no site header, banner, navigation, or footer.
+  await expect(page.locator("header.site")).toHaveCount(0);
+  await expect(page.locator("footer.site")).toHaveCount(0);
+  await expect(page.locator(".banner")).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Rules library" })).toHaveCount(0);
+}
+
+async function startAssessment(page: Page, symptom: string) {
+  await page.goto("/");
+  await passSafetyChecks(page);
+  await page.getByLabel("Main symptom").fill(symptom);
+  await page.getByRole("button", { name: "Continue" }).click();
+}
+
+/** Pick an answer inside the fieldset whose legend contains `question` (single-screen checks). */
+async function pick(page: Page, question: string | RegExp, label: string) {
+  await page.getByRole("group", { name: question }).getByRole("radio", { name: label, exact: true }).check();
+}
+
 async function answer(page: Page, label: string) {
   await page.getByRole("radio", { name: label, exact: true }).check();
   await page.getByRole("button", { name: /Next|Review answers/ }).click();
@@ -90,15 +113,17 @@ test("a red flag stops the assessment and offers 911", async ({ page }) => {
   await page.getByRole("link", { name: "Start assessment" }).click();
   await page.getByRole("button", { name: "Yes", exact: true }).click();
   await expect(page).toHaveURL("/stop/chest_pain");
-  await expect(page.getByRole("heading", { name: /SEEK EMERGENCY CARE/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Call 911" })).toHaveAttribute("href", "tel:911");
-  await expect(page.getByRole("link", { name: "Find nearest ED" })).toBeVisible();
+  await expectCardiacFullScreen(page);
 });
 
 test("an emergency phrase in the complaint stops the flow", async ({ page }) => {
   await page.goto("/");
   await passSafetyChecks(page);
   await page.getByLabel("Main symptom").fill("chest pain when walking");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expectCardiacFullScreen(page);
+  await page.goBack();
+  await page.getByLabel("Main symptom").fill("trouble breathing");
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page.getByRole("heading", { name: /SEEK EMERGENCY CARE/ })).toBeVisible();
 });
@@ -128,7 +153,7 @@ test("unmatched complaint shows a menu", async ({ page }) => {
 test("rules library lists every rule with version and citation", async ({ page }) => {
   await page.goto("/rules");
   await expect(page.getByRole("heading", { name: "Rules library" })).toBeVisible();
-  await expect(page.locator("tbody tr")).toHaveCount(17);
+  await expect(page.locator("tbody tr")).toHaveCount(21);
   await page.getByRole("link", { name: "Ankle and foot injury assessment" }).click();
   await expect(page.getByRole("heading", { name: "Ottawa Ankle Rules" })).toBeVisible();
   await expect(page).toHaveURL("/rules/ottawa_ankle");
@@ -190,4 +215,99 @@ test("old hash links still work, unknown paths show not found", async ({ page })
   await expect(page.getByRole("heading", { name: "How OLA BOT works" })).toBeVisible();
   await page.goto("/no/such/page");
   await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+});
+
+test("shingles: single-screen pattern check with checklist result, 72-hour window, and PDF", async ({ page }) => {
+  await page.route("**/api/providers?*", (route) => route.fulfill({ json: providerFixture }));
+  await startAssessment(page, "painful rash on one side");
+  await expect(page).toHaveURL("/assess/herpes_zoster_confirmation");
+  await expect(page.getByText("Pattern matching — not a scored assessment")).toBeVisible();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL("/assess/herpes_zoster_confirmation/check");
+  await expect(page.getByText(/Question \d of/)).toHaveCount(0); // no progress bar
+  await pick(page, /painful rash or blistering/, "Yes");
+  await pick(page, /band or stripe/, "Yes");
+  await pick(page, /burning, tingling/, "Yes");
+  await pick(page, /When did the rash first appear/, "1–3 days ago");
+  await pick(page, /near your eye/, "No");
+  await page.getByRole("button", { name: "Submit" }).click();
+
+  await expect(page).toHaveURL("/assess/herpes_zoster_confirmation/result");
+  await expect(page.getByText("Pattern CONSISTENT with herpes zoster (shingles)").first()).toBeVisible();
+  await expect(page.getByText("Care level: URGENT CARE")).toBeVisible();
+  await expect(page.getByText(/you are here \(Day 1–3\)/)).toBeVisible();
+  await expect(page.getByText("None: Eye pain or vision changes")).toBeVisible();
+  await expect(page.getByText(/Score/)).toHaveCount(0);
+  const [download] = await Promise.all([page.waitForEvent("download"), page.getByRole("button", { name: "Download as PDF" }).click()]);
+  expect(download.suggestedFilename()).toMatch(/^ola-bot-herpes_zoster_confirmation-/);
+  await expect(page.getByRole("button", { name: "Allow logging" }).or(page.getByText("Outcome logging is turned off"))).toBeVisible();
+});
+
+test("pattern check blocks submit when two required answers are missing", async ({ page }) => {
+  await startAssessment(page, "shingles");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await pick(page, /painful rash or blistering/, "Yes");
+  await pick(page, /band or stripe/, "Yes");
+  await page.getByRole("button", { name: "Submit" }).click();
+  await expect(page.getByText("2 required questions are unanswered.")).toBeVisible();
+  await expect(page).toHaveURL("/assess/herpes_zoster_confirmation/check");
+});
+
+test("eye pain with blurred vision routes to the emergency department", async ({ page }) => {
+  await startAssessment(page, "eye pain");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("button", { name: "No", exact: true }).click(); // eye injury warning
+  await expect(page.getByText("Eye emergency pattern").or(page.getByText("Pattern matching — not a scored assessment"))).toBeVisible();
+  await pick(page, /sudden, severe pain/, "Yes");
+  await pick(page, /blurry or hazy/, "Yes");
+  await pick(page, /When did this start/, "1–6 hours ago");
+  await page.getByRole("button", { name: "Submit" }).click();
+  await expect(page.getByText("Care level: EMERGENCY DEPARTMENT")).toBeVisible();
+  await expect(page.getByText("Pattern CONCERNING for acute angle-closure glaucoma").first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Call 911" }).first()).toHaveAttribute("href", "tel:911");
+});
+
+test("appendicitis high-suspicion pattern routes to the ER with nothing by mouth", async ({ page }) => {
+  await startAssessment(page, "stomach pain");
+  await expect(page).toHaveURL("/assess/appendicitis_redflags");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("button", { name: "No", exact: true }).click(); // rigid belly warning
+  await pick(page, /Where is your belly pain/, "Lower right side (between hip bone and ribs)");
+  await pick(page, /Do you have a fever/, "Yes");
+  await pick(page, /vomiting/, "Yes");
+  await pick(page, /How bad is the pain/, "4–6 (moderate, hard to function)");
+  await pick(page, /When did the pain start/, "6–24 hours ago");
+  await page.getByRole("button", { name: "Submit" }).click();
+  await expect(page.getByText("Pattern: HIGH suspicion for appendicitis").first()).toBeVisible();
+  await expect(page.getByText("Care level: EMERGENCY DEPARTMENT")).toBeVisible();
+  await expect(page.getByText(/Do not eat or drink anything/)).toBeVisible();
+});
+
+test("cardiac red flag: a yes replaces the whole app with the 911 screen", async ({ page }) => {
+  await startAssessment(page, "chest discomfort");
+  await expect(page).toHaveURL("/assess/ami_redflags");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page.getByRole("heading", { name: "🚨 Emergency Screening" })).toBeVisible();
+  // The screen navigates away immediately, so click rather than check-and-verify.
+  await page.getByRole("group", { name: /chest pain or pressure RIGHT NOW/ }).getByRole("radio", { name: "Yes", exact: true }).click();
+  await expect(page).toHaveURL("/stop/chest_pain");
+  await expectCardiacFullScreen(page);
+});
+
+test("assessment picker groups scoring, pattern, and emergency assessments", async ({ page }) => {
+  await page.goto("/");
+  await passSafetyChecks(page);
+  await page.getByText(/Or choose from all/).click();
+  await expect(page.getByRole("heading", { name: /Emergency screening/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Diagnostic patterns/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Scoring assessments/ })).toBeVisible();
+});
+
+test("provider finder works without an assessment", async ({ page }) => {
+  await page.route("**/api/providers?*", (route) => route.fulfill({ json: providerFixture }));
+  await page.goto("/find");
+  await expect(page).toHaveTitle("Find a provider · OLA BOT");
+  await page.getByLabel("Near ZIP code").fill("96813");
+  await expect(page.getByRole("heading", { name: /Example Urgent Care LLC/ })).toBeVisible();
+  await expect(page.getByLabel(/Share my symptom assessment/)).toHaveCount(0);
 });

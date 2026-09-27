@@ -25,14 +25,24 @@ export type SpecialtyId =
   | "emergency_department"
   | "telehealth";
 
+export type AssessmentType = "scoring_algorithm" | "diagnostic_confirmation" | "red_flag";
+
 export type YesNoAnswer = "yes" | "no" | "unsure";
-/** Answer value: "yes" | "no" | "unsure" for yes/no items, option value or "unsure" for choice items. */
+/**
+ * Answer value: "yes" | "no" | "unsure" for yes/no items; option value or "unsure" for
+ * choice items; comma-separated option values for checkbox items ("" = none selected).
+ */
 export type AnswerValue = string;
 export type Answers = Record<string, AnswerValue | undefined>;
 
 export type Condition =
   | { var: string; equals: string }
   | { var: string; in: string[] }
+  /** Checkbox item has this option selected. */
+  | { var: string; includes: string }
+  /** Pattern-match rules: the pattern level (see Scoring "pattern"). */
+  | { pattern: string }
+  | { pattern_in: string[] }
   | { any_yes: string[] }
   | { all_yes: string[] }
   | { all_no: string[] }
@@ -68,6 +78,10 @@ interface BaseItem {
   trace_label: string;
   /** If unanswered, route using the cautious result. */
   critical?: boolean;
+  /** Defaults to true. More than one unanswered required item blocks the result. */
+  required?: boolean;
+  /** Pattern-match rules: role of the finding in the pattern (shown in the checklist). */
+  finding_weight?: "essential" | "supporting" | "critical";
   show_if?: Condition;
 }
 
@@ -84,6 +98,12 @@ export interface ChoiceItem extends BaseItem {
   options: ChoiceOption[];
 }
 
+/** Select all that apply. Unknown answers assume none (base) or all concerning options (worst). */
+export interface CheckboxItem extends BaseItem {
+  type: "checkbox";
+  options: ChoiceOption[];
+}
+
 /** An item the rule requires but only a clinician can assess. Never asked; always scored with fixed points. */
 export interface ClinicianOnlyItem {
   id: string;
@@ -93,8 +113,8 @@ export interface ClinicianOnlyItem {
   note: string;
 }
 
-export type Item = YesNoItem | ChoiceItem | ClinicianOnlyItem;
-export type AskedItem = YesNoItem | ChoiceItem;
+export type Item = YesNoItem | ChoiceItem | CheckboxItem | ClinicianOnlyItem;
+export type AskedItem = YesNoItem | ChoiceItem | CheckboxItem;
 
 export interface Band {
   min: number;
@@ -115,9 +135,41 @@ export interface Override {
   result: string;
 }
 
+export interface PatternLevel {
+  id: string;
+  label: string;
+  /** True when this level means the pattern matches (shown as "CONSISTENT"). */
+  matched: boolean;
+  interpretation: string;
+  when?: Condition;
+}
+
 export type Scoring =
   | { method: "sum"; subscales?: Record<string, string[]>; bands: Band[]; threshold_text: string }
-  | { method: "decision"; steps: DecisionStep[]; default_result: string; threshold_text: string };
+  | { method: "decision"; steps: DecisionStep[]; default_result: string; threshold_text: string }
+  | {
+      /**
+       * Diagnostic confirmation or red flag: first decide the pattern level (first
+       * level whose condition holds; the last level has no condition), then route
+       * through ordered steps that may reference the level with { pattern }.
+       */
+      method: "pattern";
+      pattern_text: string;
+      levels: PatternLevel[];
+      steps: DecisionStep[];
+      default_result: string;
+      threshold_text: string;
+    };
+
+/** A treatment window keyed on a choice item, e.g. antivirals within 72 hours of rash onset. */
+export interface TimeWindow {
+  label: string;
+  item: string;
+  hours: number;
+  /** Per option value of `item`. */
+  status: Record<string, { state: "open" | "closing" | "closed"; text: string; timeline_day: string }>;
+  timeline: { label: string; strength: 1 | 2 | 3 }[];
+}
 
 export interface Care {
   level: CareLevel;
@@ -161,7 +213,13 @@ export interface Rule {
   version: string;
   last_updated: string;
   changelog: ChangelogEntry[];
-  year_validated: number;
+  /** Null for guidance-based patterns that are not a validated score. */
+  year_validated: number | null;
+  assessment_type: AssessmentType;
+  /** Shown at the top of pattern checks and red flag screens. */
+  description?: string;
+  time_criticality?: string;
+  time_window?: TimeWindow;
   citations: Citation[];
   validated_population: string;
   self_report_note?: string;

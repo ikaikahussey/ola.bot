@@ -12,6 +12,13 @@ export function describeCondition(c: Condition, rule: Rule): string {
   if ("score_gte" in c) return `score ≥ ${c.score_gte}`;
   if ("score_lte" in c) return `score ≤ ${c.score_lte}`;
   if ("subscale" in c) return `subscale ${c.subscale}${c.gte !== undefined ? ` ≥ ${c.gte}` : ""}${c.lte !== undefined ? ` ≤ ${c.lte}` : ""}`;
+  if ("pattern" in c) return `pattern = ${c.pattern}`;
+  if ("pattern_in" in c) return `pattern is one of ${c.pattern_in.join(", ")}`;
+  if ("includes" in c) {
+    const item = rule.items.find((i) => i.id === c.var);
+    const opt = item && "options" in item ? item.options.find((o) => o.value === c.includes)?.label : undefined;
+    return `${label(c.var)} includes "${opt ?? c.includes}"`;
+  }
   if ("equals" in c) return `${label(c.var)} = ${c.equals}`;
   if ("in" in c) return `${label(c.var)} is one of ${c.in.join(", ")}`;
   return JSON.stringify(c);

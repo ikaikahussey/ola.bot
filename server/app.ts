@@ -2,6 +2,7 @@ import { readFile, stat } from "node:fs/promises";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import path from "node:path";
 import { nearestZip } from "./geo";
+import { submitAssessment, type SubmitBody } from "./assess";
 import { validateLogEntry, writeLog } from "./log";
 import { HttpError, searchProviders, type Fetcher } from "./npi";
 
@@ -81,6 +82,31 @@ export function createHandler(opts: AppOptions = {}) {
         const entry = validateLogEntry(await readBody(req));
         await writeLog(entry, opts.logDir);
         return send(res, 201, { stored: true });
+      }
+
+      const submit = url.pathname.match(/^\/api\/assessments\/([a-z0-9_]+)\/submit$/);
+      if (submit && req.method === "POST") {
+        const body = (await readBody(req)) as SubmitBody;
+        const { answers, ev, response } = submitAssessment(submit[1], body);
+        if (body.user_consent_logged === true && logging) {
+          await writeLog(
+            validateLogEntry({
+              consent: true,
+              session_id: response.session_id,
+              timestamp: new Date().toISOString(),
+              rule_id: response.assessment_id,
+              rule_version: response.rule_version,
+              assessment_type: response.assessment_type,
+              answers,
+              score: ev.score,
+              result: ev.result,
+              care_level: ev.result_def.care.level,
+            }),
+            opts.logDir,
+          );
+          response.logged = true;
+        }
+        return send(res, 200, response);
       }
 
       if (url.pathname.startsWith("/api/")) throw new HttpError(404, "Not found");

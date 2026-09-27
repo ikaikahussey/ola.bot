@@ -26,6 +26,20 @@ export function About() {
         </li>
       </ol>
 
+      <h2>Three kinds of assessment</h2>
+      <ul>
+        <li>
+          <strong>📊 Scoring assessments</strong> add up points (or follow decision steps) and compare the total with published thresholds.
+        </li>
+        <li>
+          <strong>📋 Diagnostic patterns</strong> check whether your symptoms match a typical pattern, such as shingles. The result is a checklist of
+          findings present and absent and a yes/no pattern match, not a score.
+        </li>
+        <li>
+          <strong>🚨 Emergency screening</strong> stops as soon as any warning sign is present and shows only the 911 screen.
+        </li>
+      </ul>
+
       <h2>No AI in the result</h2>
       <p>
         No language model or machine-learning system is used anywhere in the assessment. Every sentence on the result screen is written in a rule file or a

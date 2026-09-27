@@ -4,6 +4,7 @@
   "short_name": "UTI symptom rule (Bent)",
   "assessment_title": "Painful urination assessment",
   "condition": "Painful or frequent urination (possible bladder infection)",
+  "assessment_type": "scoring_algorithm",
   "version": "1.0.0",
   "last_updated": "2026-09-27",
   "changelog": [

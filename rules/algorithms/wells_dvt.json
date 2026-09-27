@@ -4,6 +4,7 @@
   "short_name": "Wells DVT score",
   "assessment_title": "Leg swelling assessment",
   "condition": "Leg pain or swelling (possible blood clot)",
+  "assessment_type": "scoring_algorithm",
   "version": "1.0.0",
   "last_updated": "2026-09-27",
   "changelog": [

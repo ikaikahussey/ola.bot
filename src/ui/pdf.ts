@@ -18,6 +18,9 @@ export function pdfSafe(s: string): string {
     .replace(/−/g, "-")
     .replace(/[–—]/g, "-")
     .replace(/→/g, "->")
+    .replace(/✓/g, "[x]")
+    .replace(/○/g, "[ ]")
+    .replace(/•/g, "-")
     .replace(/[“”]/g, '"')
     .replace(/[‘’]/g, "'")
     .replace(/…/g, "...")
@@ -62,8 +65,8 @@ export async function buildPdf({ rule, ev, session }: { rule: Rule; ev: Evaluati
   write(ev.result_def.label, { size: 16, bold: true });
   write(ev.result_def.interpretation, { size: 11 });
 
-  heading("How we scored it");
-  for (const line of traceLines(rule, ev)) write(line, { mono: true, size: 9, gap: 0 });
+  heading(ev.method === "pattern" ? "How we checked the pattern" : "How we scored it");
+  for (const line of traceLines(rule, ev, session.answers)) write(line, { mono: true, size: 9, gap: 0 });
 
   heading("Where to go and when");
   const care = ev.result_def.care;
@@ -87,7 +90,7 @@ export async function buildPdf({ rule, ev, session }: { rule: Rule; ev: Evaluati
   }
 
   heading("Which rule we used");
-  write(`${rule.name} (validated ${rule.year_validated}); rule file version ${rule.version}, updated ${rule.last_updated}; clinical review: ${rule.clinical_review.status}.`);
+  write(`${rule.name} (${rule.year_validated ? `validated ${rule.year_validated}` : "pattern check based on published guidance, not a validated score"}); rule file version ${rule.version}, updated ${rule.last_updated}; clinical review: ${rule.clinical_review.status}.`);
   for (const c of rule.citations) write(`${c.text} ${c.url}`, { size: 9 });
   write(`Validated in: ${rule.validated_population}`, { size: 9 });
 

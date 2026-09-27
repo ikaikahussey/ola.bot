@@ -4,6 +4,7 @@ import { fmtPoints } from "../engine/trace";
 import type { Rule } from "../engine/types";
 import { GLOBAL_RED_FLAGS, RED_FLAGS_VERSION, RULES, RULES_BY_ID } from "../rules";
 import { RuleInfo } from "./Result";
+import { TYPE_GROUP_LABEL, TYPE_ICON, TypeBadge } from "./Pattern";
 
 const REPO = "https://github.com/ikaikahussey/ola.bot/blob/main";
 
@@ -22,6 +23,7 @@ export function Library({ ruleId }: { ruleId?: string }) {
           <tr>
             <th>Assessment</th>
             <th>Rule</th>
+            <th>Type</th>
             <th>Validated</th>
             <th>Version</th>
           </tr>
@@ -34,7 +36,10 @@ export function Library({ ruleId }: { ruleId?: string }) {
                 <div className="small sub">{r.condition}</div>
               </td>
               <td>{r.short_name}</td>
-              <td>{r.year_validated}</td>
+              <td title={TYPE_GROUP_LABEL[r.assessment_type]}>
+                <span aria-hidden>{TYPE_ICON[r.assessment_type]}</span> <span className="small">{TYPE_GROUP_LABEL[r.assessment_type]}</span>
+              </td>
+              <td>{r.year_validated ?? "Guidance"}</td>
               <td>
                 {r.version}
                 <div className="small sub">{r.last_updated}</div>
@@ -128,8 +133,26 @@ function RuleDetail({ rule }: { rule: Rule }) {
         </tbody>
       </table>
 
-      <h2>Scoring</h2>
+      <p>
+        <TypeBadge type={rule.assessment_type} />
+      </p>
+      {rule.description && <p>{rule.description}</p>}
+      <h2>{rule.scoring.method === "pattern" ? "Pattern and routing" : "Scoring"}</h2>
       <p>{rule.scoring.threshold_text}</p>
+      {rule.scoring.method === "pattern" && (
+        <>
+          <h3>Pattern levels (first match wins)</h3>
+          <ol>
+            {rule.scoring.levels.map((l) => (
+              <li key={l.id}>
+                {l.label}
+                {l.when ? ` — if ${describeCondition(l.when, rule)}` : " — otherwise"}
+              </li>
+            ))}
+          </ol>
+          <h3>Routing (first match wins)</h3>
+        </>
+      )}
       {rule.overrides && rule.overrides.length > 0 && (
         <>
           <h3>Safety checks (applied before scoring)</h3>

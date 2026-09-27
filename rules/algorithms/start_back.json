@@ -4,6 +4,7 @@
   "short_name": "STarT Back",
   "assessment_title": "Back pain assessment",
   "condition": "Low back pain",
+  "assessment_type": "scoring_algorithm",
   "version": "1.0.0",
   "last_updated": "2026-09-27",
   "changelog": [

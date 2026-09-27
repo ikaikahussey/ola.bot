@@ -5,9 +5,11 @@
 import type {
   Answers,
   AskedItem,
+  CheckboxItem,
   ChoiceItem,
   Condition,
   Item,
+  PatternLevel,
   ResultDef,
   Rule,
   YesNoItem,
@@ -19,6 +21,8 @@ export interface EvalContext {
   answers: Answers;
   score: number;
   subscales: Record<string, number>;
+  /** Pattern level id (pattern rules only). */
+  pattern?: string;
 }
 
 export type ItemStatus = "answered" | "unsure" | "missing" | "clinician_only" | "not_applicable";
@@ -36,6 +40,17 @@ export interface ItemTrace {
   worst_points: number;
   note?: string;
   critical: boolean;
+  required: boolean;
+}
+
+export type FindingState = "present" | "absent" | "unknown" | "info";
+
+/** One line of the ✓/○ checklist shown for pattern rules. */
+export interface Finding {
+  item_id: string;
+  label: string;
+  state: FindingState;
+  weight?: "essential" | "supporting" | "critical";
 }
 
 export interface PathStep {
@@ -46,8 +61,11 @@ export interface PathStep {
 
 export interface Evaluation {
   rule_id: string;
-  method: "sum" | "decision";
+  method: "sum" | "decision" | "pattern";
   items: ItemTrace[];
+  /** Pattern rules: the pattern level used for routing. */
+  pattern: PatternLevel | null;
+  findings: Finding[];
   score: number | null;
   worst_score: number | null;
   score_min: number | null;
@@ -62,7 +80,7 @@ export interface Evaluation {
   path: PathStep[];
   missing: ItemTrace[];
   unsure: ItemTrace[];
-  /** More than one visible item unanswered: the user must go back. */
+  /** More than one required item unanswered: the user must go back. */
   blocked: boolean;
   limited: boolean;
   routed_cautiously: boolean;
@@ -89,9 +107,16 @@ export function evalCondition(cond: Condition, ctx: EvalContext): boolean {
     if (cond.lte !== undefined && s > cond.lte) return false;
     return true;
   }
+  if ("pattern" in cond) return ctx.pattern === cond.pattern;
+  if ("pattern_in" in cond) return cond.pattern_in.includes(ctx.pattern ?? "");
+  if ("includes" in cond) return splitSelected(ctx.answers[cond.var]).includes(cond.includes);
   if ("equals" in cond) return ctx.answers[cond.var] === cond.equals;
   if ("in" in cond) return cond.in.includes(ctx.answers[cond.var] ?? "");
   throw new Error(`Unknown condition: ${JSON.stringify(cond)}`);
+}
+
+export function splitSelected(value: string | undefined): string[] {
+  return value ? value.split(",").filter(Boolean) : [];
 }
 
 function yesNoPoints(item: YesNoItem, value: string): number {
@@ -107,7 +132,14 @@ function choicePoints(item: ChoiceItem, value: string): number {
 export function itemPoints(item: Item, value: string | undefined): number {
   if (item.type === "clinician_only") return item.fixed_points;
   if (value === undefined) return 0;
-  return item.type === "yes_no" ? yesNoPoints(item, value) : choicePoints(item, value);
+  if (item.type === "yes_no") return yesNoPoints(item, value);
+  if (item.type === "checkbox") return checkboxPoints(item, value);
+  return choicePoints(item, value);
+}
+
+function checkboxPoints(item: CheckboxItem, value: string): number {
+  const sel = splitSelected(value);
+  return item.options.filter((o) => sel.includes(o.value)).reduce((a, o) => a + (o.points ?? 0), 0);
 }
 
 function hasPoints(item: YesNoItem): boolean {
@@ -129,6 +161,11 @@ export function fillValue(item: AskedItem, mode: FillMode): string {
     return mode === "worst" ? concerning : concerning === "yes" ? "no" : "yes";
   }
   const opts = item.options;
+  if (item.type === "checkbox") {
+    if (mode === "base") return "";
+    const flagged = opts.filter((o) => o.concerning);
+    return (flagged.length ? flagged : opts).map((o) => o.value).join(",");
+  }
   if (mode === "worst") {
     const flagged = opts.find((o) => o.concerning);
     if (flagged) return flagged.value;
@@ -197,7 +234,27 @@ function computeScore(rule: Rule, filled: Answers, visible: Set<string>) {
   return { score, subscales };
 }
 
-function selectResult(rule: Rule, ctx: EvalContext): { result: string; reason: string; path: PathStep[] } {
+export function patternLevel(rule: Rule, ctx: EvalContext): PatternLevel | null {
+  if (rule.scoring.method !== "pattern") return null;
+  const levels = rule.scoring.levels;
+  return levels.find((l) => l.when && evalCondition(l.when, ctx)) ?? levels[levels.length - 1];
+}
+
+interface Selection {
+  result: string;
+  reason: string;
+  path: PathStep[];
+  pattern: PatternLevel | null;
+}
+
+function selectResult(rule: Rule, ctx: EvalContext): Selection {
+  const pattern = patternLevel(rule, ctx);
+  if (pattern) ctx = { ...ctx, pattern: pattern.id };
+  const sel = selectRoute(rule, ctx);
+  return { ...sel, pattern };
+}
+
+function selectRoute(rule: Rule, ctx: EvalContext): Omit<Selection, "pattern"> {
   const path: PathStep[] = [];
   for (const o of rule.overrides ?? []) {
     const met = evalCondition(o.when, ctx);
@@ -227,6 +284,10 @@ function answerText(item: AskedItem, value: string | undefined): string {
   if (value === undefined) return "NOT ANSWERED";
   if (value === "unsure") return "NOT SURE";
   if (item.type === "yes_no") return value.toUpperCase();
+  if (item.type === "checkbox") {
+    const sel = splitSelected(value);
+    return sel.length ? item.options.filter((o) => sel.includes(o.value)).map((o) => o.label).join("; ") : "NONE";
+  }
   return item.options.find((o) => o.value === value)?.label ?? value;
 }
 
@@ -242,6 +303,12 @@ export function scoreRange(rule: Rule): { min: number; max: number } | null {
       const pts = [item.points_if_yes ?? 0, item.points_if_no ?? 0];
       min += Math.min(...pts);
       max += Math.max(...pts);
+    } else if (item.type === "checkbox") {
+      for (const o of item.options) {
+        const p = o.points ?? 0;
+        if (p < 0) min += p;
+        else max += p;
+      }
     } else {
       const pts = item.options.map((o) => o.points ?? 0);
       min += Math.min(...pts);
@@ -272,6 +339,7 @@ export function evaluate(rule: Rule, raw: Answers): Evaluation {
         worst_points: item.fixed_points,
         note: item.note,
         critical: false,
+        required: false,
       });
       continue;
     }
@@ -288,6 +356,7 @@ export function evaluate(rule: Rule, raw: Answers): Evaluation {
         points: 0,
         worst_points: 0,
         critical: !!item.critical,
+        required: item.required !== false,
       });
       continue;
     }
@@ -301,6 +370,7 @@ export function evaluate(rule: Rule, raw: Answers): Evaluation {
       points: inBase ? itemPoints(item, base.filled[item.id]) : 0,
       worst_points: inWorst ? itemPoints(item, worst.filled[item.id]) : 0,
       critical: !!item.critical,
+      required: item.required !== false,
     });
   }
 
@@ -335,6 +405,8 @@ export function evaluate(rule: Rule, raw: Answers): Evaluation {
     rule_id: rule.rule_id,
     method: rule.scoring.method,
     items,
+    pattern: chosen.pattern,
+    findings: buildFindings(rule, raw, items),
     score: isSum ? baseScore.score : null,
     worst_score: isSum ? worstScore.score : null,
     score_min: range?.min ?? null,
@@ -348,10 +420,35 @@ export function evaluate(rule: Rule, raw: Answers): Evaluation {
     path: chosen.path,
     missing,
     unsure,
-    blocked: missing.length > 1,
+    blocked: missing.filter((i) => i.required).length > 1,
     limited: missing.length + unsure.length > 0,
     routed_cautiously: routedCautiously,
     caution_note: cautionNote,
     range_note: rangeNote,
   };
+}
+
+/** Checklist of findings: yes/no items and each checkbox option, marked present, absent, or unknown. */
+export function buildFindings(rule: Rule, raw: Answers, items: ItemTrace[]): Finding[] {
+  const out: Finding[] = [];
+  for (const item of rule.items) {
+    if (!isAsked(item)) continue;
+    const trace = items.find((t) => t.id === item.id);
+    if (!trace || trace.status === "not_applicable") continue;
+    const v = raw[item.id];
+    const unknown = v === undefined || v === "unsure";
+    const weight = item.finding_weight;
+    if (item.type === "yes_no") {
+      out.push({ item_id: item.id, label: item.trace_label, state: unknown ? "unknown" : v === "yes" ? "present" : "absent", weight });
+    } else if (item.type === "checkbox") {
+      const sel = splitSelected(v);
+      for (const o of item.options) {
+        out.push({ item_id: item.id, label: o.label, state: unknown ? "unknown" : sel.includes(o.value) ? "present" : "absent", weight });
+      }
+    } else {
+      const label = unknown ? item.trace_label : `${item.trace_label}: ${item.options.find((o) => o.value === v)?.label ?? v}`;
+      out.push({ item_id: item.id, label, state: unknown ? "unknown" : "info", weight });
+    }
+  }
+  return out;
 }

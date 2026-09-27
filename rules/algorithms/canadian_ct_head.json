@@ -4,6 +4,7 @@
   "short_name": "Canadian CT Head Rule",
   "assessment_title": "Head injury assessment",
   "condition": "Minor head injury",
+  "assessment_type": "scoring_algorithm",
   "version": "1.0.0",
   "last_updated": "2026-09-27",
   "changelog": [

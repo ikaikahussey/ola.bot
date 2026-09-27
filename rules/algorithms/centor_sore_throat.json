@@ -4,6 +4,7 @@
   "short_name": "McIsaac score",
   "assessment_title": "Sore throat assessment",
   "condition": "Sore throat (possible strep throat)",
+  "assessment_type": "scoring_algorithm",
   "version": "1.0.0",
   "last_updated": "2026-09-27",
   "changelog": [

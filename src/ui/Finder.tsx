@@ -30,7 +30,7 @@ interface SearchResponse {
 
 type Where = { zip: string } | { lat: number; lon: number };
 
-export function Finder({ defaultSpecialty, summary }: { defaultSpecialty: SpecialtyId; summary: string }) {
+export function Finder({ defaultSpecialty, summary = "" }: { defaultSpecialty: SpecialtyId; summary?: string }) {
   const [open, setOpen] = useState(true);
   const [specialty, setSpecialty] = useState<SpecialtyId>(defaultSpecialty);
   const [zip, setZip] = useState("");
@@ -163,10 +163,10 @@ export function Finder({ defaultSpecialty, summary }: { defaultSpecialty: Specia
                 <span>Requires a scheduling (EHR) integration, which is not configured.</span>
               </div>
             </div>
-            <label className="row" style={{ alignItems: "flex-start", flexWrap: "nowrap", fontWeight: 400 }}>
+            {summary && <label className="row" style={{ alignItems: "flex-start", flexWrap: "nowrap", fontWeight: 400 }}>
               <input type="checkbox" checked={share} onChange={(e) => setShare(e.target.checked)} style={{ marginTop: 4 }} />
               <span>Share my symptom assessment with the provider I call? (Adds a “Copy summary” button to each result. Nothing is sent automatically.)</span>
-            </label>
+            </label>}
             <div>
               <button className="primary" type="submit" disabled={!where}>
                 Search

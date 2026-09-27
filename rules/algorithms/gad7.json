@@ -4,6 +4,7 @@
   "short_name": "GAD-7",
   "assessment_title": "Anxiety check",
   "condition": "Anxiety or worry",
+  "assessment_type": "scoring_algorithm",
   "version": "1.0.0",
   "last_updated": "2026-09-27",
   "changelog": [

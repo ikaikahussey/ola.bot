@@ -1,0 +1,266 @@
+{
+  "rule_id": "acute_angle_closure_glaucoma",
+  "name": "Acute angle-closure glaucoma screening",
+  "short_name": "Eye emergency pattern check",
+  "assessment_title": "Eye pain pattern check",
+  "condition": "Sudden eye pain (possible acute angle-closure glaucoma)",
+  "assessment_type": "diagnostic_confirmation",
+  "description": "Sudden eye pain with vision changes is a medical emergency. This check looks for signs of angle-closure glaucoma, which needs treatment within hours to prevent permanent vision loss.",
+  "time_criticality": "Hours — can cause permanent vision loss",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": null,
+  "citations": [
+    {
+      "text": "American Academy of Ophthalmology. Angle-closure glaucoma: symptoms and emergency care (EyeSmart patient information).",
+      "url": "https://www.aao.org/eye-health"
+    },
+    {
+      "text": "Weinreb RN, Aung T, Medeiros FA. The pathophysiology and treatment of glaucoma: a review. JAMA. 2014;311(18):1901-1911.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=%22The%20pathophysiology%20and%20treatment%20of%20glaucoma%3A%20a%20review%22%5BTitle%5D"
+    }
+  ],
+  "validated_population": "Not a validated score. Pattern based on the typical presentation of acute angle-closure glaucoma described by the American Academy of Ophthalmology.",
+  "self_report_note": "Eye pressure can only be measured by a clinician. Many other serious eye conditions cause sudden pain and blurred vision, so any sudden eye pain needs same-day care.",
+  "license_note": "Pattern logic and question wording are original to OLA BOT, based on the public guidance cited. Not a validated scoring instrument.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [
+    {
+      "id": "eye_injury",
+      "question": "Did a chemical splash into your eye, or did something hit or go into your eye?",
+      "help": "For a chemical splash, rinse the eye with clean running water for 15 minutes, then get emergency care.",
+      "action": "go_to_ed"
+    }
+  ],
+  "items": [
+    {
+      "id": "acute_eye_pain",
+      "type": "yes_no",
+      "question": "Do you have sudden, severe pain in one eye?",
+      "help": "Pain that came on quickly, within hours, not gradually over days.",
+      "trace_label": "Sudden severe eye pain (one eye)",
+      "finding_weight": "essential",
+      "critical": true
+    },
+    {
+      "id": "halos",
+      "type": "yes_no",
+      "question": "Do you see halos (rainbow rings) around lights?",
+      "help": "High eye pressure makes the front of the eye swell, which causes rings around light bulbs or streetlights.",
+      "trace_label": "Halos around lights",
+      "finding_weight": "supporting",
+      "required": false,
+      "critical": true
+    },
+    {
+      "id": "vision_blur",
+      "type": "yes_no",
+      "question": "Is your vision blurry or hazy in that eye right now?",
+      "help": "Cover the other eye and compare.",
+      "trace_label": "Blurred or hazy vision",
+      "finding_weight": "essential",
+      "critical": true
+    },
+    {
+      "id": "conjunctival_injection",
+      "type": "yes_no",
+      "question": "Is the white of that eye red or pink?",
+      "help": "Look in a mirror and compare with the other eye.",
+      "trace_label": "Red eye",
+      "finding_weight": "supporting",
+      "required": false
+    },
+    {
+      "id": "systemic_symptoms",
+      "type": "yes_no",
+      "question": "Do you have nausea, vomiting, or stomach pain along with the eye pain?",
+      "help": "High eye pressure can cause these symptoms.",
+      "trace_label": "Nausea, vomiting, or stomach pain",
+      "finding_weight": "supporting",
+      "required": false
+    },
+    {
+      "id": "symptom_onset",
+      "type": "choice",
+      "question": "When did this start?",
+      "help": "Your best estimate of when the pain or vision change began.",
+      "trace_label": "Symptom onset",
+      "options": [
+        {
+          "value": "less_1h",
+          "label": "Less than 1 hour ago",
+          "concerning": true
+        },
+        {
+          "value": "1_to_6h",
+          "label": "1–6 hours ago"
+        },
+        {
+          "value": "6_to_24h",
+          "label": "6–24 hours ago"
+        },
+        {
+          "value": "over_24h",
+          "label": "More than 24 hours ago",
+          "benign": true
+        }
+      ],
+      "finding_weight": "critical",
+      "critical": true
+    }
+  ],
+  "scoring": {
+    "method": "pattern",
+    "pattern_text": "Concerning for acute angle-closure glaucoma if: sudden severe eye pain AND (blurred vision OR halos around lights). Red eye and nausea/vomiting support the pattern.",
+    "threshold_text": "Pattern check, not a score. Routing: sudden eye pain with blurred vision or halos, or any symptoms that began within 6 hours → emergency department now; sudden eye pain for 6–24 hours → eye doctor or emergency department immediately; otherwise same-day care.",
+    "levels": [
+      {
+        "id": "concerning",
+        "label": "Pattern CONCERNING for acute angle-closure glaucoma",
+        "matched": true,
+        "interpretation": "Your symptoms raise concern for angle-closure glaucoma or another serious eye condition.",
+        "when": {
+          "all": [
+            {
+              "var": "acute_eye_pain",
+              "equals": "yes"
+            },
+            {
+              "any_yes": [
+                "vision_blur",
+                "halos"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "atypical",
+        "label": "Pattern ATYPICAL for angle-closure glaucoma",
+        "matched": false,
+        "interpretation": "Your symptoms do not match the typical pattern of angle-closure glaucoma, but eye pain still needs prompt evaluation."
+      }
+    ],
+    "steps": [
+      {
+        "label": "Sudden eye pain with blurred vision",
+        "when": {
+          "all_yes": [
+            "acute_eye_pain",
+            "vision_blur"
+          ]
+        },
+        "result": "ed_now"
+      },
+      {
+        "label": "Sudden eye pain with halos around lights",
+        "when": {
+          "all_yes": [
+            "acute_eye_pain",
+            "halos"
+          ]
+        },
+        "result": "ed_now"
+      },
+      {
+        "label": "Symptoms started within the last 6 hours",
+        "when": {
+          "var": "symptom_onset",
+          "in": [
+            "less_1h",
+            "1_to_6h"
+          ]
+        },
+        "result": "ed_now"
+      },
+      {
+        "label": "Sudden eye pain that started 6–24 hours ago",
+        "when": {
+          "all": [
+            {
+              "var": "acute_eye_pain",
+              "equals": "yes"
+            },
+            {
+              "var": "symptom_onset",
+              "equals": "6_to_24h"
+            }
+          ]
+        },
+        "result": "eye_immediate"
+      }
+    ],
+    "default_result": "same_day"
+  },
+  "results": {
+    "ed_now": {
+      "label": "Potential eye emergency: go to the emergency room now",
+      "risk": "high",
+      "interpretation": "This pattern is concerning for acute angle-closure glaucoma, a sight-threatening emergency. Vision loss can happen within hours if untreated.",
+      "recommendation": "Go to the emergency room NOW. Do not delay.",
+      "care": {
+        "level": "emergency_department",
+        "within": "Now — do not wait",
+        "where_detail": "Nearest hospital emergency department. Call 911 or go to the nearest ER.",
+        "ed_redirect": [
+          "You cannot get to an emergency room quickly: call 911"
+        ],
+        "self_care": [
+          "Do not drive yourself if your vision is blurred. Ask someone to drive you or call 911.",
+          "Bring a list of your medicines. Some cold, allergy, and bladder medicines can trigger this condition."
+        ],
+        "finder_specialty": "emergency_department"
+      }
+    },
+    "eye_immediate": {
+      "label": "Eye pain needs care immediately",
+      "risk": "high",
+      "interpretation": "Sudden eye pain that began 6–24 hours ago needs same-day evaluation, including an eye pressure check.",
+      "recommendation": "See an eye doctor or go to the emergency room immediately.",
+      "care": {
+        "level": "emergency_department",
+        "within": "Immediately (within 1 to 2 hours)",
+        "where_detail": "Emergency department, or an eye doctor (ophthalmologist or optometrist) who can see you right away. Most urgent care clinics cannot measure eye pressure.",
+        "ed_redirect": [
+          "Vision gets worse or goes dark",
+          "Severe eye pain with nausea or vomiting",
+          "Halos around lights"
+        ],
+        "self_care": [
+          "Do not drive yourself if your vision is blurred. Ask someone to drive you or call 911."
+        ],
+        "finder_specialty": "emergency_department"
+      }
+    },
+    "same_day": {
+      "label": "Eye pain needs same-day evaluation",
+      "risk": "moderate",
+      "interpretation": "Your symptoms do not match the typical pattern of angle-closure glaucoma, but eye pain still needs prompt evaluation.",
+      "recommendation": "See an eye doctor, urgent care, or emergency department today.",
+      "care": {
+        "level": "urgent_care",
+        "within": "Today",
+        "where_detail": "Eye doctor same-day appointment, urgent care, or emergency department. Call ahead: urgent care may not be able to measure eye pressure.",
+        "ed_redirect": [
+          "Vision gets worse or goes dark",
+          "Severe eye pain with nausea or vomiting",
+          "Halos around lights",
+          "Sudden loss of vision: call 911"
+        ],
+        "self_care": [
+          "Do not drive yourself if your vision is blurred. Ask someone to drive you or call 911."
+        ],
+        "finder_specialty": "urgent_care"
+      }
+    }
+  }
+}

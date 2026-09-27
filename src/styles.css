@@ -121,3 +121,23 @@ pre.trace { background: var(--soft); border: 1px solid var(--line); border-radiu
 }
 
 .banner { background: var(--soft); border-bottom: 1px solid var(--line); font-size: 0.875rem; padding: 0.5rem 0; }
+
+fieldset.invalid { border-left: 3px solid var(--alert); padding-left: 0.75rem; }
+.q-block { padding: 1rem 0; border-bottom: 1px solid var(--line); }
+.badge { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.85rem; font-weight: 700; padding: 0.2rem 0.6rem; border: 1px solid var(--ink); border-radius: 999px; }
+.badge.emergency { border-color: var(--alert); color: var(--alert); }
+.checklist { list-style: none; padding: 0; margin: 0; }
+.checklist li { display: flex; gap: 0.6rem; padding: 0.3rem 0; }
+.checklist .mark { width: 1.2em; flex: none; font-weight: 700; text-align: center; }
+.checklist .present .mark { color: var(--ok); }
+.checklist .absent { color: var(--muted); }
+.timeline { display: grid; gap: 0.35rem; margin: 0.5rem 0; }
+.timeline .bar { display: grid; grid-template-columns: 7em 1fr; gap: 0.75rem; align-items: center; font-size: 0.9rem; }
+.timeline .bar span.fill { display: block; height: 10px; background: var(--ink); border-radius: 2px; }
+.timeline .bar.here { font-weight: 700; }
+.group-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 1rem 0 0.25rem; }
+.fullscreen-emergency { min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 16px; background: #fff; }
+.fullscreen-emergency .inner { max-width: 560px; width: 100%; text-align: center; }
+.fullscreen-emergency h1 { color: var(--alert); font-size: 2.4rem; margin-bottom: 1rem; }
+.fullscreen-emergency .call { font-size: 1.6rem; min-height: 72px; width: 100%; margin: 1rem 0; }
+.fullscreen-emergency .box { text-align: left; margin-top: 1rem; }

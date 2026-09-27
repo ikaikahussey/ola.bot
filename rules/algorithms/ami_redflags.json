@@ -1,0 +1,143 @@
+{
+  "rule_id": "ami_redflags",
+  "name": "Acute cardiac event screening",
+  "short_name": "Heart attack warning signs",
+  "assessment_title": "Chest discomfort emergency screening",
+  "condition": "Possible heart attack or acute coronary syndrome",
+  "assessment_type": "red_flag",
+  "description": "Chest pain or pressure could be a heart attack. If ANY of these applies, stop and call 911 immediately. Do not wait.",
+  "time_criticality": "Minutes — every minute matters",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-09-27",
+      "changes": "Initial release."
+    }
+  ],
+  "year_validated": null,
+  "citations": [
+    {
+      "text": "American Heart Association. Warning signs of a heart attack.",
+      "url": "https://www.heart.org/en/health-topics/heart-attack/warning-signs-of-a-heart-attack"
+    }
+  ],
+  "validated_population": "Not a score. Warning signs from American Heart Association public guidance. Any one sign means call 911.",
+  "self_report_note": "Women, older adults, and people with diabetes more often have heart attacks without typical chest pain.",
+  "license_note": "Pattern logic and question wording are original to OLA BOT, based on the public guidance cited. Not a validated scoring instrument.",
+  "clinical_review": {
+    "status": "pending"
+  },
+  "red_flags": [],
+  "items": [
+    {
+      "id": "chest_pain_now",
+      "type": "yes_no",
+      "question": "Are you having chest pain or pressure RIGHT NOW?",
+      "help": "Any discomfort in the chest counts, even if mild.",
+      "trace_label": "Chest pain or pressure now",
+      "finding_weight": "critical",
+      "critical": true
+    },
+    {
+      "id": "pressure_quality",
+      "type": "yes_no",
+      "question": "Does (or did) it feel like pressure, heaviness, squeezing, or tightness?",
+      "help": "Answer about any chest discomfort in the last 24 hours.",
+      "trace_label": "Pressure, heaviness, squeezing, or tightness",
+      "finding_weight": "supporting",
+      "critical": true,
+      "required": false
+    },
+    {
+      "id": "radiation",
+      "type": "yes_no",
+      "question": "Is (or was) the pain spreading to your arm, jaw, neck, or back?",
+      "help": "Discomfort in one or both arms, the jaw, neck, back, or upper belly.",
+      "trace_label": "Pain spreading to arm, jaw, neck, or back",
+      "finding_weight": "supporting",
+      "critical": true,
+      "required": false
+    },
+    {
+      "id": "associated_symptoms",
+      "type": "yes_no",
+      "question": "Are you also having shortness of breath, nausea, or a cold sweat?",
+      "help": "These can come with or without chest discomfort.",
+      "trace_label": "Shortness of breath, nausea, or cold sweat",
+      "finding_weight": "supporting",
+      "critical": true,
+      "required": false
+    }
+  ],
+  "scoring": {
+    "method": "pattern",
+    "pattern_text": "Red flag if ANY sign is present: chest pain or pressure now, pressure-type discomfort, pain spreading to arm/jaw/neck/back, or shortness of breath, nausea, or cold sweat.",
+    "threshold_text": "Red flag screening, not a score. Any \"yes\" → call 911 immediately (full-screen emergency). All \"no\" → same-day evaluation.",
+    "levels": [
+      {
+        "id": "red_flag",
+        "label": "RED FLAG PRESENT: possible heart attack",
+        "matched": true,
+        "interpretation": "Do not wait. This could be a heart attack.",
+        "when": {
+          "any_yes": [
+            "chest_pain_now",
+            "pressure_quality",
+            "radiation",
+            "associated_symptoms"
+          ]
+        }
+      },
+      {
+        "id": "no_red_flag",
+        "label": "No heart attack warning signs reported",
+        "matched": false,
+        "interpretation": "You did not report current chest pain or heart attack warning signs."
+      }
+    ],
+    "steps": [
+      {
+        "label": "Any heart attack warning sign",
+        "when": {
+          "pattern": "red_flag"
+        },
+        "result": "emergency_stop"
+      }
+    ],
+    "default_result": "same_day"
+  },
+  "results": {
+    "emergency_stop": {
+      "label": "CALL 911 NOW",
+      "risk": "high",
+      "interpretation": "Do not wait. This could be a heart attack.",
+      "recommendation": "Call 911 immediately.",
+      "care": {
+        "level": "emergency_911",
+        "within": "Now",
+        "where_detail": "Call 911. Do not drive yourself.",
+        "ed_redirect": [
+          "Do not hang up until help arrives"
+        ]
+      }
+    },
+    "same_day": {
+      "label": "No warning signs now: get checked today",
+      "risk": "moderate",
+      "interpretation": "You did not report current chest pain or heart attack warning signs. Chest discomfort that has stopped can still come from the heart.",
+      "recommendation": "See a clinician today to find the cause of your chest discomfort.",
+      "care": {
+        "level": "urgent_care",
+        "within": "Today",
+        "where_detail": "Urgent care or emergency department today. Tell them you had chest discomfort.",
+        "ed_redirect": [
+          "Chest pain or pressure returns: call 911",
+          "Shortness of breath, cold sweat, or fainting: call 911"
+        ],
+        "finder_specialty": "urgent_care"
+      }
+    }
+  }
+}

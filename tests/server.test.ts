@@ -116,10 +116,76 @@ describe("POST /api/log", () => {
     const res = await fetch(`${base}/api/log`, { method: "POST", body: JSON.stringify(entry) });
     expect(res.status).toBe(201);
     const text = await readFile(path.join(logDir, "outcome-log.jsonl"), "utf8");
-    expect(JSON.parse(text.trim())).toEqual(entry);
+    expect(JSON.parse(text.trim().split("\n")[0])).toEqual({ ...entry, assessment_type: "scoring_algorithm" });
   });
   it("rejects entries without consent or with free text", async () => {
     expect((await fetch(`${base}/api/log`, { method: "POST", body: JSON.stringify({ ...entry, consent: false }) })).status).toBe(400);
     expect((await fetch(`${base}/api/log`, { method: "POST", body: JSON.stringify({ ...entry, answers: { note: "my name is Bob" } }) })).status).toBe(400);
+  });
+});
+
+describe("POST /api/assessments/:id/submit", () => {
+  const post = (id: string, body: unknown) =>
+    fetch(`${base}/api/assessments/${id}/submit`, { method: "POST", body: JSON.stringify(body) });
+
+  it("diagnostic confirmation returns pattern, routing, and full audit trail", async () => {
+    const res = await post("herpes_zoster_confirmation", {
+      assessment_type: "diagnostic_confirmation",
+      answers: {
+        rash_present: true,
+        dermatomal_distribution: true,
+        prodromal_pain: true,
+        rash_onset_days: "1_to_3d",
+        ophthalmic_involvement: false,
+        red_flag_symptoms: [],
+      },
+    });
+    expect(res.status).toBe(200);
+    const b = await res.json();
+    expect(b.result).toBe("antiviral_today");
+    expect(b.pattern).toEqual({ id: "consistent", label: "Pattern CONSISTENT with herpes zoster (shingles)", matched: true });
+    expect(b.routing.care_level).toBe("urgent_care");
+    expect(b.audit_trail.findings_present).toContain("Painful rash or blisters");
+    expect(b.audit_trail.findings_absent).toContain("Eye pain or vision changes");
+    expect(b.audit_trail.pattern_match).toBe(true);
+    expect(b.session_id).toMatch(/^[0-9a-f-]{36}$/);
+    expect(b.logged).toBe(false);
+  });
+
+  it("red flag returns the emergency-only UI action", async () => {
+    const b = await (await post("ami_redflags", { assessment_type: "red_flag", answers: { chest_pain_now: true } })).json();
+    expect(b.result).toBe("emergency_stop");
+    expect(b.message).toBe("CALL 911 IMMEDIATELY");
+    expect(b.ui_action).toBe("show_emergency_screen_only");
+  });
+
+  it("scoring rules work through the same endpoint", async () => {
+    const b = await (
+      await post("centor_sore_throat", { answers: { age_group: "15_44", fever: true, no_cough: true, tender_nodes: true, exudate: false } })
+    ).json();
+    expect(b.score).toBe(3);
+    expect(b.result).toBe("moderate");
+  });
+
+  it("logs only with consent, including the assessment type", async () => {
+    const b = await (
+      await post("acute_angle_closure_glaucoma", {
+        answers: { acute_eye_pain: true, vision_blur: true, symptom_onset: "1_to_6h" },
+        user_consent_logged: true,
+      })
+    ).json();
+    expect(b.logged).toBe(true);
+    const lines = (await readFile(path.join(logDir, "outcome-log.jsonl"), "utf8")).trim().split("\n");
+    const last = JSON.parse(lines[lines.length - 1]);
+    expect(last).toMatchObject({ rule_id: "acute_angle_closure_glaucoma", assessment_type: "diagnostic_confirmation", result: "ed_now", care_level: "emergency_department" });
+    expect(last).not.toHaveProperty("ip_address");
+  });
+
+  it("rejects wrong type, unknown items, bad values, and too many missing answers", async () => {
+    expect((await post("ami_redflags", { assessment_type: "diagnostic_confirmation", answers: {} })).status).toBe(400);
+    expect((await post("ami_redflags", { answers: { nope: true } })).status).toBe(400);
+    expect((await post("appendicitis_redflags", { answers: { pain_location: "elbow" } })).status).toBe(400);
+    expect((await post("appendicitis_redflags", { answers: { pain_location: "rlq" } })).status).toBe(422);
+    expect((await post("not_a_rule", { answers: {} })).status).toBe(404);
   });
 });
