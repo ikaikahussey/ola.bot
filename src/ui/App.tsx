@@ -11,6 +11,7 @@ import { guard, parsePath, pathFor, titleFor, findFlag, type Route } from "./rou
 import { ComplaintInput, Intake, Mapping, Review, RuleMenu, StopScreen } from "./Screens";
 import { CardiacEmergency, PatternCheck, TYPE_GROUP_LABEL, TYPE_ICON } from "./Pattern";
 import type { AssessmentType } from "../engine/types";
+import { ED_MAP_URL } from "../engine/careLevels";
 import { Finder } from "./Finder";
 
 const STORAGE_KEY = "olabot.session.v1";
@@ -205,9 +206,12 @@ function Page({ route, session, setSession, navigate, restart }: PageProps) {
           </div>
           <p className="small sub">Nothing you enter is stored on a server unless you choose to share it at the end.</p>
 
+          <EmergencySigns />
+
           <h2 id="all-assessments">All {RULES.length} assessments</h2>
           <p className="small sub">
-            Choose one to start it directly. The emergency safety check always runs first. “Details” shows the questions, scoring, and source rule.
+            Choose one to start it directly. “Details” shows the questions, scoring, and source rule. “Start assessment” above asks the emergency questions
+            first and then matches your symptom to an assessment.
           </p>
           <AssessmentIndex />
         </div>
@@ -452,5 +456,67 @@ function AssessmentIndex() {
         );
       })}
     </div>
+  );
+}
+
+const SIGNS_KEY = "olabot.emergencySigns.hidden";
+
+/** Front-page list of emergency warning signs. Open by default; the viewer can hide it. */
+function EmergencySigns() {
+  const [hidden, setHidden] = useState(() => {
+    try {
+      return localStorage.getItem(SIGNS_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
+  const toggle = () => {
+    const next = !hidden;
+    setHidden(next);
+    try {
+      localStorage.setItem(SIGNS_KEY, next ? "1" : "0");
+    } catch {
+      // Storage unavailable: the choice lasts for this page view only.
+    }
+  };
+  return (
+    <section className="box alert" aria-labelledby="emergency-signs">
+      <div className="spread">
+        <h2 id="emergency-signs" style={{ margin: 0, fontSize: "1.1rem" }}>
+          🚨 Emergency warning signs
+        </h2>
+        <button className="link" onClick={toggle} aria-expanded={!hidden} aria-controls="emergency-signs-body">
+          {hidden ? "Show" : "Hide"}
+        </button>
+      </div>
+      {!hidden && (
+        <div id="emergency-signs-body" style={{ marginTop: "0.75rem" }}>
+          <p style={{ margin: "0 0 0.5rem" }}>
+            <strong>Do not use an assessment if you have any of these right now.</strong> Get emergency care instead:
+          </p>
+          <ul style={{ margin: "0 0 0.75rem", paddingLeft: "1.25rem" }}>
+            {GLOBAL_RED_FLAGS.map((f) => (
+              <li key={f.id}>
+                {f.summary}{" "}
+                <span className="small sub">
+                  ({f.action === "crisis_988" ? "call or text 988" : f.action === "go_to_ed" ? "go to the emergency room" : "call 911"})
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div className="row">
+            <a className="btn danger" href="tel:911">
+              Call 911
+            </a>
+            <a className="btn" href="tel:988">
+              Call or text 988
+            </a>
+            <a className="btn" href={ED_MAP_URL} target="_blank" rel="noreferrer">
+              Find nearest ER
+            </a>
+          </div>
+        </div>
+      )}
+    </section>
   );
 }

@@ -1,51 +1,59 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "last_updated": "2026-09-27",
   "red_flags": [
     {
       "id": "chest_pain",
+      "summary": "Chest pain, pressure, squeezing, or tightness",
       "question": "Do you have chest pain, pressure, squeezing, or tightness right now?",
       "help": "Answer yes for any discomfort in the chest, even if mild, that could be spreading to the arm, jaw, neck, or back.",
       "action": "call_911"
     },
     {
       "id": "breathing",
+      "summary": "Trouble breathing, or too short of breath to speak in full sentences",
       "question": "Are you having trouble breathing, or are you too short of breath to speak in full sentences?",
       "help": "Answer yes if breathing feels hard, fast, or noisy, or if your lips look blue or gray.",
       "action": "call_911"
     },
     {
       "id": "bleeding",
+      "summary": "Heavy bleeding, or bleeding that will not stop with firm pressure",
       "question": "Are you bleeding heavily, or bleeding that does not stop after 10 minutes of firm pressure?",
       "help": "Answer yes for blood soaking through bandages, spurting blood, vomiting blood, or large amounts of blood in stool.",
       "action": "call_911"
     },
     {
       "id": "mental_status",
+      "summary": "Confusion, very hard to wake, or acting very differently than normal",
       "question": "Is the person confused, very hard to wake up, or acting very differently than normal?",
       "help": "Answer yes if the person does not know where they are, cannot stay awake, or family says they are not acting like themselves.",
       "action": "call_911"
     },
     {
       "id": "stroke",
+      "summary": "Sudden face drooping, arm or leg weakness, trouble speaking, vision loss, or trouble walking",
       "question": "Any sudden face drooping, arm or leg weakness, trouble speaking, loss of vision, or trouble walking?",
       "help": "Ask the person to smile, raise both arms, and repeat a simple sentence. Answer yes if any of these is new and sudden.",
       "action": "call_911"
     },
     {
       "id": "allergic_reaction",
+      "summary": "Swelling of the lips, tongue, or throat, or a severe allergic reaction",
       "question": "Is there swelling of the lips, tongue, or throat, or a severe allergic reaction?",
       "help": "Answer yes for swelling in the mouth or throat, hives with trouble breathing, or feeling faint after a sting, food, or medicine.",
       "action": "call_911"
     },
     {
       "id": "abdominal_pain",
+      "summary": "Severe belly pain, the worst you have had",
       "question": "Do you have severe belly pain — the worst you have had, or so bad you cannot stand up straight?",
       "help": "Answer yes for belly pain that is severe, sudden, or with a hard, rigid belly. Mild cramps or an upset stomach are a no.",
       "action": "go_to_ed"
     },
     {
       "id": "self_harm",
+      "summary": "Thoughts of hurting yourself or ending your life",
       "question": "Are you having thoughts of hurting yourself or ending your life?",
       "help": "Answer yes if you have had any such thoughts today. Help is available right now.",
       "action": "crisis_988"

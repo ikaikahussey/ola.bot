@@ -197,17 +197,15 @@ test("every step has its own URL, and back/reload work", async ({ page }) => {
   expect(page.url()).not.toMatch(/fever|yes|15_44/);
 });
 
-test("a deep link runs the safety check first, then returns to the requested page", async ({ page }) => {
+test("a direct assessment link opens without the general safety check", async ({ page }) => {
   await page.goto("/assess/ottawa_knee");
-  await expect(page).toHaveURL("/safety/1");
-  for (let i = 0; i < 8; i++) await page.getByRole("button", { name: "No", exact: true }).click();
   await expect(page).toHaveURL("/assess/ottawa_knee");
   await expect(page.getByRole("heading", { name: /Mapping to: knee injury assessment/ })).toBeVisible();
 });
 
 test("result URL without a completed assessment redirects", async ({ page }) => {
   await page.goto("/assess/phq9/result");
-  await expect(page).toHaveURL("/safety/1");
+  await expect(page).toHaveURL("/assess/phq9");
 });
 
 test("old hash links still work, unknown paths show not found", async ({ page }) => {
@@ -321,11 +319,36 @@ test("front page links to every assessment, grouped by type", async ({ page }) =
   }
   await expect(page.getByRole("link", { name: /^Details:/ })).toHaveCount(21);
   await expect(page.getByRole("link", { name: "Rules library" })).toHaveCount(0);
-  // Starting from the list still runs the safety check first, then opens the assessment.
+  // Assessment links open directly, without the 8 general emergency questions.
   await page.getByRole("link", { name: "Sore throat assessment", exact: true }).click();
-  await expect(page).toHaveURL("/safety/1");
-  for (let i = 0; i < 8; i++) await page.getByRole("button", { name: "No", exact: true }).click();
   await expect(page).toHaveURL("/assess/centor_sore_throat");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL("/assess/centor_sore_throat/warning/1"); // the assessment's own warning signs still run
+  for (let i = 0; i < 3; i++) await page.getByRole("button", { name: "No", exact: true }).click();
+  for (const a of ["15 to 44 years", "Yes", "Yes", "Yes", "No"]) await answer(page, a);
+  await page.getByRole("button", { name: "See my result" }).click();
+  await expect(page.getByText(/General emergency questions: not asked/)).toBeVisible();
+});
+
+test("front page emergency warning signs can be hidden, and the choice is remembered", async ({ page }) => {
+  await page.goto("/");
+  const box = page.getByRole("region", { name: /Emergency warning signs/ });
+  await expect(box.getByText("Chest pain, pressure, squeezing, or tightness")).toBeVisible();
+  await expect(box.getByRole("link", { name: "Call 911" })).toHaveAttribute("href", "tel:911");
+  await box.getByRole("button", { name: "Hide" }).click();
+  await expect(box.getByText("Chest pain, pressure, squeezing, or tightness")).toHaveCount(0);
+  await page.reload();
+  await expect(box.getByRole("button", { name: "Show" })).toBeVisible();
+  await box.getByRole("button", { name: "Show" }).click();
+  await expect(box.getByText("Chest pain, pressure, squeezing, or tightness")).toBeVisible();
+});
+
+test("the general start path still asks the safety questions first", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Start assessment" }).click();
+  await expect(page).toHaveURL("/safety/1");
+  await page.goto("/symptom");
+  await expect(page).toHaveURL("/safety/1");
 });
 
 test("old /rules addresses redirect to /assessments", async ({ page }) => {

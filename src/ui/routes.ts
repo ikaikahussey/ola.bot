@@ -134,7 +134,9 @@ export function guard(r: Route, s: Session): Redirect | null {
     return null;
   }
 
-  const needsSafety = ["symptom", "choose", "confirm", "warning", "question", "check", "review", "result"].includes(r.page);
+  // The general "Start assessment" path (symptom entry) runs the safety check.
+  // Assessments opened directly skip it; the front page shows the warning signs instead.
+  const needsSafety = ["symptom", "choose"].includes(r.page);
   if (needsSafety) {
     const first = firstUnclearedSafety(s);
     if (first !== null) return { to: pathFor({ page: "safety", n: first }), remember: pathFor(r) };

@@ -235,6 +235,8 @@ export interface Rule {
 
 export interface GlobalRedFlag {
   id: string;
+  /** Short phrase for the front-page warning-signs box. */
+  summary: string;
   question: string;
   help: string;
   action: RedFlagAction;

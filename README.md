@@ -12,7 +12,7 @@ OLA BOT asks a short set of emergency questions, maps the user's main symptom to
 
 | Step | What happens | Code |
 |---|---|---|
-| 1. Red-flag screen | 8 one-question gates (chest pain, breathing, bleeding, altered mental status, stroke signs, severe allergic reaction, severe abdominal pain, self-harm). Any "yes" stops the flow and shows 911 / ED / 988. | [`rules/red_flags.json`](rules/red_flags.json) |
+| 1. Red-flag screen | On the general start path, 8 one-question gates (chest pain, breathing, bleeding, altered mental status, stroke signs, severe allergic reaction, severe abdominal pain, self-harm). Any "yes" stops the flow and shows 911 / ED / 988. | [`rules/red_flags.json`](rules/red_flags.json) |
 | 2. Complaint router | Free text is normalized and matched against an explicit keyword list. Emergency phrases ("chest pain") stop the flow. The longest keyword wins; ties show a menu; no match shows the closest rules by shared words. | [`rules/complaint_map.json`](rules/complaint_map.json), [`src/engine/router.ts`](src/engine/router.ts) |
 | 3. Rule warning signs | Rule-specific red flags (for example, drooling with a sore throat). | `red_flags` in each rule |
 | 4. Structured intake | One multiple-choice question per screen, each with "Not sure" and plain-language help. Questions can depend on earlier answers (`show_if`). | [`src/ui/App.tsx`](src/ui/App.tsx) |
@@ -37,7 +37,7 @@ Every screen has its own path, so the back button, reloads, and shared links wor
 | `/assessments`, `/assessments/:rule` | All assessments, and assessment detail with its source rule (version history, raw JSON). Old `/rules` addresses redirect here |
 | `/about` | How it works |
 
-Answers are never placed in URLs. They are kept in memory and in `sessionStorage` for the current tab only, so a reload keeps progress and closing the tab clears it. A deep link to any assessment page runs the safety check first and then returns to the requested page ([`src/ui/routes.ts`](src/ui/routes.ts)).
+Answers are never placed in URLs. They are kept in memory and in `sessionStorage` for the current tab only, so a reload keeps progress and closing the tab clears it. The general path (`/safety/:n` → `/symptom`) asks the 8 emergency questions before symptom entry. Links to a specific assessment (`/assess/:rule`, including the front-page list) open it directly; the front page shows the emergency warning signs in a box the viewer can hide, and each assessment still asks its own warning-sign questions. Results state whether the general emergency questions were asked ([`src/ui/routes.ts`](src/ui/routes.ts)).
 
 ### Missing answers
 

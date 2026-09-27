@@ -6,8 +6,7 @@ import type { Evaluation } from "../engine/evaluate";
 import { formatTimestamp, type Session } from "../engine/session";
 import { handoffSummary, tellProvider, traceLines } from "../engine/trace";
 import type { Rule } from "../engine/types";
-import { GLOBAL_RED_FLAGS } from "../rules";
-import { CAVEAT } from "./Result";
+import { CAVEAT, safetyLine } from "./Result";
 
 // jsPDF's built-in Helvetica covers Latin-1 only; map other symbols.
 export function pdfSafe(s: string): string {
@@ -82,7 +81,7 @@ export async function buildPdf({ rule, ev, session }: { rule: Rule; ev: Evaluati
   for (const s of care.ed_redirect) write(`- ${s}`, { gap: 0 });
 
   heading("What we asked");
-  write(`Safety check: answered "No" to all ${GLOBAL_RED_FLAGS.length} emergency questions${rule.red_flags.length ? ` and all ${rule.red_flags.length} warning signs for this symptom` : ""}.`);
+  write(safetyLine(rule, session));
   for (const i of ev.items) {
     if (!i.question || i.status === "not_applicable") continue;
     write(`Q: ${i.question}`, { gap: 0 });

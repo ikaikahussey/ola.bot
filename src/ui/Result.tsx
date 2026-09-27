@@ -301,8 +301,7 @@ export function WhatWeAsked({ rule, session, ev }: { rule: Rule; session: Sessio
   return (
     <div className="stack">
       <p className="small">
-        Safety check: answered “No” to all {GLOBAL_RED_FLAGS.length} emergency questions
-        {rule.red_flags.length > 0 && ` and all ${rule.red_flags.length} ${rule.assessment_title.toLowerCase()} warning signs`}.
+        {safetyLine(rule, session)}
         {session.complaint_text && <> Symptom entered: “{session.complaint_text}”.</>}
       </p>
       <table className="trace-table">
@@ -438,4 +437,14 @@ function PlainTrace({ rule, ev, answers }: { rule: Rule; ev: Evaluation; answers
       {show && <pre className="trace">{traceLines(rule, ev, answers).join("\n")}</pre>}
     </div>
   );
+}
+
+/** Describes which emergency questions were actually asked in this session. */
+export function safetyLine(rule: Rule, session: Session): string {
+  const all = GLOBAL_RED_FLAGS.every((f) => session.red_flags_cleared.includes(f.id));
+  const general = all
+    ? `Safety check: answered “No” to all ${GLOBAL_RED_FLAGS.length} emergency questions`
+    : "General emergency questions: not asked (assessment opened directly; warning signs were listed on the front page)";
+  const specific = rule.red_flags.length > 0 ? `; answered “No” to all ${rule.red_flags.length} warning signs for this assessment` : "";
+  return `${general}${specific}.`;
 }

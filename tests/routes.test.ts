@@ -57,12 +57,13 @@ describe("guard", () => {
     expect(guard({ page: "safety", n: 1 }, newSession())).toBeNull();
   });
 
-  it("deep links into an assessment go through the safety check first and are remembered", () => {
-    expect(guard({ page: "confirm", rule: "phq9" }, newSession())).toEqual({ to: "/safety/1", remember: "/assess/phq9" });
-    expect(guard({ page: "question", rule: "phq9", n: 4 }, { ...newSession(), red_flags_cleared: ["chest_pain"] })).toEqual({
-      to: "/safety/2",
-      remember: "/assess/phq9/q/4",
-    });
+  it("symptom entry requires the safety check; direct assessment links do not", () => {
+    expect(guard({ page: "symptom" }, newSession())).toEqual({ to: "/safety/1", remember: "/symptom" });
+    expect(guard({ page: "symptom" }, { ...newSession(), red_flags_cleared: ["chest_pain"] })).toEqual({ to: "/safety/2", remember: "/symptom" });
+    expect(guard({ page: "confirm", rule: "phq9" }, newSession())).toBeNull();
+    expect(guard({ page: "question", rule: "phq9", n: 1 }, { ...newSession(), rule_id: "phq9" })).toBeNull();
+    // Rule-specific warning signs still come first.
+    expect(guard({ page: "question", rule: "ottawa_ankle", n: 1 }, { ...newSession(), rule_id: "ottawa_ankle" })).toEqual({ to: "/assess/ottawa_ankle/warning/1" });
   });
 
   it("questions require the rule to be selected and its warning signs cleared", () => {
